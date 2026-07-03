@@ -3,4 +3,4 @@
 
 View the UI Design here:
 
-https://www.figma.com/design/VjK7nveGVWWoPuLpJUkqXf/Contract-Obligations-Tracking-Assistant-%E2%80%93-Group-A?node-id=0-1&t=CLTYvjzXVGSzGXTm-1
+https://www.figma.com/design/NyML0FgGMeOIo1pqKsUR4N/Contract-Obligation-Tracking-Assistant?node-id=0-1&t=qm7Vdw4owmwsovpw-1
