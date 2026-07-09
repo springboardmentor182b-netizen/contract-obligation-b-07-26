@@ -1,0 +1,128 @@
+body {
+  margin: 0;
+  background-color: #F8F7F2;
+  font-family: Arial, sans-serif;
+}
+.login-container {
+  width: 350px;
+  margin: 100px auto;
+  padding: 30px;
+  background: #FFFFFF;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+}
+h1 {
+  text-align: center;
+  color: #1A1A1A;
+}
+input {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  border: 1px solid #9CA3AF;
+  border-radius: 5px;
+  box-sizing: border-box;
+}
+input:focus {
+  outline: none;
+  border-color: #D4AF37;
+}
+button {
+  width: 100%;
+  padding: 10px;
+  background-color: #D4AF37;
+  color: #1A1A1A;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+button:hover {
+  background-color: #bf9825;
+}
+p {
+  text-align: center;
+  color: #1A1A1A
+}
+a {
+  color: #D4AF37;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+hr {
+  margin: 20px 0;
+  border: none;
+  border-top: 1px solid #9CA3AF;
+}
+
+.login-btn {
+  width: 100%;
+  padding: 12px;
+  background-color: #D4AF37;
+  color: #1A1A1A;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.login-btn:hover {
+  background-color: #bf9825;
+}
+
+.google-btn,
+.facebook-btn,
+.github-btn,
+.apple-btn {
+  width: 100%;
+  padding: 12px;
+  margin-top: 12px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.google-btn {
+  background: #F8F7F2;
+  color: #1A1A1A;
+  border: 1px solid #DADCE0;
+}
+
+.google-btn:hover {
+  background: #F1F3F4;
+}
+
+.facebook-btn {
+  background: #EAF2FF;
+  color: #1877F2;
+  border: 1px solid #BFD7FF;
+}
+
+.facebook-btn:hover {
+  background: #DCEAFF;
+}
+
+.github-btn {
+  background: #F3F4F6;
+  color: #24292E;
+  border: 1px solid #D1D5DB;
+}
+
+.github-btn:hover {
+  background: #E5E7EB;
+}
+
+.apple-btn {
+  background: #F5F5F5;
+  color: #1A1A1A;
+  border: 1px solid #D1D5DB;
+}
+
+.apple-btn:hover {
+  background: #ECECEC;
+}
