@@ -1,14 +1,7 @@
-
-
+import Dashboard from "./pages/Dashboard";
 
 function App() {
-  
-
-  return (
-  <div>
-  <h1>Hello Basant Singh</h1>
-  </div>
-  )
+  return <Dashboard />;
 }
 
-export default App
+export default App;
