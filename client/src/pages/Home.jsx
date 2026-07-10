@@ -3,23 +3,24 @@ import { Link } from 'react-router-dom'
 function Home() {
   return (
     <div className="home-page">
-      <div className="home-hero">
+      <section className="home-hero">
         <div className="home-copy">
-          <p className="page-breadcrumb">Contract Renewal Platform</p>
-          <h1>Streamline renewals, compliance, and contract lifecycle visibility</h1>
+          <p className="page-breadcrumb">Enterprise Contract Platform</p>
+          <h1>Streamline renewals, compliance, and lifecycle decisions in one command center.</h1>
           <p className="page-subtitle">
-            One place to monitor contract status, upcoming renewal deadlines, obligation milestones, and portfolio performance.
+            Monitor active deals, upcoming renewals, obligations, and portfolio health with a clear executive view.
           </p>
           <div className="home-actions">
             <Link to="/dashboard" className="btn-primary">
               Open Renewal Dashboard
             </Link>
             <a href="#overview" className="btn-secondary">
-              See the layout
+              Explore the workspace
             </a>
           </div>
         </div>
-        <div className="home-hero-panel">
+
+        <div className="hero-panel-stack">
           <div className="home-stat-card">
             <p className="stat-label">Active contracts</p>
             <p className="stat-value">244</p>
@@ -36,26 +37,20 @@ function Home() {
             <p className="stat-note">Healthy portfolio</p>
           </div>
         </div>
-      </div>
+      </section>
 
       <section id="overview" className="home-overview">
         <div className="feature-card">
-          <h2>Renewal Intelligence</h2>
-          <p>
-            Track all contract renewal windows with alerts, approval workflows, and risk flags so nothing slips through the cracks.
-          </p>
+          <h2>Renewal intelligence</h2>
+          <p>Track renewal windows, alerts, approvals, and risk flags with compact executive summaries.</p>
         </div>
         <div className="feature-card">
-          <h2>Obligation Management</h2>
-          <p>
-            Centralize obligations, due dates, and compliance tasks with context-rich status updates and ownership assignments.
-          </p>
+          <h2>Obligation management</h2>
+          <p>Centralize due dates, ownership, and task completion so every compliance milestone stays visible.</p>
         </div>
         <div className="feature-card">
-          <h2>Portfolio Visibility</h2>
-          <p>
-            Understand contract exposure by category, vendor, and region with simple charts designed for legal and finance stakeholders.
-          </p>
+          <h2>Portfolio visibility</h2>
+          <p>Understand exposure by category, partner, and region through a simple high-level dashboard.</p>
         </div>
       </section>
     </div>
