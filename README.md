@@ -3,53 +3,48 @@ Compliance Dashboard — React + FastAPI
 Feature-branch code for the Compliance Dashboard page of the Contract Obligation Tracking & Compliance Management platform (Infosys Springboard internship group project).
 
 This reproduces the Compliance Dashboard exactly as designed in the Figma file: same KPI cards, department compliance chart, risk trend chart, audit summary, audit table, risk indicators panel, sidebar navigation, top navigation, search bar, notification badge, user profile, and role badge.
-STRUCTURE
+## Structure
 
+```text
 compliance-dashboard/
-├── backend/                          FastAPI service
-│   ├── main.py                        app entrypoint + CORS
+├── backend/                          # FastAPI service
+│   ├── main.py                       # App entrypoint + CORS
 │   ├── requirements.txt
 │   └── app/
-│       ├── models.py                  Pydantic models
-│       ├── data.py                    dashboard seed data
+│       ├── models.py                 # Pydantic models
+│       ├── data.py                   # Dashboard seed data
 │       └── routers/
-│           └── dashboard.py           Dashboard API endpoints
+│           └── dashboard.py          # Dashboard API routes
 │
-└── frontend/                          React (Vite) app
+└── frontend/                         # React (Vite)
     ├── index.html
-    ├── vite.config.js                 /api proxy → localhost:8000
+    ├── vite.config.js                # Proxy /api → localhost:8000
     └── src/
         ├── App.jsx
         ├── api.js
         ├── index.css
-        │
         ├── pages/
         │   └── ComplianceDashboard.jsx
-        │
         ├── components/
         │   ├── layout/
-        │   │     ├── Sidebar.jsx
-        │   │     ├── Topbar.jsx
-        │   │     └── DashboardLayout.jsx
-        │   │
+        │   │   ├── Sidebar.jsx
+        │   │   ├── Topbar.jsx
+        │   │   └── DashboardLayout.jsx
         │   ├── cards/
-        │   │     ├── MetricCard.jsx
-        │   │     ├── SummaryCard.jsx
-        │   │     └── RiskCard.jsx
-        │   │
+        │   │   ├── MetricCard.jsx
+        │   │   ├── SummaryCard.jsx
+        │   │   └── RiskCard.jsx
         │   ├── charts/
-        │   │     ├── DepartmentChart.jsx
-        │   │     └── RiskTrendChart.jsx
-        │   │
+        │   │   ├── DepartmentChart.jsx
+        │   │   └── RiskTrendChart.jsx
         │   ├── tables/
-        │   │     └── AuditTable.jsx
-        │   │
+        │   │   └── AuditTable.jsx
         │   └── common/
-        │         ├── Avatar.jsx
-        │         ├── Badge.jsx
-        │         └── SearchBar.jsx
-        │
+        │       ├── Avatar.jsx
+        │       ├── Badge.jsx
+        │       └── SearchBar.jsx
         └── assets/
+```
  Running locally
  Backend
 cd backend
