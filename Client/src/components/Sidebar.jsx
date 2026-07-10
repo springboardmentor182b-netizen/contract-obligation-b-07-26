@@ -28,12 +28,13 @@ function Sidebar() {
 
         <div className="company-card">
           <h3>Nexora Group</h3>
-          <span>234 Contracts</span>
+          <span>Enterprise.214 Contracts</span>
         </div>
         <h4 className="menu-heading">MAIN MENU</h4>
         <ul className="menu">
           <li className="active"><FaTachometerAlt /> Dashboard</li>
           <li><FaFolderOpen /> Contract Repository</li>
+          
           <li><FaTasks /> Obligation Tracking</li>
           <li><FaSyncAlt /> Renewal Management</li>
           <li><FaShieldAlt /> Compliance Monitoring</li>
