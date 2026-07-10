@@ -1,81 +1,367 @@
-# Obligation Tracker
+ User Dashboard (React + FastAPI)
 
-Full-stack implementation of the Obligation Tracker page (React + FastAPI), matching the team's Figma design.
+A modern **User Dashboard** developed using **React.js** and **FastAPI** for managing user information, contracts, activities, notifications, and dashboard analytics. The application provides users with a centralized platform to monitor important metrics, upcoming tasks, and account activities through an intuitive and responsive interface.
 
-## Folder structure
+---
+
+# Structure
 
 ```
-obligation-tracker/
-├── backend/                        # FastAPI
-│   └── app/
-│       ├── main.py                 # app entrypoint, CORS
-│       ├── models/obligation.py    # Pydantic schemas
-│       ├── routers/obligations.py  # /obligations endpoints
-│       └── services/obligation_service.py  # in-memory data + logic
-└── frontend/                       # React (Vite)
-    └── src/
-        ├── App.jsx
-        └── features/obligationTracker/
-            ├── ObligationTrackerPage.jsx
-            ├── constants.js
-            ├── api/obligationApi.js
-            ├── hooks/useObligations.js
-            └── components/
-                ├── KanbanBoard.jsx
-                ├── KanbanColumn.jsx
-                ├── ObligationCard.jsx
-                └── AddObligationModal.jsx
+user-dashboard/
+│
+├── backend/
+│   ├── app/
+│   │   ├── api/
+│   │   ├── models/
+│   │   ├── schemas/
+│   │   ├── services/
+│   │   ├── database.py
+│   │   └── main.py
+│   │
+│   ├── requirements.txt
+│   └── README.md
+│
+├── frontend/
+│   ├── public/
+│   ├── src/
+│   │   ├── assets/
+│   │   ├── components/
+│   │   ├── layouts/
+│   │   ├── pages/
+│   │   ├── services/
+│   │   ├── hooks/
+│   │   ├── utils/
+│   │   ├── App.jsx
+│   │   └── main.jsx
+│   │
+│   ├── package.json
+│   └── vite.config.js
+│
+└── README.md
 ```
 
-## Running the backend
+---
+
+# Backend
+
+## Requirements
+
+- Python 3.10+
+- FastAPI
+- SQLAlchemy
+- Pydantic
+- Uvicorn
+
+### Install Dependencies
 
 ```bash
-cd backend
-python -m venv venv
-source venv/bin/activate        # venv\Scripts\activate on Windows
 pip install -r requirements.txt
-uvicorn app.main:app --reload --port 8000
 ```
 
-Check it's up: open http://localhost:8000/docs to see the interactive Swagger UI for all endpoints.
-
-## Running the frontend
+### Run Backend
 
 ```bash
-cd frontend
+uvicorn app.main:app --reload
+```
+
+Backend Server
+
+```
+http://localhost:8000
+```
+
+Swagger Documentation
+
+```
+http://localhost:8000/docs
+```
+
+---
+
+# Frontend
+
+## Requirements
+
+- Node.js
+- React.js
+- Vite
+- Axios
+- React Router
+
+### Install Dependencies
+
+```bash
 npm install
+```
+
+### Run Frontend
+
+```bash
 npm run dev
 ```
 
-Open http://localhost:5173 — it will fetch obligations from `http://localhost:8000/obligations`.
+Frontend Server
 
-**Important:** start the backend first, or the frontend will show a connection error banner.
-
-## API endpoints
-
-| Method | Path                          | Description                        |
-|--------|-------------------------------|-------------------------------------|
-| GET    | `/obligations/`               | List all (optional `?status=` `?priority=` filters) |
-| GET    | `/obligations/{id}`           | Get one obligation                 |
-| POST   | `/obligations/`               | Create a new obligation             |
-| PUT    | `/obligations/{id}`           | Update an obligation                |
-| PATCH  | `/obligations/{id}/status`    | Move to a new status (used by the ← → arrows on cards) |
-| DELETE | `/obligations/{id}`           | Delete an obligation                |
-
-## What's implemented vs. what's mocked
-
-- Data currently lives **in memory** in `obligation_service.py` (a Python list) — restarts will reset it. Swap in SQLAlchemy + SQLite/Postgres when you're ready to persist data; the router/service layers are already split out to make that swap isolated to `obligation_service.py`.
-- Moving cards between statuses is done via hover-arrow buttons on each card (← →) rather than full drag-and-drop, to keep the scope manageable — this can be upgraded to `react-dnd` or `dnd-kit` later if your task requires true drag-and-drop.
-- The "List" view toggle renders a simple table as a starting point; expand it if your task calls for more detail there.
-
-## Next steps for your feature branch
-
-```bash
-git checkout main
-git pull origin main
-git checkout -b feature/obligation-tracker
-# copy backend/ and frontend/ contents into your group's folder structure
-git add .
-git commit -m "Add Obligation Tracker page (React + FastAPI)"
-git push origin feature/obligation-tracker
 ```
+http://localhost:5173
+```
+
+---
+
+# Dashboard Components
+
+## Sidebar
+
+The sidebar contains:
+
+- Dashboard
+- Profile
+- Contracts
+- Compliance
+- Obligation Tracker
+- Reports
+- Notifications
+- Settings
+- Logout
+
+---
+
+## Top Navigation
+
+The top navigation includes:
+
+- Dashboard Title
+- Search Bar
+- Notifications
+- User Profile
+- Settings
+
+---
+
+## Dashboard Cards
+
+The dashboard displays the following KPI cards:
+
+- Active Contracts
+- Pending Obligations
+- Upcoming Renewals
+- Compliance Score
+- Expiring Contracts
+
+Each card contains
+
+- Icon
+- Count
+- Status
+- Description
+
+---
+
+## Contract Activity Chart
+
+Displays monthly contract statistics.
+
+Shows
+
+- Created Contracts
+- Renewed Contracts
+- Terminated Contracts
+
+---
+
+## Portfolio Distribution
+
+Displays contract distribution by category.
+
+Categories
+
+- Vendor
+- Employment
+- Lease
+- Software
+- NDA
+- Others
+
+---
+
+## Recent Activities
+
+Displays user activities including
+
+- Contract Created
+- Contract Updated
+- Approval Submitted
+- Profile Updated
+- Notification Received
+
+---
+
+## Upcoming Deadlines
+
+Shows
+
+- Contract Renewals
+- Compliance Reports
+- Insurance Renewal
+- Audit Completion
+- License Renewal
+
+Status badges
+
+- Pending
+- In Progress
+- Completed
+- Overdue
+
+---
+
+# User Profile
+
+Displays
+
+- User Name
+- Email
+- Role
+- Department
+- Profile Picture
+
+---
+
+# Search
+
+Users can search for
+
+- Contracts
+- Obligations
+- Reports
+- Notifications
+
+---
+
+# API Endpoints
+
+| Method | Endpoint | Description |
+|---------|----------|-------------|
+| GET | /api/dashboard | Dashboard Summary |
+| GET | /api/contracts | Fetch Contracts |
+| GET | /api/activities | Recent Activities |
+| GET | /api/deadlines | Upcoming Deadlines |
+| GET | /api/profile | User Profile |
+| GET | /api/notifications | Notifications |
+
+---
+
+# Sample API Responses
+
+### GET /api/dashboard
+
+```json
+{
+    "activeContracts": 247,
+    "pendingObligations": 41,
+    "renewals": 23,
+    "complianceScore": 94.2
+}
+```
+
+### GET /api/profile
+
+```json
+{
+    "name": "Sarah Chen",
+    "role": "Legal Manager",
+    "department": "Legal"
+}
+```
+
+### GET /api/activities
+
+```json
+[
+    {
+        "title": "Created New Contract",
+        "time": "10 minutes ago"
+    }
+]
+```
+
+### GET /api/deadlines
+
+```json
+[
+    {
+        "title": "Compliance Report",
+        "status": "Pending"
+    }
+]
+```
+
+---
+
+# Technologies Used
+
+## Frontend
+
+- React.js
+- Vite
+- Axios
+- React Router
+- CSS / Tailwind CSS
+- Chart.js / Recharts
+
+## Backend
+
+- FastAPI
+- Python
+- SQLAlchemy
+- Pydantic
+- Uvicorn
+
+## Database
+
+- MySQL / PostgreSQL / SQLite
+
+---
+
+# Features
+
+ Responsive Dashboard
+
+ Modern UI
+
+ Sidebar Navigation
+
+ Search Functionality
+
+ User Profile
+
+ Dashboard Analytics
+
+Contract Overview
+
+Activity Timeline
+
+ Upcoming Deadlines
+
+ Notifications
+
+ REST API Integration
+
+---
+
+# Future Enhancements
+
+- JWT Authentication
+- Role-Based Access Control
+- Dark Mode
+- Email Notifications
+- PDF Report Export
+- Excel Export
+- Real-Time Dashboard
+- Audit Logs
+
+---
+
+# Notes
+
+This project is built using **React.js** for the frontend and **FastAPI** for the backend. The dashboard provides users with a centralized platform to monitor contracts, compliance, notifications, and daily activities. The architecture is modular, scalable, and easy to extend for enterprise-level applications.
