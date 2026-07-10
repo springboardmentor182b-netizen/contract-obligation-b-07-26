@@ -1,4 +1,4 @@
-Compliance Dashboard — React + FastAPI
+**Compliance Dashboard — React + FastAPI**
 
 Feature-branch code for the Compliance Dashboard page of the Contract Obligation Tracking & Compliance Management platform (Infosys Springboard internship group project).
 
