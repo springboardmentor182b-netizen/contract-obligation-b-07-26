@@ -44,9 +44,11 @@ compliance-dashboard/
         │       ├── Badge.jsx
         │       └── SearchBar.jsx
         └── assets/
-```
- Running locally
- Backend
+## Running Locally
+
+### Backend
+
+```bash
 cd backend
 
 python -m venv venv
@@ -60,237 +62,277 @@ source venv/bin/activate
 pip install -r requirements.txt
 
 uvicorn main:app --reload --port 8000
-Swagger documentation
+```
 
+FastAPI Swagger documentation is available at:
+
+```text
 http://localhost:8000/docs
-Frontend
+```
+
+---
+
+### Frontend
+
+```bash
 cd frontend
 
 npm install
 
 npm run dev
+```
 
-Runs on
+The application runs at:
 
+```text
 http://localhost:5173
+```
 
-The Vite development server proxies every
+The Vite development server automatically proxies all `/api/*` requests to the FastAPI backend running on **http://localhost:8000**, so no additional `.env` configuration is required during development.
 
-/api/*
+---
 
-request to
+# Dashboard Components
 
-http://localhost:8000
+## Sidebar
 
-No .env configuration is required during development.
+The sidebar includes:
 
-Dashboard Components
-Sidebar
+- ContractIQ Logo
+- User Profile
+- Dashboard
+- Compliance (Active)
+- Contract Repository
+- Obligation Tracker
+- Reports & Export
+- Notification Center
 
-Contains
+---
 
-ContractIQ Logo
-User Profile
-Dashboard
-Compliance (Active)
-Contract Repository
-Obligation Tracker
-Reports & Export
-Notification Center
-Top Navigation
+## Top Navigation
 
-Contains
+The top navigation bar contains:
 
-Search contracts & obligations
-Notification Bell
-User Avatar
-Username
-Role Badge
-KPI Cards
+- Search Contracts & Obligations
+- Notification Bell
+- User Avatar
+- Username
+- Role Badge
 
-Displays
+---
 
-Overall Compliance
+## KPI Cards
 
-Missed Deadlines
+The dashboard displays four key metrics:
 
-Risk Flags
+- Overall Compliance
+- Missed Deadlines
+- Risk Flags
+- Audits Completed
 
-Audits Completed
+Each card contains:
 
-Each card displays
+- Icon
+- Current Value
+- Trend Indicator
+- Description
 
-Icon
-Current Value
-Trend
-Description
-Department Compliance Chart
+---
 
-Horizontal bar chart
+## Department Compliance Chart
 
-Departments
+A horizontal bar chart displays compliance scores for:
 
-Legal
+- Legal
+- Finance
+- HR
+- IT
+- Operations
+- Procurement
 
-Finance
+---
 
-HR
+## Risk Trend Chart
 
-IT
+A line chart visualizes compliance risk trends across the first half of 2024:
 
-Operations
+- January
+- February
+- March
+- April
+- May
+- June
 
-Procurement
+---
 
-Displays compliance percentage.
+## Audit Summary
 
-Risk Trend Chart
+The dashboard displays:
 
-Line chart showing
+- Total Audits: **22**
+- Completed: **18**
+- In Progress: **3**
+- Failed: **1**
 
-Jan
+---
 
-Feb
+## Audit Table
 
-Mar
+The audit table contains the following columns:
 
-Apr
+- Audit
+- Department
+- Auditor
+- Status
+- Score
 
-May
+Supported status badges:
 
-Jun
+- Completed
+- In Progress
+- Terminated
 
-Risk trend across H1 2024.
+---
 
-Audit Summary
+## Risk Indicators
 
-Displays
+Displays:
 
-22 Total Audits
+- Expired Contracts with Active Obligations
+- Contracts Without Designated Owner
+- Obligations Past Due Date
+- Missing Compliance Documentation
+- Unreviewed Renewal Notices
 
-18 Completed
+Each indicator displays:
 
-3 In Progress
+- Severity Badge
+- Number of Affected Items
 
-1 Failed
-Audit Table
+---
 
-Columns
+# API Endpoints
 
-Audit
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/dashboard/metrics` | Retrieve KPI metrics |
+| GET | `/api/dashboard/departments` | Retrieve department compliance scores |
+| GET | `/api/dashboard/risk-trend` | Retrieve monthly risk trend |
+| GET | `/api/dashboard/audits` | Retrieve audit table data |
+| GET | `/api/dashboard/risks` | Retrieve risk indicators |
 
-Department
+---
 
-Auditor
+# Sample API Responses
 
-Status
+### GET `/api/dashboard/metrics`
 
-Score
-
-Supports
-
-Completed
-In Progress
-Terminated
-
-status badges.
-
-Risk Indicators
-
-Displays
-
-Expired Contracts
-
-Contracts without Owner
-
-Past Due Obligations
-
-Missing Documentation
-
-Renewal Notices
-
-Each card contains
-
-Severity badge
-Number of affected items
-API Endpoints
-Method	Endpoint	Purpose
-GET	/api/dashboard/metrics	KPI cards
-GET	/api/dashboard/departments	Department compliance chart
-GET	/api/dashboard/risk-trend	Risk trend chart
-GET	/api/dashboard/audits	Audit summary table
-GET	/api/dashboard/risks	Risk indicator panel
-Sample Responses
-GET /api/dashboard/metrics
+```json
 {
   "overallCompliance": 94.2,
   "missedDeadlines": 3,
   "riskFlags": 5,
   "auditsCompleted": "18/22"
 }
-GET /api/dashboard/departments
-[
-  { "department":"Legal","score":98 },
-  { "department":"Finance","score":91 },
-  { "department":"HR","score":87 },
-  { "department":"IT","score":95 },
-  { "department":"Operations","score":80 },
-  { "department":"Procurement","score":89 }
-]
-GET /api/dashboard/audits
+```
+
+### GET `/api/dashboard/departments`
+
+```json
 [
   {
-    "audit":"Q2 Vendor Contracts Audit",
-    "department":"Procurement",
-    "auditor":"David Park",
-    "status":"Completed",
-    "score":97
+    "department": "Legal",
+    "score": 98
+  },
+  {
+    "department": "Finance",
+    "score": 91
+  },
+  {
+    "department": "HR",
+    "score": 87
+  },
+  {
+    "department": "IT",
+    "score": 95
+  },
+  {
+    "department": "Operations",
+    "score": 80
+  },
+  {
+    "department": "Procurement",
+    "score": 89
   }
 ]
-GET /api/dashboard/risks
+```
+
+### GET `/api/dashboard/audits`
+
+```json
 [
   {
-    "title":"Expired contracts with active obligations",
-    "level":"High",
-    "count":2
+    "audit": "Q2 Vendor Contracts Audit",
+    "department": "Procurement",
+    "auditor": "David Park",
+    "status": "Completed",
+    "score": 97
   }
 ]
-Libraries
-Frontend
-React
+```
 
-Vite
+### GET `/api/dashboard/risks`
 
-Axios
+```json
+[
+  {
+    "title": "Expired Contracts with Active Obligations",
+    "level": "High",
+    "count": 2
+  }
+]
+```
 
-React Router
+---
 
-Recharts
+# Technologies Used
 
-React Icons
-Backend
-FastAPI
+## Frontend
 
-Pydantic
+- React
+- Vite
+- Axios
+- React Router
+- Recharts
+- React Icons
 
-Uvicorn
+## Backend
 
-Python 3.11+
-Notes
+- FastAPI
+- Pydantic
+- Uvicorn
+- Python 3.11+
 
-This implementation recreates the Compliance Dashboard directly from the approved Figma design.
+---
 
-Current version includes:
+# Notes
 
-Pixel-matched page layout
-Responsive sidebar and top navigation
-KPI metric cards
-Department compliance chart
-Risk trend line chart
-Audit summary cards
-Audit table with status badges
-Risk indicators panel
-FastAPI backend with mock seed data
-Fully separated React components for maintainability
+This implementation recreates the **Compliance Dashboard** from the approved Figma design.
 
-The current implementation uses mock data stored in backend/app/data.py. When backend integration is complete, these seed values can be replaced with data from your database or business logic without requiring changes to the frontend components.
+### Features Included
+
+- Responsive dashboard layout
+- Sidebar navigation
+- Top navigation bar
+- KPI metric cards
+- Department compliance chart
+- Risk trend line chart
+- Audit summary cards
+- Audit table with status badges
+- Risk indicators panel
+- FastAPI backend with mock data
+- Modular and reusable React components
+
+The current implementation uses mock data stored in `backend/app/data.py`. During backend integration, these mock values can be replaced with live database data without requiring changes to the frontend components.
+```
+business logic without requiring changes to the frontend components.
