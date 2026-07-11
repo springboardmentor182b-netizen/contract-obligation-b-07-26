@@ -1,43 +1,21 @@
-import { useState } from 'react'
-import Sidebar from './layout/Sidebar'
-import Navbar from './layout/Navbar'
-import PageContainer from './layout/PageContainer'
-import './assets/global.css'
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import ForgotPassword from "./pages/ForgotPassword";
+import Dashboard from "./pages/Dashboard";
 
 function App() {
-  const [sidebarOpen, setSidebarOpen] = useState(true)
-
   return (
-    <div className={`app-shell ${sidebarOpen ? 'sidebar-open' : 'sidebar-closed'}`}>
-      <Sidebar open={sidebarOpen} onToggle={() => setSidebarOpen(prev => !prev)} />
-      <div className="main-content">
-        <Navbar onToggle={() => setSidebarOpen(prev => !prev)} />
-        <PageContainer>
-          <div className="dashboard-hero">
-            <div className="dashboard-header">
-              <div className="header-copy">
-                <p className="page-breadcrumb">Renewal Management</p>
-                <h1>Renewal Management</h1>
-                <p className="page-subtitle">
-                  All contract renewals, approvals, reminders, and analytics in one place
-                </p>
-              </div>
-              <div className="header-actions">
-                <button className="btn-secondary">Export</button>
-                <button className="btn-primary">Add Renewal</button>
-              </div>
-            </div>
-            <div className="hero-content">
-              <div className="dashboard-panel blank-panel">
-                <div className="panel-title">Overview panel</div>
-                <div className="panel-empty">This area is ready for your contract renewal widgets.</div>
-              </div>
-            </div>
-          </div>
-        </PageContainer>
-      </div>
-    </div>
-  )
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+      </Routes>
+    </BrowserRouter>
+  );
 }
 
-export default App
+export default App;
