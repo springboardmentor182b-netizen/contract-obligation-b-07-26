@@ -1,4 +1,30 @@
+# Dependencies and build output
+node_modules/
+dist/
+
+# Python virtual environments and cache files
+venv/
+.venv/
 __pycache__/
 *.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Test and coverage output
+.coverage
+coverage.xml
+htmlcov/
+
+# Local ContractIQ data and configuration
 server/data/
-server/venv/
+.env
+.env.*
+!.env.example
+*.local
+
+# Editor and operating-system files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

@@ -1,7 +1,7 @@
-export default function formatCurrency(value, currency = 'INR') {
+export const formatCurrency = (value) => {
   return new Intl.NumberFormat('en-IN', {
     style: 'currency',
-    currency,
-    maximumFractionDigits: 2,
-  }).format(value)
-}
+    currency: 'INR',
+    minimumFractionDigits: 0,
+  }).format(value);
+};
