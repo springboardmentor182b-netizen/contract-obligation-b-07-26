@@ -1,0 +1,1 @@
+import React from 'react';\r\nimport UserDashboardScreen from './UserDashboardScreen';\r\n\r\nexport default function UserDashboard() {\r\n  return <UserDashboardScreen />;\r\n}\r\n
