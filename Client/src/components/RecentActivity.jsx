@@ -10,6 +10,8 @@ import {
 const activities = [
   {
     icon: <FaUpload />,
+    color: "#3b82f6",
+    bg: "#eff6ff",
     title: "Contract uploaded",
     description:
       "Goldman Sachs Advisory Services uploaded by Marcus Reid",
@@ -17,6 +19,8 @@ const activities = [
   },
   {
     icon: <FaCheckCircle />,
+    color: "#22c55e",
+    bg: "#ecfdf5",
     title: "Contract approved",
     description:
       "SaaS Platform License – Salesforce approved by CEO",
@@ -24,6 +28,8 @@ const activities = [
   },
   {
     icon: <FaClock />,
+    color: "#f59e0b",
+    bg: "#fff7ed",
     title: "Renewal reminder sent",
     description:
       "Office Lease – Floor 12 & 13 renewal reminder dispatched",
@@ -31,6 +37,8 @@ const activities = [
   },
   {
     icon: <FaExclamationTriangle />,
+    color: "#ef4444",
+    bg: "#fef2f2",
     title: "Compliance issue detected",
     description:
       "Data Processing Agreement flagged for GDPR gap",
@@ -38,6 +46,8 @@ const activities = [
   },
   {
     icon: <FaUserPlus />,
+    color: "#8b5cf6",
+    bg: "#f5f3ff",
     title: "New user added",
     description:
       "Priya Nair added as Contract Owner role",
@@ -45,6 +55,8 @@ const activities = [
   },
   {
     icon: <FaHistory />,
+    color: "#f97316",
+    bg: "#fff7ed",
     title: "Version updated",
     description:
       "Senior VP Employment Agreement updated to v2.0",
@@ -57,27 +69,33 @@ function RecentActivity() {
     <div className="recent-activity">
 
       <div className="activity-header">
-        <div>
-          <h2>Recent Activity</h2>
-          
-        </div>
+        <h2>Recent Activity</h2>
+
+        <span className="view-all">
+          View all
+        </span>
       </div>
 
       {activities.map((item, index) => (
         <div className="activity-item" key={index}>
 
-          <div className="activity-icon">
+          <div
+            className="activity-icon"
+            style={{
+              backgroundColor: item.bg,
+              color: item.color,
+            }}
+          >
             {item.icon}
           </div>
 
           <div className="activity-content">
             <h4>{item.title}</h4>
             <p>{item.description}</p>
+            <span className="activity-time">
+              {item.time}
+            </span>
           </div>
-
-          <span className="activity-time">
-            {item.time}
-          </span>
 
         </div>
       ))}

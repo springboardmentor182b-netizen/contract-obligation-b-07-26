@@ -3,7 +3,7 @@ import { FaEye, FaEdit, FaDownload } from "react-icons/fa";
 const contracts = [
   {
     id: "CTR-2024-001",
-    name: "Microsoft Azure Enterprise",
+    name: "Microsoft Azure Enterprise Agreement",
     category: "Vendor",
     dept: "IT",
     owner: "Sarah Chen",
@@ -13,7 +13,7 @@ const contracts = [
   },
   {
     id: "CTR-2024-002",
-    name: "Goldman Sachs Services",
+    name: "Goldman Sachs Advisory Services",
     category: "Service",
     dept: "Finance",
     owner: "Marcus Reid",
@@ -23,7 +23,7 @@ const contracts = [
   },
   {
     id: "CTR-2024-003",
-    name: "Senior VP Employment",
+    name: "Senior VP Employment Agreement",
     category: "Employment",
     dept: "HR",
     owner: "Priya Nair",
@@ -33,7 +33,7 @@ const contracts = [
   },
   {
     id: "CTR-2024-004",
-    name: "Office Lease - Floor 5",
+    name: "Office Lease - Floor 12 & 13",
     category: "Lease",
     dept: "Operations",
     owner: "Tom Weston",
@@ -43,7 +43,7 @@ const contracts = [
   },
   {
     id: "CTR-2024-005",
-    name: "Supplier NDA",
+    name: "Supplier NDA - Techparts Ltd",
     category: "NDA",
     dept: "Procurement",
     owner: "Dana Kim",
@@ -53,7 +53,7 @@ const contracts = [
   },
   {
     id: "CTR-2024-006",
-    name: "SaaS Platform License",
+    name: "SaaS Platform License - Salesforce",
     category: "Vendor",
     dept: "Sales",
     owner: "Alex Ruiz",
@@ -63,7 +63,7 @@ const contracts = [
   },
   {
     id: "CTR-2024-007",
-    name: "Strategic Partnership",
+    name: "Strategic Partnership - Deloitte",
     category: "Partnership",
     dept: "Legal",
     owner: "Nia Foster",
@@ -73,7 +73,7 @@ const contracts = [
   },
   {
     id: "CTR-2024-008",
-    name: "Data Processing Agreement",
+    name: "Data Processing Agreement - EU",
     category: "Compliance",
     dept: "Legal",
     owner: "James Park",
@@ -114,7 +114,7 @@ function RecentContracts() {
               <th>Status</th>
               <th>Renewal</th>
               <th>Ver</th>
-              <th>Actions</th>
+              <th></th>
             </tr>
           </thead>
 
@@ -126,7 +126,7 @@ function RecentContracts() {
 
                 <td>{item.id}</td>
 
-                <td>{item.name}</td>
+                <td title={item.name}>{item.name}</td>
 
                 <td>{item.category}</td>
 
@@ -140,6 +140,7 @@ function RecentContracts() {
                       .toLowerCase()
                       .replace(/\s/g, "-")}`}
                   >
+                    <span className="status-dot"></span>
                     {item.status}
                   </span>
                 </td>
@@ -165,21 +166,6 @@ function RecentContracts() {
         </table>
 
       </div>
-
-      <div className="table-footer">
-
-        <span>Showing 1–8 of 214 Contracts</span>
-
-        <div className="pagination">
-          <button>{"<"}</button>
-          <button className="active-page">1</button>
-          <button>2</button>
-          <button>3</button>
-          <button>{">"}</button>
-        </div>
-
-      </div>
-
     </div>
   );
 }

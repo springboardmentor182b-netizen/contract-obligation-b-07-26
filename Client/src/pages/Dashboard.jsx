@@ -6,7 +6,17 @@ import ComplianceLevels from "../components/ComplianceLevels";
 import "../styles/dashboard.css";
 import ContractsByDepartment from "../components/ContractsByDepartment";
 import RecentActivity from "../components/RecentActivity";
+import ContractStatus from "../components/ContractStatus";
 import UpcomingRenewals from"../components/UpcomingRenewals";
+import ContractGrowth from "../components/ContractGrowth";
+import ComplianceSummary from "../components/ComplianceSummary";
+import Footer from "../components/Footer";
+import{
+  FiUpload,
+  FiPlus,
+  FiClipboard,
+  FiDownload
+}from "react-icons/fi";
 
 function Dashboard() {
   return (
@@ -19,8 +29,24 @@ function Dashboard() {
         <Navbar />
 
         <div className="dashboard-header">
-          <h1>Dashboard Overview</h1>
-          <p>Welcome back, Jennifer. Here is your compliance snapshot for today.</p>
+          <div>
+            <h1>Dashboard Overview</h1>
+            <p>Welcome back, Jennifer. Here is your compliance snapshot for today.</p>
+          </div>
+          <div className="header-actions">
+            <button className="action-btn">
+              <FiUpload/>
+            </button>
+            <button className="action-btn">
+              <FiPlus/>
+            </button>
+            <button className="action-btn">
+              <FiClipboard/>
+            </button>
+            <button className="action-btn download">
+              <FiDownload/>
+            </button>
+          </div>
         </div>
 
         <div className="cards">
@@ -66,30 +92,25 @@ function Dashboard() {
         <div className="dashboard-grid">
 
           <div className="left-column">
-
-            <div className="card-placeholder">
-              <h2>Contract Growth</h2>
-              <p>Graph will be added here.</p>
-            </div>
+            <ContractGrowth/>
+            <ContractStatus/>
+            <ContractsByDepartment/>
             <ComplianceLevels/>
-            {/*<ContractsByDepartment/>*/}
             <RecentContracts />
             <RecentActivity/>
             <UpcomingRenewals/>
-
+            <ComplianceSummary/>
+            <Footer/>
           </div>
 
           <div className="right-column">
-
-          
-
-            
-            
-
           </div>
 
         </div>
-
+      <div className="help-button">
+        ?
+        <span className="help-tooltip">Help & Resources</span>
+      </div>
       </main>
 
     </div>
