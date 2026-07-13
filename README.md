@@ -1,3 +1,4 @@
+ GROUP-C-Feature/User-DashBoard/Harshitha
 User Dashboard (React + FastAPI)
 
 A modern **User Dashboard** developed using **React.js** and **FastAPI** for managing user information, contracts, activities, notifications, and dashboard analytics. The application provides users with a centralized platform to monitor important metrics, upcoming tasks, and account activities through an intuitive and responsive interface.
@@ -147,7 +148,7 @@ Each card contains
 - Status
 - Description
 
----
+
 
 ## Contract Activity Chart
 
@@ -350,3 +351,11 @@ Notifications
 # Notes
 
 This project is built using **React.js** for the frontend and **FastAPI** for the backend. The dashboard provides users with a centralized platform to monitor contracts, compliance, notifications, and daily activities. The architecture is modular, scalable, and easy to extend for enterprise-level applications.
+
+# contract-obligation-b-07-26
+## 🎨 Figma Design
+
+View the UI Design here:
+
+https://www.figma.com/design/NyML0FgGMeOIo1pqKsUR4N/Contract-Obligation-Tracking-Assistant?node-id=0-1&t=qm7Vdw4owmwsovpw-1
+ main-group-C
