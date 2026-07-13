@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   BarChart,
   Bar,
@@ -6,27 +6,87 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
+  Cell,
+  LabelList,
 } from "recharts";
-import { departments } from "../../Data/dashboardData";
+import api from "../../api";
 
 const DepartmentChart = () => {
-  return (
-    <div
-      style={{
-        background: "#fff",
-        borderRadius: "12px",
-        padding: "20px",
-        boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-      }}
-    >
-      <h3 style={{ marginBottom: "20px" }}>Department Compliance</h3>
+  const [departments, setDepartments] = useState([]);
 
-      <ResponsiveContainer width="100%" height={300}>
-        <BarChart data={departments}>
-          <XAxis dataKey="department" />
-          <YAxis domain={[0, 100]} />
+  useEffect(() => {
+    loadDepartments();
+  }, []);
+
+  const loadDepartments = async () => {
+    try {
+      const response = await api.get("/dashboard/departments");
+      setDepartments(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const getBarColor = (department, score) => {
+  // Green if score is at or above target (90%)
+  // Red otherwise
+
+  if (score >= 90) {
+    return "#10B981"; // Green
+  }
+
+  return "#EF4444"; // Red
+};
+
+  return (
+    <div className="chart-card">
+      <h3 style={{ marginBottom: "20px" }}>
+        Department Compliance
+      </h3>
+
+      <ResponsiveContainer width="100%" height={360}>
+        <BarChart
+          layout="vertical"
+          data={departments}
+          margin={{
+            top: 5,
+            right: 30,
+            left: 30,
+            bottom: 5,
+          }}
+        >
+          <XAxis
+            type="number"
+            domain={[0, 100]}
+            hide
+          />
+
+          <YAxis
+            type="category"
+            dataKey="department"
+            width={100}
+          />
+
           <Tooltip />
-          <Bar dataKey="score" fill="#2563eb" radius={[6, 6, 0, 0]} />
+
+          <Bar
+            dataKey="score"
+            radius={[0, 8, 8, 0]}
+            barSize={12}
+          >
+            {departments.map((entry, index) => (
+              <Cell
+  key={index}
+  fill={getBarColor(entry.department, entry.score)}
+/>
+            ))}
+
+            <LabelList
+              dataKey="score"
+              position="right"
+              formatter={(value) => `${value}%`}
+            />
+          </Bar>
         </BarChart>
       </ResponsiveContainer>
     </div>

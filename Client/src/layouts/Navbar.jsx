@@ -1,10 +1,14 @@
 import React from "react";
-import { FaBell, FaSearch } from "react-icons/fa";
+import {
+  FaBell,
+  FaSearch,
+  FaSignOutAlt,
+} from "react-icons/fa";
 
 const Navbar = () => {
   return (
-    <div className="navbar">
-
+    <header className="navbar">
+      {/* Search */}
       <div className="search-box">
         <FaSearch className="search-icon" />
 
@@ -14,28 +18,42 @@ const Navbar = () => {
         />
       </div>
 
+      {/* Right Side */}
       <div className="navbar-right">
 
+        {/* Notification */}
         <div className="notification">
           <FaBell />
+
+          <span className="notification-count">
+            3
+          </span>
         </div>
 
+        {/* User */}
         <div className="user-info">
 
           <div className="user-avatar">
-            R
+            SC
           </div>
 
-          <div>
-            <h4>Rakhi</h4>
-            <small>Administrator</small>
+          <div className="user-details">
+            <h4 className="user-name">Sarah Chen</h4>
+
+<p className="user-role">
+  Compliance Officer
+</p>
           </div>
 
         </div>
 
-      </div>
+        {/* Logout */}
+        <div className="logout-btn">
+          <FaSignOutAlt />
+        </div>
 
-    </div>
+      </div>
+    </header>
   );
 };
 

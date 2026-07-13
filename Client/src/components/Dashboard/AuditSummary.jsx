@@ -1,53 +1,92 @@
-import React from "react";
-import { auditSummary } from "../../Data/dashboardData";
-
-const cardStyle = {
-  flex: 1,
-  background: "#fff",
-  borderRadius: "12px",
-  padding: "20px",
-  textAlign: "center",
-  boxShadow: "0 2px 8px rgba(0,0,0,0.08)",
-};
+import React, { useEffect, useState } from "react";
+import api from "../../api";
 
 const AuditSummary = () => {
+  const [auditSummary, setAuditSummary] = useState({
+    total: 0,
+    completed: 0,
+    inProgress: 0,
+    failed: 0,
+  });
+
+  useEffect(() => {
+    loadAuditSummary();
+  }, []);
+
+  const loadAuditSummary = async () => {
+    try {
+      const response = await api.get("/dashboard/audits");
+
+      const audits = response.data;
+
+      setAuditSummary({
+        total: audits.length,
+        completed: audits.filter(
+          (a) => a.status === "Completed"
+        ).length,
+        inProgress: audits.filter(
+          (a) => a.status === "In Progress"
+        ).length,
+        failed: audits.filter(
+          (a) => a.status === "Terminated"
+        ).length,
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const cards = [
+    {
+      title: "Total Audits",
+      value: auditSummary.total,
+      color: "#111827",
+    },
+    {
+      title: "Completed",
+      value: auditSummary.completed,
+      color: "#22C55E",
+    },
+    {
+      title: "In Progress",
+      value: auditSummary.inProgress,
+      color: "#F59E0B",
+    },
+    {
+      title: "Failed",
+      value: auditSummary.failed,
+      color: "#EF4444",
+    },
+  ];
+
   return (
-    <div style={{ marginTop: "40px" }}>
-      <h2 style={{ marginBottom: "20px" }}>Audit Summary</h2>
+    <div className="audit-summary-section">
 
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(4,1fr)",
-          gap: "20px",
-        }}
-      >
-        <div style={cardStyle}>
-          <h1>{auditSummary.total}</h1>
-          <p>Total Audits</p>
-        </div>
+      <h2 className="section-heading">
+        Audit Summary
+      </h2>
 
-        <div style={cardStyle}>
-          <h1 style={{ color: "#16a34a" }}>
-            {auditSummary.completed}
-          </h1>
-          <p>Completed</p>
-        </div>
+      <div className="audit-summary">
 
-        <div style={cardStyle}>
-          <h1 style={{ color: "#f59e0b" }}>
-            {auditSummary.inProgress}
-          </h1>
-          <p>In Progress</p>
-        </div>
+        {cards.map((card, index) => (
+          <div
+            key={index}
+            className="summary-card"
+          >
+            <h1
+              style={{
+                color: card.color,
+              }}
+            >
+              {card.value}
+            </h1>
 
-        <div style={cardStyle}>
-          <h1 style={{ color: "#dc2626" }}>
-            {auditSummary.failed}
-          </h1>
-          <p>Failed</p>
-        </div>
+            <p>{card.title}</p>
+          </div>
+        ))}
+
       </div>
+
     </div>
   );
 };

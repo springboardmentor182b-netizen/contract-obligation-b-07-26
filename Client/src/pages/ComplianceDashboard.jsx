@@ -3,7 +3,6 @@ import "../assets/dashboard.css";
 
 import api from "../api";
 
-
 import PageContainer from "../layouts/PageContainer";
 import KpiCard from "../components/Dashboard/KpiCard";
 import DepartmentChart from "../components/Dashboard/DepartmentChart";
@@ -11,8 +10,6 @@ import RiskTrendChart from "../components/Dashboard/RiskTrendChart";
 import AuditSummary from "../components/Dashboard/AuditSummary";
 import AuditTable from "../components/Dashboard/AuditTable";
 import RiskIndicators from "../components/Dashboard/RiskIndicators";
-
-import { metrics } from "../Data/dashboardData";
 
 const ComplianceDashboard = () => {
   const [metrics, setMetrics] = useState([]);
@@ -23,53 +20,59 @@ const ComplianceDashboard = () => {
 
   const loadDashboard = async () => {
     try {
-      const response = await api.get("/api/dashboard/metrics");
+      const response = await api.get("/dashboard/metrics");
 
       setMetrics([
         {
           id: 1,
           title: "Overall Compliance",
           value: response.data.overallCompliance + "%",
-          trend: "+1.8%",
-          color: "#16a34a",
+          trend: "+1.8% vs last qtr",
+          color: "#22C55E",
         },
         {
           id: 2,
           title: "Missed Deadlines",
           value: response.data.missedDeadlines,
           trend: "Current",
-          color: "#dc2626",
+          color: "#EF4444",
         },
         {
           id: 3,
           title: "Risk Flags",
           value: response.data.riskFlags,
           trend: "Current",
-          color: "#f59e0b",
+          color: "#F59E0B",
         },
         {
           id: 4,
           title: "Audits Completed",
           value: response.data.auditsCompleted,
           trend: "Current",
-          color: "#2563eb",
+          color: "#3B82F6",
         },
       ]);
     } catch (error) {
       console.error(error);
     }
   };
+
   return (
     <PageContainer>
       <div className="dashboard-content">
 
-        <h1 className="dashboard-title">
-          Compliance Dashboard
-        </h1>
+        {/* Header */}
+        <div className="dashboard-header">
+          <div>
+            <h1 className="dashboard-title">
+              Compliance Dashboard
+            </h1>
 
-        <p className="dashboard-subtitle">
-          Monitor compliance performance across departments.
-        </p>
+            <p className="dashboard-subtitle">
+              June 3, 2024
+            </p>
+          </div>
+        </div>
 
         {/* KPI Cards */}
         <div className="kpi-grid">
@@ -90,14 +93,19 @@ const ComplianceDashboard = () => {
           <RiskTrendChart />
         </div>
 
-        {/* Audit Summary */}
-        <AuditSummary />
+        {/* Bottom Section */}
+        <div className="bottom-grid">
 
-        {/* Audit Table */}
-        <AuditTable />
+          <div className="left-section">
+            <AuditSummary />
+            <AuditTable />
+          </div>
 
-        {/* Risk Indicators */}
-        <RiskIndicators />
+          <div className="right-section">
+            <RiskIndicators />
+          </div>
+
+        </div>
 
       </div>
     </PageContainer>

@@ -1,19 +1,30 @@
-import React from "react";
-import { audits } from "../../Data/dashboardData";
+import React, { useEffect, useState } from "react";
+import api from "../../api";
 
 const AuditTable = () => {
+  const [audits, setAudits] = useState([]);
+
+  useEffect(() => {
+    loadAudits();
+  }, []);
+
+  const loadAudits = async () => {
+    try {
+      const response = await api.get("/dashboard/audits");
+      setAudits(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const getStatusClass = (status) => {
     switch (status) {
       case "Completed":
         return "badge completed";
-
       case "In Progress":
         return "badge progress";
-
       case "Terminated":
         return "badge failed";
-
       default:
         return "badge";
     }
@@ -22,26 +33,24 @@ const AuditTable = () => {
   return (
     <div className="table-card">
 
-      <h2>Recent Audits</h2>
+      <div className="table-header">
+        <h2>Recent Audits</h2>
+      </div>
 
       <table className="audit-table">
 
         <thead>
-
           <tr>
             <th>Audit</th>
             <th>Department</th>
             <th>Auditor</th>
             <th>Status</th>
-            <th>Score</th>
+            <th style={{ textAlign: "center" }}>Score</th>
           </tr>
-
         </thead>
 
         <tbody>
-
           {audits.map((audit, index) => (
-
             <tr key={index}>
 
               <td>{audit.audit}</td>
@@ -51,21 +60,23 @@ const AuditTable = () => {
               <td>{audit.auditor}</td>
 
               <td>
-
                 <span className={getStatusClass(audit.status)}>
                   {audit.status}
                 </span>
-
               </td>
 
-              <td>
-                <strong>{audit.score}</strong>
+              <td
+                style={{
+                  textAlign: "center",
+                  fontWeight: 700,
+                  color: "#111827",
+                }}
+              >
+                {audit.score}
               </td>
 
             </tr>
-
           ))}
-
         </tbody>
 
       </table>

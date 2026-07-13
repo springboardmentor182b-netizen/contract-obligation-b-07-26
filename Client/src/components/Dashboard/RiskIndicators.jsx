@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import api from "../../api";
 import {
   FaExclamationTriangle,
   FaFileContract,
@@ -7,7 +8,7 @@ import {
   FaSyncAlt,
 } from "react-icons/fa";
 
-import { risks } from "../../Data/dashboardData";
+
 
 const getIcon = (title) => {
   if (title.includes("Expired"))
@@ -39,55 +40,52 @@ const getClass = (level) => {
 };
 
 const RiskIndicators = () => {
-  return (
-    <div>
+  const [risks, setRisks] = useState([]);
+  useEffect(() => {
+  loadRisks();
+}, []);
 
-      <h2 style={{ marginBottom: "20px" }}>
-        Risk Indicators
-      </h2>
+const loadRisks = async () => {
+  try {
+    const response = await api.get("/dashboard/risks");
+    setRisks(response.data);
+  } catch (error) {
+    console.error(error);
+  }
+};
+ return (
+  <div className="chart-card risk-section">
+    <h3 style={{ marginBottom: "20px" }}>
+      Risk Indicators
+    </h3>
 
-      <div className="risk-grid">
+    {risks.map((risk, index) => (
+      <div className="risk-row" key={index}>
 
-        {risks.map((risk, index) => (
-
-          <div
-            className="risk-card"
-            key={index}
-          >
-
-            <div
-              style={{
-                fontSize: 28,
-                color: "#2563EB",
-                marginBottom: 18,
-              }}
-            >
-              {getIcon(risk.title)}
-            </div>
-
-            <h3>{risk.title}</h3>
-
-            <h1
-              style={{
-                marginTop: 15,
-                marginBottom: 15,
-              }}
-            >
-              {risk.count}
-            </h1>
-
-            <span className={getClass(risk.level)}>
-              {risk.level}
-            </span>
-
+        <div className="risk-left">
+          <div className="risk-icon">
+            {getIcon(risk.title)}
           </div>
 
-        ))}
+          <div>
+            <div className="risk-title">
+              {risk.title}
+            </div>
+
+            <div className="risk-items">
+              {risk.count} Items
+            </div>
+          </div>
+        </div>
+
+        <span className={getClass(risk.level)}>
+          {risk.level}
+        </span>
 
       </div>
-
-    </div>
-  );
+    ))}
+  </div>
+);
 };
 
 export default RiskIndicators;

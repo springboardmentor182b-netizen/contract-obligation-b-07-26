@@ -7,7 +7,7 @@ router = APIRouter()
 def get_metrics():
 
     return {
-        "overallCompliance": 94.2,
+        "overallCompliance": 50,
         "missedDeadlines": 3,
         "riskFlags": 5,
         "auditsCompleted": "18/22"
@@ -57,7 +57,7 @@ def get_risk_trend():
         },
         {
             "month": "Mar",
-            "risk": 82
+            "risk": 45
         },
         {
             "month": "Apr",
