@@ -1,12 +1,12 @@
-# User Dashboard (React + FastAPI)
+User Dashboard (React + FastAPI)
 
 A modern **User Dashboard** developed using **React.js** and **FastAPI** for managing user information, contracts, activities, notifications, and dashboard analytics. The application provides users with a centralized platform to monitor important metrics, upcoming tasks, and account activities through an intuitive and responsive interface.
 
----
 
-# Structure
 
-```
+Structure
+
+
 user-dashboard/
 │
 ├── backend/
@@ -38,13 +38,11 @@ user-dashboard/
 │   └── vite.config.js
 │
 └── README.md
-```
 
----
 
-# Backend
 
-## Requirements
+Backend
+ Requirements
 
 - Python 3.10+
 - FastAPI
@@ -54,29 +52,26 @@ user-dashboard/
 
 ### Install Dependencies
 
-```bash
+bash
 pip install -r requirements.txt
-```
+
 
 ### Run Backend
 
-```bash
+bash
 uvicorn app.main:app --reload
-```
 
 Backend Server
 
-```
 http://localhost:8000
-```
 
 Swagger Documentation
 
-```
-http://localhost:8000/docs
-```
 
----
+http://localhost:8000/docs
+
+
+
 
 # Frontend
 
@@ -90,23 +85,21 @@ http://localhost:8000/docs
 
 ### Install Dependencies
 
-```bash
+
 npm install
-```
+
 
 ### Run Frontend
 
-```bash
+
 npm run dev
-```
+
 
 Frontend Server
 
-```
-http://localhost:5173
-```
 
----
+http://localhost:5173
+
 
 # Dashboard Components
 
@@ -124,7 +117,6 @@ The sidebar contains:
 - Settings
 - Logout
 
----
 
 ## Top Navigation
 
@@ -136,7 +128,7 @@ The top navigation includes:
 - User Profile
 - Settings
 
----
+
 
 ## Dashboard Cards
 
@@ -167,7 +159,7 @@ Shows
 - Renewed Contracts
 - Terminated Contracts
 
----
+
 
 ## Portfolio Distribution
 
@@ -182,7 +174,6 @@ Categories
 - NDA
 - Others
 
----
 
 ## Recent Activities
 
@@ -194,7 +185,7 @@ Displays user activities including
 - Profile Updated
 - Notification Received
 
----
+
 
 ## Upcoming Deadlines
 
@@ -213,7 +204,7 @@ Status badges
 - Completed
 - Overdue
 
----
+
 
 # User Profile
 
@@ -225,7 +216,6 @@ Displays
 - Department
 - Profile Picture
 
----
 
 # Search
 
@@ -236,7 +226,7 @@ Users can search for
 - Reports
 - Notifications
 
----
+
 
 # API Endpoints
 
@@ -249,56 +239,55 @@ Users can search for
 | GET | /api/profile | User Profile |
 | GET | /api/notifications | Notifications |
 
----
 
 # Sample API Responses
 
 ### GET /api/dashboard
 
-```json
+json
 {
     "activeContracts": 247,
     "pendingObligations": 41,
     "renewals": 23,
     "complianceScore": 94.2
 }
-```
+
 
 ### GET /api/profile
 
-```json
+json
 {
     "name": "Sarah Chen",
     "role": "Legal Manager",
     "department": "Legal"
 }
-```
+
 
 ### GET /api/activities
 
-```json
+
 [
     {
         "title": "Created New Contract",
         "time": "10 minutes ago"
     }
 ]
-```
+
 
 ### GET /api/deadlines
 
-```json
+json
 [
     {
         "title": "Compliance Report",
         "status": "Pending"
     }
 ]
-```
 
----
 
-# Technologies Used
+
+
+
 
 ## Frontend
 
@@ -321,33 +310,29 @@ Users can search for
 
 - MySQL / PostgreSQL / SQLite
 
----
+
 
 # Features
+ Responsive Dashboard
+ Modern UI
+ Sidebar Navigation
 
-✅ Responsive Dashboard
+Search Functionality
 
-✅ Modern UI
+ User Profile
 
-✅ Sidebar Navigation
+ Dashboard Analytics
+ Contract Overview
 
-✅ Search Functionality
+Activity Timeline
 
-✅ User Profile
+Upcoming Deadlines
 
-✅ Dashboard Analytics
+Notifications
 
-✅ Contract Overview
+ REST API Integration
 
-✅ Activity Timeline
 
-✅ Upcoming Deadlines
-
-✅ Notifications
-
-✅ REST API Integration
-
----
 
 # Future Enhancements
 
@@ -360,7 +345,7 @@ Users can search for
 - Real-Time Dashboard
 - Audit Logs
 
----
+
 
 # Notes
 
