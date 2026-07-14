@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: contract_db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: contract_management
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - contract_network
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: contract_backend
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/contract_management
+    depends_on:
+      - postgres
+    volumes:
+      - ./uploads:/app/uploads
+    networks:
+      - contract_network
+
+  frontend:
+    build:
+      context: ./Client
+      dockerfile: Dockerfile
+    container_name: contract_frontend
+    ports:
+      - "4200:80"
+    depends_on:
+      - backend
+    networks:
+      - contract_network
+
+volumes:
+  postgres_data:
+
+networks:
+  contract_network:
+    driver: bridge
