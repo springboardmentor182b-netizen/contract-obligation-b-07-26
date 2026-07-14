@@ -1,0 +1,127 @@
+/* ==========================
+   ContractIQ Login Page
+========================== */
+
+body {
+  margin: 0;
+  padding: 0;
+  background: #eef4ff;
+  font-family: "Segoe UI", sans-serif;
+}
+
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #eef4ff, #ffffff);
+}
+
+.login-card {
+  width: 100%;
+  max-width: 520px;
+  background: #fff;
+  border-radius: 18px;
+  padding: 35px;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+}
+
+.logo-text{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:12px;
+    font-size:30px;
+    font-weight:700;
+    color:#2563eb;
+    margin-bottom:25px;
+}
+
+.logo-square{
+    width:20px;
+    height:20px;
+    background:#2563eb;
+    border-radius:5px;
+}
+
+.login-title{
+    text-align:center;
+    font-size:42px;
+    font-weight:700;
+    margin-bottom:8px;
+}
+
+.login-subtitle{
+    text-align:center;
+    color:#6c757d;
+    margin-bottom:30px;
+}
+
+.form-label{
+    font-weight:600;
+}
+
+.form-control,
+.form-select{
+    height:50px;
+}
+
+.input-group-text{
+    background:#f8f9fa;
+}
+
+.login-btn{
+    height:50px;
+    border-radius:10px;
+    font-size:18px;
+    font-weight:600;
+}
+
+.quick-role-title{
+    margin-top:30px;
+    margin-bottom:15px;
+    font-size:18px;
+    font-weight:700;
+}
+
+.role-card{
+    border:1px solid #dee2e6;
+    border-radius:12px;
+    padding:18px;
+    text-align:center;
+    cursor:pointer;
+    transition:.3s;
+    background:#fff;
+}
+
+.role-card svg{
+    color:#2563eb;
+    margin-bottom:10px;
+}
+
+.role-card:hover{
+    background:#2563eb;
+    color:#fff;
+    transform:translateY(-4px);
+}
+
+.role-card:hover svg{
+    color:#fff;
+}
+
+@media(max-width:768px){
+
+.login-card{
+    width:95%;
+    padding:22px;
+}
+
+.login-title{
+    font-size:34px;
+}
+
+.logo-text{
+    font-size:24px;
+}
+
+}
