@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Pencil, Trash2 } from "lucide-react";
 import PageLayout from "../layout/PageLayout";
 import { getStoredContracts, removeStoredContract, updateStoredContract } from "../services/contractRepository";
@@ -6,16 +6,20 @@ import { getStoredContracts, removeStoredContract, updateStoredContract } from "
 const STATUSES = ["Active", "Draft", "Under Review", "Expired", "Terminated"];
 
 export default function Contracts() {
-  const [contracts, setContracts] = useState(getStoredContracts);
+  const [contracts, setContracts] = useState([]);
   const [editing, setEditing] = useState(null);
 
-  function refresh() {
-    setContracts(getStoredContracts());
+  useEffect(() => {
+    getStoredContracts().then(setContracts);
+  }, []);
+
+  async function refresh() {
+    setContracts(await getStoredContracts());
   }
 
-  function remove(id) {
-    removeStoredContract(id);
-    refresh();
+  async function remove(id) {
+    await removeStoredContract(id);
+    await refresh();
   }
 
   return (
@@ -27,7 +31,7 @@ export default function Contracts() {
         </div>
         {contracts.length === 0 ? <p className="rounded-lg border border-dashed border-slate-200 p-8 text-center text-sm text-slate-400">No contracts are stored yet. Upload one from Repository.</p> : <div className="overflow-x-auto"><table className="w-full text-left text-sm"><thead><tr className="border-b border-slate-100 text-xs uppercase tracking-wide text-slate-400"><th className="pb-3 font-medium">Contract</th><th className="pb-3 font-medium">Counterparty</th><th className="pb-3 font-medium">Category</th><th className="pb-3 font-medium">Expiry</th><th className="pb-3 font-medium">Status</th><th className="pb-3 text-right font-medium">Actions</th></tr></thead><tbody>{contracts.map((contract) => <tr key={contract.id} className="border-b border-slate-50 last:border-0"><td className="py-4"><p className="font-medium text-slate-800">{contract.title}</p><p className="text-xs text-slate-400">{contract.fileName}</p></td><td className="py-4 text-slate-600">{contract.counterparty}</td><td className="py-4 text-slate-600">{contract.category}</td><td className="py-4 text-slate-600">{contract.expiryDate || "Not set"}</td><td className="py-4"><Status status={contract.status} /></td><td className="py-4"><div className="flex justify-end gap-2"><button onClick={() => setEditing(contract)} className="rounded-md p-2 text-slate-500 hover:bg-slate-100 hover:text-blue-600" aria-label={`Edit ${contract.title}`}><Pencil size={16} /></button><button onClick={() => remove(contract.id)} className="rounded-md p-2 text-slate-500 hover:bg-red-50 hover:text-red-600" aria-label={`Delete ${contract.title}`}><Trash2 size={16} /></button></div></td></tr>)}</tbody></table></div>}
       </div>
-      {editing && <EditContract contract={editing} onClose={() => setEditing(null)} onSave={(changes) => { updateStoredContract(editing.id, changes); refresh(); setEditing(null); }} />}
+      {editing && <EditContract contract={editing} onClose={() => setEditing(null)} onSave={async (changes) => { await updateStoredContract(editing.id, changes); await refresh(); setEditing(null); }} />}
     </PageLayout>
   );
 }

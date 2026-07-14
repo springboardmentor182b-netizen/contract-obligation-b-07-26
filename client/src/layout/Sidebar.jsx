@@ -16,7 +16,7 @@ import {
   FileCheck2,
 } from 'lucide-react';
 
-const Sidebar = ({ collapsed, onToggle }) => {
+const Sidebar = ({ collapsed, counts = {}, onToggle }) => {
   const menuItems = [
     { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
     { name: 'Contracts', path: '/contracts', icon: FileText },
@@ -55,10 +55,14 @@ const Sidebar = ({ collapsed, onToggle }) => {
             }
           >
             <Icon size={18} strokeWidth={1.8} />
-            {!collapsed && item.name}
+            {!collapsed && <><span className="flex-1">{item.name}</span>{counts[item.name] > 0 && <span className="flex h-6 min-w-6 items-center justify-center rounded-full bg-slate-700 px-1.5 text-xs text-slate-200">{counts[item.name]}</span>}</>}
           </NavLink>
         })}
       </nav>
+      <div className={`border-t border-slate-800 p-4 ${collapsed ? "hidden" : "block"}`}>
+        <div className="flex items-center gap-3"><span className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-600 text-xs font-bold">SM</span><div className="min-w-0"><p className="truncate text-sm font-semibold">Sarah Mitchell</p><p className="text-xs text-slate-400">Legal Director</p></div></div>
+        <button onClick={onToggle} className="mt-4 flex items-center gap-2 text-sm text-slate-400 hover:text-white"><PanelLeftClose size={15} /> Collapse</button>
+      </div>
     </aside>
   );
 };

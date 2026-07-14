@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Sidebar from "./Sidebar";
 import Navbar from "./Navbar";
+import api from "../services/api";
 
 export default function PageLayout({
   breadcrumbItems = [],
@@ -11,11 +12,23 @@ export default function PageLayout({
   children,
 }) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [navigationCounts, setNavigationCounts] = useState({});
+
+  useEffect(() => {
+    api.get("/dashboard").then(({ data }) => setNavigationCounts(data.dashboard?.navigation ?? {
+      Contracts: data.contracts?.length ?? 0,
+      Obligations: data.pending_obligations ?? 0,
+      Renewals: data.upcoming_renewals ?? 0,
+      Compliance: data.compliance?.overdue_obligations ?? 0,
+      Notifications: data.unread_notifications ?? 0,
+    })).catch(() => {});
+  }, []);
 
   return (
     <div className="flex h-screen bg-[#f5f6fa]">
       <Sidebar
         user={user}
+        counts={navigationCounts}
         collapsed={sidebarCollapsed}
         onToggle={() => setSidebarCollapsed((collapsed) => !collapsed)}
       />

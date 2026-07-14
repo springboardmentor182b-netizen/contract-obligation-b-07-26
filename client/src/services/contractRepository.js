@@ -1,38 +1,37 @@
-const STORAGE_KEY = "contractiq.repository.contracts";
+import api from "./api";
 
-export function getStoredContracts() {
-  try {
-    const stored = JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "[]");
-    return Array.isArray(stored) ? stored : [];
-  } catch {
-    return [];
-  }
+function formatContract(contract) {
+  return { ...contract, fileName: contract.fileName ?? contract.document_name, expiryDate: contract.expiryDate ?? contract.expiry_date, uploadedAt: contract.uploadedAt ?? contract.created_at };
 }
 
-export function addStoredContract(contract) {
-  const contracts = getStoredContracts();
-  const record = {
-    id: globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(16).slice(2)}`,
-    uploadedAt: new Date().toISOString(),
-    status: "Active",
-    category: "General",
-    ...contract,
-  };
-  localStorage.setItem(STORAGE_KEY, JSON.stringify([record, ...contracts]));
-  return record;
+export async function getStoredContracts() {
+  const { data } = await api.get("/contracts");
+  return data.map(formatContract);
 }
 
-export function removeStoredContract(id) {
-  localStorage.setItem(
-    STORAGE_KEY,
-    JSON.stringify(getStoredContracts().filter((contract) => contract.id !== id)),
-  );
+export async function addStoredContract({ file, title, counterparty, category, status, expiryDate }) {
+  const { data } = await api.post("/contracts", {
+    title: title || file.name.replace(/\.[^/.]+$/, ""),
+    counterparty: counterparty || "Not provided",
+    category: category || "General",
+    status: status || "Active",
+    expiry_date: expiryDate || null,
+    document_name: file.name,
+  });
+  return formatContract(data);
 }
 
-export function updateStoredContract(id, changes) {
-  const contracts = getStoredContracts().map((contract) => (
-    contract.id === id ? { ...contract, ...changes, updatedAt: new Date().toISOString() } : contract
-  ));
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(contracts));
-  return contracts.find((contract) => contract.id === id);
+export async function removeStoredContract(id) {
+  await api.delete(`/contracts/${id}`);
+}
+
+export async function updateStoredContract(id, changes) {
+  const { data } = await api.patch(`/contracts/${id}`, {
+    title: changes.title,
+    counterparty: changes.counterparty,
+    category: changes.category,
+    status: changes.status,
+    expiry_date: changes.expiryDate || null,
+  });
+  return formatContract(data);
 }

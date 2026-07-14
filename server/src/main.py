@@ -70,6 +70,56 @@ def parse_date(value: str | None) -> date | None:
     return date.fromisoformat(value) if value else None
 
 
+def contract_for_client(contract: dict[str, Any]) -> dict[str, Any]:
+    return {
+        **contract,
+        "fileName": contract.get("document_name"),
+        "expiryDate": contract.get("expiry_date"),
+        "uploadedAt": contract.get("created_at"),
+    }
+
+
+def reference_dashboard() -> dict[str, Any]:
+    """Initial dashboard data shown before a live contract workspace is populated."""
+    return {
+        "unreadNotifications": 3,
+        "navigation": {"Contracts": 84, "Obligations": 12, "Renewals": 5, "Compliance": 7, "Notifications": 3},
+        "stats": {
+            "totalContracts": {"value": 84, "trend": 8.2},
+            "activeContracts": {"value": 42, "trend": 7.7, "newThisMonth": 3},
+            "upcomingRenewals": {"value": 4, "urgent": 2},
+            "pendingObligations": {"value": 5, "highPriority": 3, "newCount": 2},
+            "complianceScore": {"value": 87, "trend": 5.2},
+        },
+        "contractVolume": [
+            {"month": "Jan", "active": 28, "new": 5, "expired": 3}, {"month": "Feb", "active": 31, "new": 6, "expired": 2},
+            {"month": "Mar", "active": 33, "new": 4, "expired": 4}, {"month": "Apr", "active": 35, "new": 8, "expired": 1},
+            {"month": "May", "active": 38, "new": 5, "expired": 2}, {"month": "Jun", "active": 40, "new": 7, "expired": 3},
+            {"month": "Jul", "active": 42, "new": 3, "expired": 1},
+        ],
+        "complianceStatus": [
+            {"label": "Compliant", "value": 58, "color": "#10b981"}, {"label": "Pending", "value": 20, "color": "#3b82f6"},
+            {"label": "Delayed", "value": 12, "color": "#f59e0b"}, {"label": "Non-Compliant", "value": 7, "color": "#ef4444"},
+            {"label": "High Risk", "value": 3, "color": "#7c3aed"},
+        ],
+        "renewalsTrend": [{"month": "Jan", "count": 8}, {"month": "Feb", "count": 5}, {"month": "Mar", "count": 12}, {"month": "Apr", "count": 7}, {"month": "May", "count": 9}, {"month": "Jun", "count": 6}, {"month": "Jul", "count": 4}],
+        "recentActivity": [
+            {"id": "activity-1", "type": "overdue", "text": "CTR-002 building audit overdue by 4 days", "timeAgo": "2h ago"},
+            {"id": "activity-2", "type": "renewal", "text": "CTR-004 renewal workflow initiated", "timeAgo": "1d ago"},
+            {"id": "activity-3", "type": "review", "text": "CTR-007 submitted to Legal for review", "timeAgo": "2d ago"},
+            {"id": "activity-4", "type": "completed", "text": "OBL-004 billing reconciliation completed", "timeAgo": "3d ago"},
+            {"id": "activity-5", "type": "created", "text": "CTR-010 Franchise Agreement draft created", "timeAgo": "5d ago"},
+        ],
+        "upcomingDeadlines": [
+            {"contractId": "CTR-004", "obligation": "Q3 Component Delivery", "dueDate": "Sep 1, 2025", "assignee": {"name": "David", "initials": "DR"}, "priority": "Critical", "status": "In Progress"},
+            {"contractId": "CTR-003", "obligation": "Monthly HR Report — July", "dueDate": "Jul 31, 2025", "assignee": {"name": "Priya", "initials": "PS"}, "priority": "High", "status": "Pending"},
+            {"contractId": "CTR-001", "obligation": "Annual License Payment", "dueDate": "Jan 15, 2026", "assignee": {"name": "James", "initials": "JO"}, "priority": "High", "status": "Pending"},
+            {"contractId": "CTR-002", "obligation": "Building Maintenance Audit", "dueDate": "Jun 30, 2025", "assignee": {"name": "James", "initials": "JO"}, "priority": "Critical", "status": "Overdue"},
+            {"contractId": "CTR-008", "obligation": "EMEA Expansion Report", "dueDate": "Aug 15, 2025", "assignee": {"name": "David", "initials": "DR"}, "priority": "Medium", "status": "Pending"},
+        ],
+    }
+
+
 @app.get("/health")
 def health() -> dict[str, str]:
     return {"status": "ok", "service": "contractiq-api"}
@@ -133,7 +183,7 @@ def list_contracts(
         contracts = [contract for contract in contracts if contract["status"] == status_filter.value]
     if category:
         contracts = [contract for contract in contracts if contract["category"].lower() == category.lower()]
-    return contracts
+    return [contract_for_client(contract) for contract in contracts]
 
 
 @app.post("/api/contracts", response_model=APIRecord, status_code=status.HTTP_201_CREATED)
@@ -142,7 +192,7 @@ def create_contract(payload: ContractCreate, current_user: dict[str, Any] = Depe
     data["owner_id"] = data.get("owner_id") or current_user["id"]
     contract = store.create("contracts", data)
     store.audit("created", "contract", contract["id"], current_user["id"])
-    return contract
+    return contract_for_client(contract)
 
 
 @app.get("/api/contracts/{contract_id}", response_model=APIRecord)
@@ -151,7 +201,14 @@ def get_contract(contract_id: str, _: dict[str, Any] = Depends(get_current_user)
     contract["versions"] = [item for item in store.list("contract_versions") if item["contract_id"] == contract_id]
     contract["obligations"] = [item for item in store.list("obligations") if item["contract_id"] == contract_id]
     contract["renewals"] = [item for item in store.list("renewals") if item["contract_id"] == contract_id]
-    return contract
+    return contract_for_client(contract)
+
+
+@app.delete("/api/contracts/{contract_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_contract(contract_id: str, current_user: dict[str, Any] = Depends(get_current_user)) -> None:
+    ensure_record("contracts", contract_id)
+    store.delete("contracts", contract_id)
+    store.audit("deleted", "contract", contract_id, current_user["id"])
 
 
 @app.patch("/api/contracts/{contract_id}", response_model=APIRecord)
@@ -280,6 +337,10 @@ def dashboard(_: dict[str, Any] = Depends(get_current_user)) -> dict[str, Any]:
     activities = sorted(store.list("activities"), key=lambda item: item["created_at"], reverse=True)[:10]
 
     return {
+        "dashboard": reference_dashboard(),
+        "contracts": [contract_for_client(contract) for contract in contracts],
+        "obligations": obligations,
+        "renewals": renewals,
         "active_contracts": sum(1 for item in contracts if item["status"] == ContractStatus.active.value),
         "upcoming_renewals": sum(1 for item in renewals if item["status"] == RenewalStatus.upcoming.value),
         "pending_obligations": sum(1 for item in obligations if item["status"] in {ObligationStatus.pending.value, ObligationStatus.in_progress.value}),

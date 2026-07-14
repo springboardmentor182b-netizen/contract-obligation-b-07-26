@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FileUp, Trash2 } from "lucide-react";
 import PageLayout from "../layout/PageLayout";
 import { addStoredContract, getStoredContracts, removeStoredContract } from "../services/contractRepository";
@@ -6,29 +6,37 @@ import { addStoredContract, getStoredContracts, removeStoredContract } from "../
 const initialForm = { title: "", counterparty: "", category: "General", status: "Active", expiryDate: "" };
 
 export default function Repository() {
-  const [contracts, setContracts] = useState(getStoredContracts);
+  const [contracts, setContracts] = useState([]);
   const [form, setForm] = useState(initialForm);
   const [file, setFile] = useState(null);
   const [message, setMessage] = useState(null);
   const inputRef = useRef(null);
 
-  function submit(event) {
+  useEffect(() => {
+    getStoredContracts().then(setContracts).catch(() => setMessage({ type: "error", text: "Unable to load backend contracts. Start the backend and refresh." }));
+  }, []);
+
+  async function submit(event) {
     event.preventDefault();
     if (!file) {
       setMessage({ type: "error", text: "Choose a contract file before adding it to the repository." });
       return;
     }
-    addStoredContract({ ...form, title: form.title.trim() || file.name.replace(/\.[^/.]+$/, ""), fileName: file.name });
-    setContracts(getStoredContracts());
-    setForm(initialForm);
-    setFile(null);
-    inputRef.current.value = "";
-    setMessage({ type: "success", text: `${file.name} was added to the repository.` });
+    try {
+      await addStoredContract({ ...form, title: form.title.trim() || file.name.replace(/\.[^/.]+$/, ""), file });
+      setContracts(await getStoredContracts());
+      setForm(initialForm);
+      setFile(null);
+      inputRef.current.value = "";
+      setMessage({ type: "success", text: `${file.name} was added to the backend repository.` });
+    } catch {
+      setMessage({ type: "error", text: "Upload failed. Start the backend and try again." });
+    }
   }
 
-  function remove(id) {
-    removeStoredContract(id);
-    setContracts(getStoredContracts());
+  async function remove(id) {
+    await removeStoredContract(id);
+    setContracts(await getStoredContracts());
   }
 
   return (

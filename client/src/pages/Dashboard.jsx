@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Plus,
   FileText,
@@ -52,9 +53,10 @@ const STATUS_STYLES = {
 
 export default function Dashboard() {
   const [data, setData] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    getDashboardSummary().then(setData);
+    getDashboardSummary().then(setData).catch(() => setData({ error: true }));
   }, []);
 
   if (!data) {
@@ -67,13 +69,17 @@ export default function Dashboard() {
     );
   }
 
+  if (data.error) {
+    return <PageLayout breadcrumbItems={[{ label: "ContractIQ", to: "/" }, { label: "Dashboard" }]}><div className="flex h-64 items-center justify-center text-sm text-red-500">Unable to load backend data. Start the backend and refresh.</div></PageLayout>;
+  }
+
   const { stats, contractVolume, complianceStatus, renewalsTrend, recentActivity, upcomingDeadlines } = data;
 
   return (
     <PageLayout
       breadcrumbItems={[{ label: "ContractIQ", to: "/" }, { label: "Dashboard" }]}
-      primaryAction={{ label: "New Contract", icon: Plus, onClick: () => {} }}
-      notificationCount={3}
+      primaryAction={{ label: "New Contract", icon: Plus, onClick: () => navigate("/repository") }}
+      notificationCount={data.unreadNotifications}
     >
       {/* Stat cards */}
       <div className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-5">
@@ -92,7 +98,7 @@ export default function Dashboard() {
           iconColor="#059669"
           value={stats.activeContracts.value}
           label="Active Contracts"
-          sublabel={`↑ ${stats.activeContracts.newThisMonth} this month`}
+          sublabel={`${stats.activeContracts.newThisMonth} added this month`}
           trend={stats.activeContracts.trend}
         />
         <StatCard
@@ -132,7 +138,7 @@ export default function Dashboard() {
           <div className="mb-4 flex items-center justify-between">
             <div>
               <h3 className="font-semibold text-slate-900">Contract Volume</h3>
-              <p className="text-xs text-slate-400">Jan – Jul 2025</p>
+              <p className="text-xs text-slate-400">Last 6 months</p>
             </div>
             <Legend items={[
               { label: "Active", color: "#3b82f6" },
@@ -192,7 +198,7 @@ export default function Dashboard() {
       <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-3">
         <div className="rounded-xl border border-slate-200 bg-white p-6 xl:col-span-2">
           <h3 className="font-semibold text-slate-900">Renewals Trend</h3>
-          <p className="mb-4 text-xs text-slate-400">Monthly renewal activity 2025</p>
+          <p className="mb-4 text-xs text-slate-400">Monthly renewal activity</p>
           <ResponsiveContainer width="100%" height={220}>
             <LineChart data={renewalsTrend}>
               <CartesianGrid vertical={false} stroke="#f1f5f9" />
