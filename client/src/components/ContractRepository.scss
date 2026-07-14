@@ -1,0 +1,1129 @@
+// Color Palette
+$background: #F8FAFC;
+$surface: #FFFFFF;
+$primary: #F59E0B;
+$text-primary: #111827;
+$text-secondary: #6B7280;
+$border: #E5E7EB;
+$success: #22C55E;
+$danger: #EF4444;
+
+// Category Badge Colors
+$vendor-color: #3B82F6;
+$service-color: #8B5CF6;
+$employment-color: #22C55E;
+$lease-color: #F59E0B;
+$compliance-color: #7C3AED;
+$insurance-color: #EF4444;
+$nda-color: #6B7280;
+$partnership-color: #EAB308;
+
+// Status Badge Colors
+$active-color: #22C55E;
+$expired-color: #EF4444;
+$draft-color: #6B7280;
+$under-review-color: #F59E0B;
+$archived-color: #8B5CF6;
+
+.contract-repository {
+  background: #F8FAFC;
+  min-height: 100vh;
+  padding: 32px;
+
+  // Header Section
+  .header-section {
+    margin-bottom: 24px;
+
+    .page-title {
+      font-size: 32px;
+      font-weight: 700;
+      color: $text-primary;
+      margin: 0 0 8px 0;
+    }
+
+    .page-subtitle {
+      font-size: 14px;
+      color: $text-secondary;
+      margin: 0;
+      font-weight: 500;
+    }
+  }
+
+  // Action Bar
+  .action-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding: 16px 20px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+    .action-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+
+      .icon-btn {
+        padding: 8px;
+        border: 1px solid $border;
+        border-radius: 8px;
+        background: $surface;
+        cursor: pointer;
+        transition: all 0.2s;
+
+        &:hover {
+          background: $background;
+          border-color: #CBD5E1;
+        }
+      }
+
+      .sort-select {
+        padding: 8px 12px;
+        border: 1px solid $border;
+        border-radius: 8px;
+        background: $surface;
+        font-size: 14px;
+        color: $text-primary;
+        cursor: pointer;
+
+        &:focus {
+          outline: none;
+          border-color: $primary;
+        }
+      }
+
+      .view-toggle {
+        display: flex;
+        border: 1px solid $border;
+        border-radius: 8px;
+        overflow: hidden;
+
+        .view-btn {
+          padding: 8px 12px;
+          border: none;
+          background: $surface;
+          cursor: pointer;
+          transition: all 0.2s;
+
+          &.active {
+            background: $background;
+          }
+
+          &:hover:not(.active) {
+            background: #F1F5F9;
+          }
+        }
+      }
+    }
+
+    .action-right {
+      display: flex;
+      gap: 12px;
+
+      .btn {
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: none;
+
+        &.btn-primary {
+          background: $primary;
+          color: white;
+
+          &:hover {
+            background: #D97706;
+          }
+        }
+
+        &.btn-secondary {
+          background: $surface;
+          color: $text-primary;
+          border: 1px solid $border;
+
+          &:hover {
+            background: $background;
+            border-color: #CBD5E1;
+          }
+        }
+      }
+    }
+  }
+
+  // Category Tabs
+  .category-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+
+    &::-webkit-scrollbar {
+      height: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: #E2E8F0;
+      border-radius: 3px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #CBD5E1;
+      border-radius: 3px;
+    }
+
+    .category-tab {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border: 1px solid $border;
+      border-radius: 24px;
+      background: $surface;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      white-space: nowrap;
+
+      .category-icon {
+        font-size: 16px;
+      }
+
+      .category-name {
+        font-size: 14px;
+        font-weight: 500;
+        color: $text-primary;
+      }
+
+      .category-count {
+        background: $background;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 600;
+        color: $text-secondary;
+      }
+
+      &.active {
+        background: #0F172A;
+        border-color: #0F172A;
+
+        .category-name {
+          color: white;
+        }
+
+        .category-count {
+          background: rgba(255, 255, 255, 0.2);
+          color: white;
+        }
+      }
+
+      &:hover:not(.active) {
+        background: $background;
+        border-color: #CBD5E1;
+      }
+    }
+  }
+
+  // Search Section
+  .search-section {
+    margin-bottom: 24px;
+
+    .search-box {
+      display: flex;
+      align-items: center;
+      padding: 16px 20px;
+      background: $surface;
+      border: 1px solid $border;
+      border-radius: 16px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+      .search-icon {
+        color: #94A3B8;
+        margin-right: 12px;
+      }
+
+      .search-input {
+        flex: 1;
+        border: none;
+        font-size: 16px;
+        color: $text-primary;
+        background: transparent;
+
+        &::placeholder {
+          color: #94A3B8;
+        }
+
+        &:focus {
+          outline: none;
+        }
+      }
+    }
+  }
+
+  // Main Content
+  .main-content {
+    display: flex;
+    gap: 24px;
+    position: relative;
+
+    // Contract List Panel
+    .contract-list-panel {
+      flex: 1;
+      transition: all 0.3s ease;
+
+      &.expanded {
+        flex: 0.6;
+      }
+
+      .contract-card {
+        background: $surface;
+        border-radius: 16px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+
+        .contract-table {
+          width: 100%;
+          border-collapse: collapse;
+
+          .table-header {
+            position: sticky;
+            top: 0;
+            background: $surface;
+            z-index: 10;
+
+            th {
+              padding: 16px;
+              text-align: left;
+              font-size: 12px;
+              font-weight: 600;
+              color: $text-secondary;
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+              border-bottom: 1px solid $border;
+
+              &.col-star {
+                width: 40px;
+              }
+
+              &.col-id {
+                width: 120px;
+              }
+
+              &.col-name {
+                width: 250px;
+              }
+
+              &.col-category {
+                width: 120px;
+              }
+
+              &.col-department {
+                width: 120px;
+              }
+
+              &.col-owner {
+                width: 140px;
+              }
+
+              &.col-status {
+                width: 120px;
+              }
+
+              &.col-renewal {
+                width: 120px;
+              }
+
+              &.col-version {
+                width: 80px;
+              }
+
+              &.col-size {
+                width: 80px;
+              }
+
+              &.col-actions {
+                width: 100px;
+              }
+            }
+          }
+
+          .contract-row {
+            border-bottom: 1px solid $border;
+            cursor: pointer;
+            transition: all 0.2s ease;
+
+            &:hover {
+              background: $background;
+              box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            }
+
+            &.selected {
+              background: #EFF6FF;
+              border-left: 3px solid $primary;
+            }
+
+            td {
+              padding: 16px;
+              vertical-align: middle;
+
+              &.col-star {
+                .star-btn {
+                  background: none;
+                  border: none;
+                  cursor: pointer;
+                  padding: 4px;
+                  transition: all 0.2s;
+
+                  svg {
+                    color: #CBD5E1;
+                    transition: all 0.2s;
+                  }
+
+                  &.starred svg {
+                    color: #FBBF24;
+                    fill: #FBBF24;
+                  }
+
+                  &:hover svg {
+                    color: #FBBF24;
+                  }
+                }
+              }
+
+              &.col-id {
+                font-size: 13px;
+                font-weight: 600;
+                color: $text-secondary;
+              }
+
+              &.col-name {
+                .contract-name-cell {
+                  .contract-title {
+                    font-size: 14px;
+                    font-weight: 600;
+                    color: $text-primary;
+                    margin-bottom: 4px;
+                  }
+
+                  .contract-subtitle {
+                    font-size: 12px;
+                    color: $text-secondary;
+                  }
+                }
+              }
+
+              &.col-category {
+                .category-badge {
+                  padding: 4px 12px;
+                  border-radius: 12px;
+                  font-size: 12px;
+                  font-weight: 600;
+
+                  &.badge-vendor {
+                    background: rgba(59, 130, 246, 0.1);
+                    color: $vendor-color;
+                  }
+
+                  &.badge-service {
+                    background: rgba(139, 92, 246, 0.1);
+                    color: $service-color;
+                  }
+
+                  &.badge-employment {
+                    background: rgba(34, 197, 94, 0.1);
+                    color: $employment-color;
+                  }
+
+                  &.badge-lease {
+                    background: rgba(245, 158, 11, 0.1);
+                    color: $lease-color;
+                  }
+
+                  &.badge-compliance {
+                    background: rgba(124, 58, 237, 0.1);
+                    color: $compliance-color;
+                  }
+
+                  &.badge-insurance {
+                    background: rgba(239, 68, 68, 0.1);
+                    color: $insurance-color;
+                  }
+
+                  &.badge-nda {
+                    background: rgba(107, 114, 128, 0.1);
+                    color: $nda-color;
+                  }
+
+                  &.badge-partnership {
+                    background: rgba(234, 179, 8, 0.1);
+                    color: $partnership-color;
+                  }
+                }
+              }
+
+              &.col-department {
+                font-size: 14px;
+                color: $text-primary;
+              }
+
+              &.col-owner {
+                font-size: 14px;
+                color: $text-primary;
+              }
+
+              &.col-status {
+                .status-badge {
+                  display: flex;
+                  align-items: center;
+                  gap: 6px;
+                  padding: 4px 12px;
+                  border-radius: 12px;
+                  font-size: 12px;
+                  font-weight: 600;
+
+                  .status-dot {
+                    width: 6px;
+                    height: 6px;
+                    border-radius: 50%;
+                  }
+
+                  &.status-active {
+                    background: rgba(34, 197, 94, 0.1);
+                    color: $active-color;
+
+                    .status-dot {
+                      background: $active-color;
+                    }
+                  }
+
+                  &.status-expired {
+                    background: rgba(239, 68, 68, 0.1);
+                    color: $expired-color;
+
+                    .status-dot {
+                      background: $expired-color;
+                    }
+                  }
+
+                  &.status-draft {
+                    background: rgba(107, 114, 128, 0.1);
+                    color: $draft-color;
+
+                    .status-dot {
+                      background: $draft-color;
+                    }
+                  }
+
+                  &.status-under-review {
+                    background: rgba(245, 158, 11, 0.1);
+                    color: $under-review-color;
+
+                    .status-dot {
+                      background: $under-review-color;
+                    }
+                  }
+
+                  &.status-archived {
+                    background: rgba(139, 92, 246, 0.1);
+                    color: $archived-color;
+
+                    .status-dot {
+                      background: $archived-color;
+                    }
+                  }
+                }
+              }
+
+              &.col-renewal {
+                font-size: 14px;
+                color: $text-primary;
+              }
+
+              &.col-version {
+                font-size: 13px;
+                font-weight: 600;
+                color: $text-secondary;
+              }
+
+              &.col-size {
+                font-size: 13px;
+                color: $text-secondary;
+              }
+
+              &.col-actions {
+                .action-icons {
+                  display: flex;
+                  gap: 4px;
+
+                  .action-icon {
+                    padding: 6px;
+                    border: 1px solid $border;
+                    border-radius: 6px;
+                    background: $surface;
+                    cursor: pointer;
+                    transition: all 0.2s;
+                    color: $text-secondary;
+
+                    &:hover {
+                      background: $background;
+                      border-color: #CBD5E1;
+                      color: $text-primary;
+                    }
+
+                    &.danger {
+                      &:hover {
+                        background: rgba(239, 68, 68, 0.1);
+                        border-color: $danger;
+                        color: $danger;
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+
+      .table-footer {
+        padding: 16px 20px;
+        background: $surface;
+        border-top: 1px solid $border;
+        border-radius: 16px;
+
+        .pagination {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+
+          .pagination-info {
+            font-size: 14px;
+            color: $text-secondary;
+          }
+
+          .pagination-controls {
+            display: flex;
+            gap: 8px;
+
+            .page-btn {
+              padding: 6px 12px;
+              border: 1px solid $border;
+              border-radius: 6px;
+              background: $surface;
+              cursor: pointer;
+              font-size: 14px;
+              color: $text-primary;
+              transition: all 0.2s;
+
+              &:hover:not(:disabled) {
+                background: $background;
+              }
+
+              &.active {
+                background: $primary;
+                color: white;
+                border-color: $primary;
+              }
+
+              &:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // Details Panel
+    .details-panel {
+      flex: 0;
+      background: $surface;
+      border-radius: 16px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      transition: all 0.3s ease;
+      opacity: 0;
+      transform: translateX(100%);
+
+      &.visible {
+        flex: 0.4;
+        opacity: 1;
+        transform: translateX(0);
+      }
+
+      .details-header {
+        padding: 24px;
+        border-bottom: 1px solid $border;
+        display: flex;
+        align-items: flex-start;
+        gap: 16px;
+        position: sticky;
+        top: 0;
+        background: $surface;
+        z-index: 10;
+
+        .contract-icon {
+          padding: 12px;
+          background: $background;
+          border-radius: 12px;
+          color: $text-primary;
+        }
+
+        .contract-info {
+          flex: 1;
+
+          .contract-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: $text-primary;
+            margin: 0 0 12px 0;
+          }
+
+          .contract-meta {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+
+            .contract-number {
+              font-size: 13px;
+              font-weight: 600;
+              color: $text-secondary;
+            }
+
+            .status-badge {
+              display: flex;
+              align-items: center;
+              gap: 6px;
+              padding: 4px 12px;
+              border-radius: 12px;
+              font-size: 12px;
+              font-weight: 600;
+
+              .status-dot {
+                width: 6px;
+                height: 6px;
+                border-radius: 50%;
+              }
+
+              &.status-active {
+                background: rgba(34, 197, 94, 0.1);
+                color: $active-color;
+
+                .status-dot {
+                  background: $active-color;
+                }
+              }
+
+              &.status-expired {
+                background: rgba(239, 68, 68, 0.1);
+                color: $expired-color;
+
+                .status-dot {
+                  background: $expired-color;
+                }
+              }
+
+              &.status-draft {
+                background: rgba(107, 114, 128, 0.1);
+                color: $draft-color;
+
+                .status-dot {
+                  background: $draft-color;
+                }
+              }
+
+              &.status-under-review {
+                background: rgba(245, 158, 11, 0.1);
+                color: $under-review-color;
+
+                .status-dot {
+                  background: $under-review-color;
+                }
+              }
+
+              &.status-archived {
+                background: rgba(139, 92, 246, 0.1);
+                color: $archived-color;
+
+                .status-dot {
+                  background: $archived-color;
+                }
+              }
+            }
+
+            .version-badge {
+              padding: 4px 12px;
+              background: $background;
+              border-radius: 12px;
+              font-size: 12px;
+              font-weight: 600;
+              color: $text-secondary;
+            }
+          }
+        }
+
+        .close-btn {
+          background: none;
+          border: none;
+          cursor: pointer;
+          padding: 4px;
+          color: #64748B;
+          transition: all 0.2s;
+
+          &:hover {
+            color: $text-primary;
+            background: $background;
+            border-radius: 8px;
+          }
+        }
+      }
+
+      .details-tabs {
+        display: flex;
+        gap: 4px;
+        padding: 16px 24px;
+        border-bottom: 1px solid $border;
+
+        .detail-tab {
+          padding: 8px 16px;
+          border: none;
+          background: none;
+          cursor: pointer;
+          font-size: 14px;
+          font-weight: 500;
+          color: $text-secondary;
+          border-radius: 8px;
+          transition: all 0.2s;
+
+          &.active {
+            background: $background;
+            color: $text-primary;
+            font-weight: 600;
+          }
+
+          &:hover:not(.active) {
+            background: #F1F5F9;
+          }
+        }
+      }
+
+      .document-preview {
+        padding: 24px;
+        display: flex;
+        gap: 16px;
+        align-items: center;
+
+        .pdf-thumbnail {
+          padding: 16px;
+          background: $background;
+          border-radius: 12px;
+          color: $text-secondary;
+        }
+
+        .document-info {
+          .document-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: $text-primary;
+            margin-bottom: 4px;
+          }
+
+          .document-meta {
+            display: flex;
+            gap: 12px;
+            font-size: 13px;
+            color: $text-secondary;
+          }
+        }
+      }
+
+      .action-buttons {
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+
+        .action-btn {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 12px 16px;
+          border: 1px solid $border;
+          border-radius: 8px;
+          background: $surface;
+          cursor: pointer;
+          font-size: 14px;
+          font-weight: 500;
+          color: $text-primary;
+          transition: all 0.2s;
+
+          &:hover {
+            background: $background;
+            border-color: #CBD5E1;
+          }
+
+          &.primary {
+            background: #0F172A;
+            color: white;
+            border-color: #0F172A;
+
+            &:hover {
+              background: #1E293B;
+            }
+          }
+
+          &.danger {
+            color: $danger;
+            border-color: rgba(239, 68, 68, 0.3);
+
+            &:hover {
+              background: rgba(239, 68, 68, 0.1);
+              border-color: $danger;
+            }
+          }
+        }
+      }
+
+      .tab-content {
+        padding: 24px;
+        overflow-y: auto;
+        max-height: calc(100vh - 400px);
+
+        .details-tab-content {
+          .detail-section {
+            margin-bottom: 24px;
+
+            .detail-section-title {
+              font-size: 16px;
+              font-weight: 600;
+              color: $text-primary;
+              margin: 0 0 16px 0;
+            }
+
+            .detail-grid {
+              display: grid;
+              grid-template-columns: repeat(2, 1fr);
+              gap: 16px;
+
+              .detail-item {
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+
+                label {
+                  font-size: 12px;
+                  font-weight: 500;
+                  color: $text-secondary;
+                  text-transform: uppercase;
+                }
+
+                span {
+                  font-size: 14px;
+                  color: $text-primary;
+                }
+              }
+            }
+
+            .parties-list {
+              display: flex;
+              flex-direction: column;
+              gap: 8px;
+
+              .party-item {
+                padding: 8px 12px;
+                background: $background;
+                border-radius: 6px;
+                font-size: 14px;
+              }
+            }
+
+            .detail-description {
+              font-size: 14px;
+              color: $text-primary;
+              line-height: 1.6;
+              margin: 0;
+            }
+
+            .tags-list {
+              display: flex;
+              flex-wrap: wrap;
+              gap: 8px;
+
+              .tag-item {
+                padding: 4px 12px;
+                background: rgba(245, 158, 11, 0.1);
+                color: $primary;
+                border-radius: 12px;
+                font-size: 12px;
+                font-weight: 500;
+              }
+            }
+          }
+        }
+
+        .versions-tab-content {
+          .versions-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+
+            .versions-title {
+              font-size: 16px;
+              font-weight: 600;
+              color: $text-primary;
+              margin: 0;
+            }
+
+            .btn-sm {
+              padding: 6px 12px;
+              font-size: 13px;
+            }
+          }
+
+          .versions-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+
+            .version-item {
+              padding: 16px;
+              background: $background;
+              border-radius: 8px;
+              border: 1px solid $border;
+
+              &.current {
+                border-color: $primary;
+                background: rgba(245, 158, 11, 0.05);
+              }
+
+              .version-header {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                margin-bottom: 8px;
+
+                .version-number {
+                  font-size: 14px;
+                  font-weight: 600;
+                  color: $text-primary;
+                }
+
+                .version-current-badge {
+                  padding: 2px 8px;
+                  background: $primary;
+                  color: white;
+                  border-radius: 12px;
+                  font-size: 11px;
+                  font-weight: 600;
+                }
+              }
+
+              .version-details {
+                margin-bottom: 12px;
+
+                .version-description {
+                  font-size: 14px;
+                  color: $text-primary;
+                  margin: 0 0 8px 0;
+                }
+
+                .version-meta {
+                  display: flex;
+                  gap: 16px;
+                  font-size: 12px;
+                  color: $text-secondary;
+                }
+              }
+
+              .version-actions {
+                display: flex;
+                gap: 8px;
+
+                .version-btn {
+                  padding: 6px 12px;
+                  border: 1px solid $border;
+                  border-radius: 6px;
+                  background: $surface;
+                  cursor: pointer;
+                  font-size: 13px;
+                  color: $text-primary;
+                  transition: all 0.2s;
+
+                  &:hover {
+                    background: $background;
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        .activity-tab-content {
+          .activity-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: $text-primary;
+            margin: 0 0 20px 0;
+          }
+
+          .activity-timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            padding-left: 20px;
+            border-left: 2px solid $border;
+
+            .activity-item {
+              position: relative;
+              padding-left: 20px;
+
+              .activity-dot {
+                position: absolute;
+                left: -26px;
+                top: 4px;
+                width: 10px;
+                height: 10px;
+                border-radius: 50%;
+                background: $primary;
+                border: 2px solid $surface;
+              }
+
+              .activity-content {
+                .activity-header {
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                  margin-bottom: 4px;
+
+                  .activity-event {
+                    font-size: 14px;
+                    font-weight: 600;
+                    color: $text-primary;
+                  }
+
+                  .activity-date {
+                    font-size: 12px;
+                    color: $text-secondary;
+                  }
+                }
+
+                .activity-description {
+                  font-size: 13px;
+                  color: $text-secondary;
+                  margin: 0;
+                  line-height: 1.5;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
