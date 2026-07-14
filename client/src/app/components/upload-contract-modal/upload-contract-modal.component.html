@@ -1,0 +1,155 @@
+<div class="modal-overlay" *ngIf="isVisible" (click)="close()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Upload Contract</h2>
+      <button class="close-btn" (click)="close()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path d="M18 6L6 18M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <!-- File Upload Section -->
+      <div class="upload-section">
+        <div 
+          class="upload-zone"
+          [class.dragging]="isDragging"
+          (dragover)="onDragOver($event)"
+          (dragleave)="onDragLeave($event)"
+          (drop)="onDrop($event)"
+          (click)="fileInput?.click()">
+          <input 
+            type="file" 
+            #fileInput
+            class="file-input"
+            (change)="onFileSelect($event)"
+            accept=".pdf,.doc,.docx"
+          >
+          
+          <div *ngIf="!selectedFile" class="upload-placeholder">
+            <svg class="upload-icon" width="48" height="48" viewBox="0 0 48 48" fill="none" stroke="currentColor">
+              <path d="M24 32V16M24 16L18 22M24 16L30 22"/>
+              <path d="M8 40h32a2 2 0 002-2V10a2 2 0 00-2-2H16l-6 6v24a2 2 0 002 2z"/>
+            </svg>
+            <p class="upload-text">Drag and drop your file here</p>
+            <p class="upload-subtext">or click to browse</p>
+            <p class="upload-formats">Supported formats: PDF, DOC, DOCX</p>
+          </div>
+
+          <div *ngIf="selectedFile" class="file-preview">
+            <svg class="file-icon" width="40" height="40" viewBox="0 0 40 40" fill="none" stroke="currentColor">
+              <path d="M8 4h16l8 8v24a2 2 0 01-2 2H10a2 2 0 01-2-2V6a2 2 0 012-2z"/>
+              <path d="M24 4v8h8"/>
+            </svg>
+            <div class="file-info">
+              <div class="file-name">{{ selectedFile.name }}</div>
+              <div class="file-size">{{ formatFileSize(selectedFile.size) }}</div>
+            </div>
+            <button class="remove-file-btn" (click)="removeFile(); $event.stopPropagation()">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor">
+                <path d="M6 6l8 8M14 6l-8 8"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Upload Progress -->
+        <div *ngIf="isUploading" class="upload-progress">
+          <div class="progress-bar">
+            <div class="progress-fill" [style.width.%]="uploadProgress"></div>
+          </div>
+          <div class="progress-text">{{ uploadProgress }}%</div>
+        </div>
+      </div>
+
+      <!-- Contract Details Form -->
+      <div class="form-section">
+        <div class="form-row">
+          <div class="form-group full-width">
+            <label>Contract Title *</label>
+            <input 
+              type="text" 
+              [(ngModel)]="contractData.title" 
+              placeholder="Enter contract title"
+            >
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group full-width">
+            <label>Description</label>
+            <textarea 
+              [(ngModel)]="contractData.description" 
+              placeholder="Enter contract description"
+              rows="3"
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Category *</label>
+            <select [(ngModel)]="contractData.category">
+              <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Department</label>
+            <input 
+              type="text" 
+              [(ngModel)]="contractData.department" 
+              placeholder="Enter department"
+            >
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Owner</label>
+            <input 
+              type="text" 
+              [(ngModel)]="contractData.owner" 
+              placeholder="Enter owner name"
+            >
+          </div>
+          <div class="form-group">
+            <label>Contract Value</label>
+            <input 
+              type="text" 
+              [(ngModel)]="contractData.value" 
+              placeholder="Enter contract value"
+            >
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Start Date</label>
+            <input 
+              type="date" 
+              [(ngModel)]="contractData.startDate"
+            >
+          </div>
+          <div class="form-group">
+            <label>End Date</label>
+            <input 
+              type="date" 
+              [(ngModel)]="contractData.endDate"
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="close()">Cancel</button>
+      <button 
+        class="btn btn-primary" 
+        (click)="uploadContract()"
+        [disabled]="isUploading || !selectedFile">
+        {{ isUploading ? 'Uploading...' : 'Upload Contract' }}
+      </button>
+    </div>
+  </div>
+</div>

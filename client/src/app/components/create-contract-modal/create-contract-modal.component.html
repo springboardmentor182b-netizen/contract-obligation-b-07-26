@@ -1,0 +1,125 @@
+<div class="modal-overlay" *ngIf="isVisible" (click)="close()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Create New Contract</h2>
+      <button class="close-btn" (click)="close()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+          <path d="M18 6L6 18M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="form-section">
+        <div class="form-row">
+          <div class="form-group">
+            <label>Contract Number</label>
+            <input 
+              type="text" 
+              [(ngModel)]="contractData.contractNumber" 
+              placeholder="Auto-generated"
+              readonly
+            >
+          </div>
+          <div class="form-group">
+            <label>Contract Title *</label>
+            <input 
+              type="text" 
+              [(ngModel)]="contractData.title" 
+              placeholder="Enter contract title"
+            >
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group full-width">
+            <label>Description</label>
+            <textarea 
+              [(ngModel)]="contractData.description" 
+              placeholder="Enter contract description"
+              rows="3"
+            ></textarea>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Category *</label>
+            <select [(ngModel)]="contractData.category">
+              <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Status *</label>
+            <select [(ngModel)]="contractData.status" (change)="onStatusChange()">
+              <option *ngFor="let status of statuses" [value]="status">{{ status }}</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Department</label>
+            <select [(ngModel)]="contractData.department">
+              <option value="">Select department</option>
+              <option *ngFor="let dept of departments" [value]="dept">{{ dept }}</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Owner</label>
+            <input 
+              type="text" 
+              [(ngModel)]="contractData.owner" 
+              placeholder="Enter owner name"
+            >
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Start Date</label>
+            <input 
+              type="date" 
+              [(ngModel)]="contractData.startDate"
+            >
+          </div>
+          <div class="form-group">
+            <label>End Date</label>
+            <input 
+              type="date" 
+              [(ngModel)]="contractData.endDate"
+            >
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Contract Value</label>
+            <input 
+              type="text" 
+              [(ngModel)]="contractData.value" 
+              placeholder="Enter contract value"
+            >
+          </div>
+          <div class="form-group">
+            <label>Renewal Date</label>
+            <input 
+              type="date" 
+              [(ngModel)]="contractData.renewalDate"
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-secondary" (click)="close()">Cancel</button>
+      <button 
+        class="btn btn-primary" 
+        (click)="saveContract()"
+        [disabled]="isSaving">
+        {{ isSaving ? 'Saving...' : 'Create Contract' }}
+      </button>
+    </div>
+  </div>
+</div>

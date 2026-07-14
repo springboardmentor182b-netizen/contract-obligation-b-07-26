@@ -1,0 +1,71 @@
+<div class="dashboard">
+  <h1>Dashboard</h1>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-icon">📄</div>
+      <div class="stat-info">
+        <div class="stat-value">{{ stats.totalContracts }}</div>
+        <div class="stat-label">Total Contracts</div>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">✅</div>
+      <div class="stat-info">
+        <div class="stat-value">{{ stats.activeContracts }}</div>
+        <div class="stat-label">Active Contracts</div>
+      </div>
+    </div>
+
+    <div class="stat-card warning">
+      <div class="stat-icon">⚠️</div>
+      <div class="stat-info">
+        <div class="stat-value">{{ stats.expiringSoon }}</div>
+        <div class="stat-label">Expiring Soon</div>
+      </div>
+    </div>
+
+    <div class="stat-card info">
+      <div class="stat-icon">📋</div>
+      <div class="stat-info">
+        <div class="stat-value">{{ stats.pendingApprovals }}</div>
+        <div class="stat-label">Pending Approvals</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dashboard-grid">
+    <div class="panel">
+      <h2>Recent Activities</h2>
+      <div class="activity-list">
+        <div class="activity-item" *ngFor="let activity of recentActivities">
+          <div class="activity-info">
+            <div class="activity-contract">{{ activity.contract }}</div>
+            <div class="activity-action">{{ activity.action }}</div>
+          </div>
+          <div class="activity-meta">
+            <div class="activity-user">{{ activity.user }}</div>
+            <div class="activity-date">{{ activity.date }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Upcoming Renewals</h2>
+      <div class="renewal-list">
+        <div class="renewal-item" *ngFor="let renewal of upcomingRenewals">
+          <div class="renewal-info">
+            <div class="renewal-contract">{{ renewal.contract }}</div>
+            <div class="renewal-title">{{ renewal.title }}</div>
+          </div>
+          <div class="renewal-meta">
+            <div class="renewal-date">{{ renewal.renewalDate }}</div>
+            <div class="renewal-days">{{ renewal.daysLeft }} days left</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

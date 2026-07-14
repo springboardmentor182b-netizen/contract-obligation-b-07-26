@@ -1,0 +1,795 @@
+// Color Palette
+$background: #F8FAFC;
+$primary: #0F172A;
+$accent: #F59E0B;
+$success: #22C55E;
+$danger: #EF4444;
+$text: #1E293B;
+$border: #E5E7EB;
+
+// Category Badge Colors
+$vendor-color: #3B82F6;
+$service-color: #8B5CF6;
+$employment-color: #22C55E;
+$lease-color: #F59E0B;
+$compliance-color: #7C3AED;
+$insurance-color: #EF4444;
+$nda-color: #6B7280;
+$partnership-color: #EAB308;
+
+// Status Badge Colors
+$active-color: #22C55E;
+$expired-color: #EF4444;
+$draft-color: #6B7280;
+$under-review-color: #F59E0B;
+
+.contract-repository {
+  background: $background;
+  min-height: 100vh;
+  padding: 32px;
+
+  // Header Section
+  .header-section {
+    margin-bottom: 24px;
+
+    .page-title {
+      font-size: 32px;
+      font-weight: 700;
+      color: $primary;
+      margin: 0 0 16px 0;
+    }
+
+    .stats-bar {
+      display: flex;
+      gap: 32px;
+
+      .stat-item {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+
+        .stat-value {
+          font-size: 28px;
+          font-weight: 700;
+          color: $primary;
+        }
+
+        .stat-label {
+          font-size: 14px;
+          color: #64748B;
+          font-weight: 500;
+        }
+      }
+    }
+  }
+
+  // Action Bar
+  .action-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding: 16px 20px;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+    .action-left {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+
+      .icon-btn {
+        padding: 8px;
+        border: 1px solid $border;
+        border-radius: 8px;
+        background: white;
+        cursor: pointer;
+        transition: all 0.2s;
+
+        &:hover {
+          background: $background;
+          border-color: #CBD5E1;
+        }
+      }
+
+      .sort-select {
+        padding: 8px 12px;
+        border: 1px solid $border;
+        border-radius: 8px;
+        background: white;
+        font-size: 14px;
+        color: $text;
+        cursor: pointer;
+
+        &:focus {
+          outline: none;
+          border-color: $accent;
+        }
+      }
+
+      .view-toggle {
+        display: flex;
+        border: 1px solid $border;
+        border-radius: 8px;
+        overflow: hidden;
+
+        .view-btn {
+          padding: 8px 12px;
+          border: none;
+          background: white;
+          cursor: pointer;
+          transition: all 0.2s;
+
+          &.active {
+            background: $background;
+          }
+
+          &:hover:not(.active) {
+            background: #F1F5F9;
+          }
+        }
+      }
+    }
+
+    .action-right {
+      display: flex;
+      gap: 12px;
+
+      .btn {
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: none;
+
+        &.btn-primary {
+          background: $accent;
+          color: white;
+
+          &:hover {
+            background: #D97706;
+          }
+        }
+
+        &.btn-secondary {
+          background: white;
+          color: $text;
+          border: 1px solid $border;
+
+          &:hover {
+            background: $background;
+            border-color: #CBD5E1;
+          }
+        }
+      }
+    }
+  }
+
+  // Category Tabs
+  .category-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+
+    &::-webkit-scrollbar {
+      height: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: #E2E8F0;
+      border-radius: 3px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #CBD5E1;
+      border-radius: 3px;
+    }
+
+    .category-tab {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border: 1px solid $border;
+      border-radius: 24px;
+      background: white;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      white-space: nowrap;
+
+      .category-icon {
+        font-size: 16px;
+      }
+
+      .category-name {
+        font-size: 14px;
+        font-weight: 500;
+        color: $text;
+      }
+
+      .category-count {
+        background: $background;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 600;
+        color: #64748B;
+      }
+
+      &.active {
+        background: $primary;
+        border-color: $primary;
+
+        .category-name {
+          color: white;
+        }
+
+        .category-count {
+          background: rgba(255, 255, 255, 0.2);
+          color: white;
+        }
+      }
+
+      &:hover:not(.active) {
+        background: $background;
+        border-color: #CBD5E1;
+      }
+    }
+  }
+
+  // Search Section
+  .search-section {
+    margin-bottom: 24px;
+
+    .search-box {
+      display: flex;
+      align-items: center;
+      padding: 16px 20px;
+      background: white;
+      border: 1px solid $border;
+      border-radius: 16px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+
+      .search-icon {
+        color: #94A3B8;
+        margin-right: 12px;
+      }
+
+      .search-input {
+        flex: 1;
+        border: none;
+        font-size: 16px;
+        color: $text;
+        background: transparent;
+
+        &::placeholder {
+          color: #94A3B8;
+        }
+
+        &:focus {
+          outline: none;
+        }
+      }
+    }
+  }
+
+  // Main Content
+  .main-content {
+    display: flex;
+    gap: 24px;
+    position: relative;
+
+    // Contract List Panel
+    .contract-list-panel {
+      flex: 1;
+      transition: all 0.3s ease;
+
+      &.expanded {
+        flex: 0.6;
+      }
+
+      .contract-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+
+        .contract-table {
+          width: 100%;
+          border-collapse: collapse;
+
+          .table-header {
+            position: sticky;
+            top: 0;
+            background: white;
+            z-index: 10;
+
+            th {
+              padding: 16px;
+              text-align: left;
+              font-size: 12px;
+              font-weight: 600;
+              color: #64748B;
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+              border-bottom: 1px solid $border;
+
+              &.col-star {
+                width: 40px;
+              }
+
+              &.col-id {
+                width: 120px;
+              }
+
+              &.col-name {
+                width: 250px;
+              }
+
+              &.col-category {
+                width: 120px;
+              }
+
+              &.col-department {
+                width: 120px;
+              }
+
+              &.col-owner {
+                width: 140px;
+              }
+
+              &.col-status {
+                width: 120px;
+              }
+
+              &.col-renewal {
+                width: 120px;
+              }
+
+              &.col-version {
+                width: 80px;
+              }
+            }
+          }
+
+          .contract-row {
+            border-bottom: 1px solid $border;
+            cursor: pointer;
+            transition: all 0.2s ease;
+
+            &:hover {
+              background: $background;
+              box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            }
+
+            &.selected {
+              background: #EFF6FF;
+              border-left: 3px solid $accent;
+            }
+
+            td {
+              padding: 16px;
+              vertical-align: middle;
+
+              &.col-star {
+                .star-btn {
+                  background: none;
+                  border: none;
+                  cursor: pointer;
+                  padding: 4px;
+                  transition: all 0.2s;
+
+                  svg {
+                    color: #CBD5E1;
+                    transition: all 0.2s;
+                  }
+
+                  &.starred svg {
+                    color: #FBBF24;
+                    fill: #FBBF24;
+                  }
+
+                  &:hover svg {
+                    color: #FBBF24;
+                  }
+                }
+              }
+
+              &.col-id {
+                font-size: 13px;
+                font-weight: 600;
+                color: #64748B;
+              }
+
+              &.col-name {
+                .contract-name-cell {
+                  .contract-title {
+                    font-size: 14px;
+                    font-weight: 600;
+                    color: $text;
+                    margin-bottom: 4px;
+                  }
+
+                  .contract-subtitle {
+                    font-size: 12px;
+                    color: #64748B;
+                  }
+                }
+              }
+
+              &.col-category {
+                .category-badge {
+                  padding: 4px 12px;
+                  border-radius: 12px;
+                  font-size: 12px;
+                  font-weight: 600;
+
+                  &.badge-vendor {
+                    background: rgba(59, 130, 246, 0.1);
+                    color: $vendor-color;
+                  }
+
+                  &.badge-service {
+                    background: rgba(139, 92, 246, 0.1);
+                    color: $service-color;
+                  }
+
+                  &.badge-employment {
+                    background: rgba(34, 197, 94, 0.1);
+                    color: $employment-color;
+                  }
+
+                  &.badge-lease {
+                    background: rgba(245, 158, 11, 0.1);
+                    color: $lease-color;
+                  }
+
+                  &.badge-compliance {
+                    background: rgba(124, 58, 237, 0.1);
+                    color: $compliance-color;
+                  }
+
+                  &.badge-insurance {
+                    background: rgba(239, 68, 68, 0.1);
+                    color: $insurance-color;
+                  }
+
+                  &.badge-nda {
+                    background: rgba(107, 114, 128, 0.1);
+                    color: $nda-color;
+                  }
+
+                  &.badge-partnership {
+                    background: rgba(234, 179, 8, 0.1);
+                    color: $partnership-color;
+                  }
+                }
+              }
+
+              &.col-department {
+                font-size: 14px;
+                color: $text;
+              }
+
+              &.col-owner {
+                font-size: 14px;
+                color: $text;
+              }
+
+              &.col-status {
+                .status-badge {
+                  padding: 4px 12px;
+                  border-radius: 12px;
+                  font-size: 12px;
+                  font-weight: 600;
+
+                  &.status-active {
+                    background: rgba(34, 197, 94, 0.1);
+                    color: $active-color;
+                  }
+
+                  &.status-expired {
+                    background: rgba(239, 68, 68, 0.1);
+                    color: $expired-color;
+                  }
+
+                  &.status-draft {
+                    background: rgba(107, 114, 128, 0.1);
+                    color: $draft-color;
+                  }
+
+                  &.status-under-review {
+                    background: rgba(245, 158, 11, 0.1);
+                    color: $under-review-color;
+                  }
+                }
+              }
+
+              &.col-renewal {
+                font-size: 14px;
+                color: $text;
+              }
+
+              &.col-version {
+                font-size: 13px;
+                font-weight: 600;
+                color: #64748B;
+              }
+            }
+          }
+        }
+      }
+
+      .table-footer {
+        padding: 16px 20px;
+        background: white;
+        border-top: 1px solid $border;
+        border-radius: 16px;
+
+        .pagination {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+
+          .pagination-info {
+            font-size: 14px;
+            color: #64748B;
+          }
+
+          .pagination-controls {
+            display: flex;
+            gap: 8px;
+
+            .page-btn {
+              padding: 6px 12px;
+              border: 1px solid $border;
+              border-radius: 6px;
+              background: white;
+              cursor: pointer;
+              font-size: 14px;
+              color: $text;
+              transition: all 0.2s;
+
+              &:hover:not(:disabled) {
+                background: $background;
+              }
+
+              &.active {
+                background: $primary;
+                color: white;
+                border-color: $primary;
+              }
+
+              &:disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // Details Panel
+    .details-panel {
+      flex: 0;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      transition: all 0.3s ease;
+      opacity: 0;
+      transform: translateX(100%);
+
+      &.visible {
+        flex: 0.4;
+        opacity: 1;
+        transform: translateX(0);
+      }
+
+      .details-header {
+        padding: 24px;
+        border-bottom: 1px solid $border;
+        display: flex;
+        align-items: flex-start;
+        gap: 16px;
+        position: sticky;
+        top: 0;
+        background: white;
+        z-index: 10;
+
+        .contract-icon {
+          padding: 12px;
+          background: $background;
+          border-radius: 12px;
+          color: $primary;
+        }
+
+        .contract-info {
+          flex: 1;
+
+          .contract-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: $primary;
+            margin: 0 0 12px 0;
+          }
+
+          .contract-meta {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+
+            .contract-number {
+              font-size: 13px;
+              font-weight: 600;
+              color: #64748B;
+            }
+
+            .status-badge {
+              padding: 4px 12px;
+              border-radius: 12px;
+              font-size: 12px;
+              font-weight: 600;
+
+              &.status-active {
+                background: rgba(34, 197, 94, 0.1);
+                color: $active-color;
+              }
+
+              &.status-expired {
+                background: rgba(239, 68, 68, 0.1);
+                color: $expired-color;
+              }
+
+              &.status-draft {
+                background: rgba(107, 114, 128, 0.1);
+                color: $draft-color;
+              }
+
+              &.status-under-review {
+                background: rgba(245, 158, 11, 0.1);
+                color: $under-review-color;
+              }
+            }
+
+            .version-badge {
+              padding: 4px 12px;
+              background: $background;
+              border-radius: 12px;
+              font-size: 12px;
+              font-weight: 600;
+              color: #64748B;
+            }
+          }
+        }
+
+        .close-btn {
+          background: none;
+          border: none;
+          cursor: pointer;
+          padding: 4px;
+          color: #64748B;
+          transition: all 0.2s;
+
+          &:hover {
+            color: $text;
+            background: $background;
+            border-radius: 8px;
+          }
+        }
+      }
+
+      .details-tabs {
+        display: flex;
+        gap: 4px;
+        padding: 16px 24px;
+        border-bottom: 1px solid $border;
+
+        .detail-tab {
+          padding: 8px 16px;
+          border: none;
+          background: none;
+          cursor: pointer;
+          font-size: 14px;
+          font-weight: 500;
+          color: #64748B;
+          border-radius: 8px;
+          transition: all 0.2s;
+
+          &.active {
+            background: $background;
+            color: $primary;
+            font-weight: 600;
+          }
+
+          &:hover:not(.active) {
+            background: #F1F5F9;
+          }
+        }
+      }
+
+      .document-preview {
+        padding: 24px;
+        display: flex;
+        gap: 16px;
+        align-items: center;
+
+        .pdf-thumbnail {
+          padding: 16px;
+          background: $background;
+          border-radius: 12px;
+          color: #64748B;
+        }
+
+        .document-info {
+          .document-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: $text;
+            margin-bottom: 4px;
+          }
+
+          .document-meta {
+            display: flex;
+            gap: 12px;
+            font-size: 13px;
+            color: #64748B;
+          }
+        }
+      }
+
+      .action-buttons {
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+
+        .action-btn {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 12px 16px;
+          border: 1px solid $border;
+          border-radius: 8px;
+          background: white;
+          cursor: pointer;
+          font-size: 14px;
+          font-weight: 500;
+          color: $text;
+          transition: all 0.2s;
+
+          &:hover {
+            background: $background;
+            border-color: #CBD5E1;
+          }
+
+          &.primary {
+            background: $primary;
+            color: white;
+            border-color: $primary;
+
+            &:hover {
+              background: #1E293B;
+            }
+          }
+
+          &.danger {
+            color: $danger;
+            border-color: rgba(239, 68, 68, 0.3);
+
+            &:hover {
+              background: rgba(239, 68, 68, 0.1);
+              border-color: $danger;
+            }
+          }
+        }
+      }
+    }
+  }
+}
