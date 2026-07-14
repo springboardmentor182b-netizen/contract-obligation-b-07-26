@@ -14,9 +14,27 @@ async function getToken() {
   return loginRequest;
 }
 
+function clearToken() {
+  localStorage.removeItem("token");
+  loginRequest = undefined;
+}
+
 api.interceptors.request.use(async (config) => {
   config.headers.Authorization = `Bearer ${await getToken()}`;
   return config;
 });
+
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const request = error.config;
+    if (error.response?.status !== 401 || request?._retried) return Promise.reject(error);
+
+    request._retried = true;
+    clearToken();
+    request.headers.Authorization = `Bearer ${await getToken()}`;
+    return api(request);
+  },
+);
 
 export default api;
