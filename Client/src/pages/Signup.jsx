@@ -1,40 +1,106 @@
 import "./login.css";
 import { Link } from "react-router-dom";
+import { useState } from "react";
+import { api } from "../utils/api";
 
 function Signup() {
+  const [formData, setFormData] = useState({
+    username: "",
+    email: "",
+    password: "",
+    confirmPassword: ""
+  });
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    
+    if (formData.password !== formData.confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      await api.signup({
+        username: formData.username,
+        email: formData.email,
+        password: formData.password
+      });
+      alert("Account created successfully! Please login.");
+      window.location.href = "/";
+    } catch (err) {
+      setError(err.message || "Failed to create account");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="login-container">
       <h1>Sign Up</h1>
 
-      <input
-        type="text"
-        placeholder="Enter Full Name"
-      />
+      {error && <p className="error-message">{error}</p>}
 
-      <br /><br />
+      <form onSubmit={handleSubmit}>
+        <input
+          type="text"
+          name="username"
+          placeholder="Enter Full Name"
+          value={formData.username}
+          onChange={handleChange}
+          required
+        />
 
-      <input
-        type="email"
-        placeholder="Enter Email"
-      />
+        <br /><br />
 
-      <br /><br />
+        <input
+          type="email"
+          name="email"
+          placeholder="Enter Email"
+          value={formData.email}
+          onChange={handleChange}
+          required
+        />
 
-      <input
-        type="password"
-        placeholder="Create Password"
-      />
+        <br /><br />
 
-      <br /><br />
+        <input
+          type="password"
+          name="password"
+          placeholder="Create Password"
+          value={formData.password}
+          onChange={handleChange}
+          required
+        />
 
-      <input
-        type="password"
-        placeholder="Confirm Password"
-      />
+        <br /><br />
 
-      <br /><br />
+        <input
+          type="password"
+          name="confirmPassword"
+          placeholder="Confirm Password"
+          value={formData.confirmPassword}
+          onChange={handleChange}
+          required
+        />
 
-      <button>Create Account</button>
+        <br /><br />
+
+        <button type="submit" disabled={loading}>
+          {loading ? "Creating Account..." : "Create Account"}
+        </button>
+      </form>
 
       <p>
         Already have an account?{" "}

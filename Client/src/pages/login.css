@@ -126,3 +126,18 @@ hr {
 .apple-btn:hover {
   background: #ECECEC;
 }
+
+.error-message {
+  color: #DC2626;
+  background-color: #FEE2E2;
+  padding: 10px;
+  border-radius: 5px;
+  text-align: center;
+  margin-bottom: 15px;
+  font-size: 14px;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
