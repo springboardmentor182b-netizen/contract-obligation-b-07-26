@@ -1,11 +1,12 @@
 // Color Palette
 $background: #F8FAFC;
-$primary: #0F172A;
-$accent: #F59E0B;
+$surface: #FFFFFF;
+$primary: #F59E0B;
+$text-primary: #111827;
+$text-secondary: #6B7280;
+$border: #E5E7EB;
 $success: #22C55E;
 $danger: #EF4444;
-$text: #1E293B;
-$border: #E5E7EB;
 
 // Category Badge Colors
 $vendor-color: #3B82F6;
@@ -22,9 +23,10 @@ $active-color: #22C55E;
 $expired-color: #EF4444;
 $draft-color: #6B7280;
 $under-review-color: #F59E0B;
+$archived-color: #8B5CF6;
 
 .contract-repository {
-  background: $background;
+  background: #F8FAFC;
   min-height: 100vh;
   padding: 32px;
 
@@ -35,31 +37,15 @@ $under-review-color: #F59E0B;
     .page-title {
       font-size: 32px;
       font-weight: 700;
-      color: $primary;
-      margin: 0 0 16px 0;
+      color: $text-primary;
+      margin: 0 0 8px 0;
     }
 
-    .stats-bar {
-      display: flex;
-      gap: 32px;
-
-      .stat-item {
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-
-        .stat-value {
-          font-size: 28px;
-          font-weight: 700;
-          color: $primary;
-        }
-
-        .stat-label {
-          font-size: 14px;
-          color: #64748B;
-          font-weight: 500;
-        }
-      }
+    .page-subtitle {
+      font-size: 14px;
+      color: $text-secondary;
+      margin: 0;
+      font-weight: 500;
     }
   }
 
@@ -83,7 +69,7 @@ $under-review-color: #F59E0B;
         padding: 8px;
         border: 1px solid $border;
         border-radius: 8px;
-        background: white;
+        background: $surface;
         cursor: pointer;
         transition: all 0.2s;
 
@@ -97,14 +83,14 @@ $under-review-color: #F59E0B;
         padding: 8px 12px;
         border: 1px solid $border;
         border-radius: 8px;
-        background: white;
+        background: $surface;
         font-size: 14px;
-        color: $text;
+        color: $text-primary;
         cursor: pointer;
 
         &:focus {
           outline: none;
-          border-color: $accent;
+          border-color: $primary;
         }
       }
 
@@ -117,7 +103,7 @@ $under-review-color: #F59E0B;
         .view-btn {
           padding: 8px 12px;
           border: none;
-          background: white;
+          background: $surface;
           cursor: pointer;
           transition: all 0.2s;
 
@@ -146,7 +132,7 @@ $under-review-color: #F59E0B;
         border: none;
 
         &.btn-primary {
-          background: $accent;
+          background: $primary;
           color: white;
 
           &:hover {
@@ -155,8 +141,8 @@ $under-review-color: #F59E0B;
         }
 
         &.btn-secondary {
-          background: white;
-          color: $text;
+          background: $surface;
+          color: $text-primary;
           border: 1px solid $border;
 
           &:hover {
@@ -197,7 +183,7 @@ $under-review-color: #F59E0B;
       padding: 10px 16px;
       border: 1px solid $border;
       border-radius: 24px;
-      background: white;
+      background: $surface;
       cursor: pointer;
       transition: all 0.3s ease;
       white-space: nowrap;
@@ -209,7 +195,7 @@ $under-review-color: #F59E0B;
       .category-name {
         font-size: 14px;
         font-weight: 500;
-        color: $text;
+        color: $text-primary;
       }
 
       .category-count {
@@ -218,12 +204,12 @@ $under-review-color: #F59E0B;
         border-radius: 12px;
         font-size: 12px;
         font-weight: 600;
-        color: #64748B;
+        color: $text-secondary;
       }
 
       &.active {
-        background: $primary;
-        border-color: $primary;
+        background: #0F172A;
+        border-color: #0F172A;
 
         .category-name {
           color: white;
@@ -250,7 +236,7 @@ $under-review-color: #F59E0B;
       display: flex;
       align-items: center;
       padding: 16px 20px;
-      background: white;
+      background: $surface;
       border: 1px solid $border;
       border-radius: 16px;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
@@ -264,7 +250,7 @@ $under-review-color: #F59E0B;
         flex: 1;
         border: none;
         font-size: 16px;
-        color: $text;
+        color: $text-primary;
         background: transparent;
 
         &::placeholder {
@@ -294,7 +280,7 @@ $under-review-color: #F59E0B;
       }
 
       .contract-card {
-        background: white;
+        background: $surface;
         border-radius: 16px;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         overflow: hidden;
@@ -306,7 +292,7 @@ $under-review-color: #F59E0B;
           .table-header {
             position: sticky;
             top: 0;
-            background: white;
+            background: $surface;
             z-index: 10;
 
             th {
@@ -314,7 +300,7 @@ $under-review-color: #F59E0B;
               text-align: left;
               font-size: 12px;
               font-weight: 600;
-              color: #64748B;
+              color: $text-secondary;
               text-transform: uppercase;
               letter-spacing: 0.5px;
               border-bottom: 1px solid $border;
@@ -354,6 +340,14 @@ $under-review-color: #F59E0B;
               &.col-version {
                 width: 80px;
               }
+
+              &.col-size {
+                width: 80px;
+              }
+
+              &.col-actions {
+                width: 100px;
+              }
             }
           }
 
@@ -369,7 +363,7 @@ $under-review-color: #F59E0B;
 
             &.selected {
               background: #EFF6FF;
-              border-left: 3px solid $accent;
+              border-left: 3px solid $primary;
             }
 
             td {
@@ -403,7 +397,7 @@ $under-review-color: #F59E0B;
               &.col-id {
                 font-size: 13px;
                 font-weight: 600;
-                color: #64748B;
+                color: $text-secondary;
               }
 
               &.col-name {
@@ -411,13 +405,13 @@ $under-review-color: #F59E0B;
                   .contract-title {
                     font-size: 14px;
                     font-weight: 600;
-                    color: $text;
+                    color: $text-primary;
                     margin-bottom: 4px;
                   }
 
                   .contract-subtitle {
                     font-size: 12px;
-                    color: #64748B;
+                    color: $text-secondary;
                   }
                 }
               }
@@ -473,52 +467,122 @@ $under-review-color: #F59E0B;
 
               &.col-department {
                 font-size: 14px;
-                color: $text;
+                color: $text-primary;
               }
 
               &.col-owner {
                 font-size: 14px;
-                color: $text;
+                color: $text-primary;
               }
 
               &.col-status {
                 .status-badge {
+                  display: flex;
+                  align-items: center;
+                  gap: 6px;
                   padding: 4px 12px;
                   border-radius: 12px;
                   font-size: 12px;
                   font-weight: 600;
 
+                  .status-dot {
+                    width: 6px;
+                    height: 6px;
+                    border-radius: 50%;
+                  }
+
                   &.status-active {
                     background: rgba(34, 197, 94, 0.1);
                     color: $active-color;
+
+                    .status-dot {
+                      background: $active-color;
+                    }
                   }
 
                   &.status-expired {
                     background: rgba(239, 68, 68, 0.1);
                     color: $expired-color;
+
+                    .status-dot {
+                      background: $expired-color;
+                    }
                   }
 
                   &.status-draft {
                     background: rgba(107, 114, 128, 0.1);
                     color: $draft-color;
+
+                    .status-dot {
+                      background: $draft-color;
+                    }
                   }
 
                   &.status-under-review {
                     background: rgba(245, 158, 11, 0.1);
                     color: $under-review-color;
+
+                    .status-dot {
+                      background: $under-review-color;
+                    }
+                  }
+
+                  &.status-archived {
+                    background: rgba(139, 92, 246, 0.1);
+                    color: $archived-color;
+
+                    .status-dot {
+                      background: $archived-color;
+                    }
                   }
                 }
               }
 
               &.col-renewal {
                 font-size: 14px;
-                color: $text;
+                color: $text-primary;
               }
 
               &.col-version {
                 font-size: 13px;
                 font-weight: 600;
-                color: #64748B;
+                color: $text-secondary;
+              }
+
+              &.col-size {
+                font-size: 13px;
+                color: $text-secondary;
+              }
+
+              &.col-actions {
+                .action-icons {
+                  display: flex;
+                  gap: 4px;
+
+                  .action-icon {
+                    padding: 6px;
+                    border: 1px solid $border;
+                    border-radius: 6px;
+                    background: $surface;
+                    cursor: pointer;
+                    transition: all 0.2s;
+                    color: $text-secondary;
+
+                    &:hover {
+                      background: $background;
+                      border-color: #CBD5E1;
+                      color: $text-primary;
+                    }
+
+                    &.danger {
+                      &:hover {
+                        background: rgba(239, 68, 68, 0.1);
+                        border-color: $danger;
+                        color: $danger;
+                      }
+                    }
+                  }
+                }
               }
             }
           }
@@ -527,7 +591,7 @@ $under-review-color: #F59E0B;
 
       .table-footer {
         padding: 16px 20px;
-        background: white;
+        background: $surface;
         border-top: 1px solid $border;
         border-radius: 16px;
 
@@ -538,7 +602,7 @@ $under-review-color: #F59E0B;
 
           .pagination-info {
             font-size: 14px;
-            color: #64748B;
+            color: $text-secondary;
           }
 
           .pagination-controls {
@@ -549,10 +613,10 @@ $under-review-color: #F59E0B;
               padding: 6px 12px;
               border: 1px solid $border;
               border-radius: 6px;
-              background: white;
+              background: $surface;
               cursor: pointer;
               font-size: 14px;
-              color: $text;
+              color: $text-primary;
               transition: all 0.2s;
 
               &:hover:not(:disabled) {
@@ -578,7 +642,7 @@ $under-review-color: #F59E0B;
     // Details Panel
     .details-panel {
       flex: 0;
-      background: white;
+      background: $surface;
       border-radius: 16px;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
       overflow: hidden;
@@ -600,14 +664,14 @@ $under-review-color: #F59E0B;
         gap: 16px;
         position: sticky;
         top: 0;
-        background: white;
+        background: $surface;
         z-index: 10;
 
         .contract-icon {
           padding: 12px;
           background: $background;
           border-radius: 12px;
-          color: $primary;
+          color: $text-primary;
         }
 
         .contract-info {
@@ -616,7 +680,7 @@ $under-review-color: #F59E0B;
           .contract-title {
             font-size: 20px;
             font-weight: 700;
-            color: $primary;
+            color: $text-primary;
             margin: 0 0 12px 0;
           }
 
@@ -628,33 +692,67 @@ $under-review-color: #F59E0B;
             .contract-number {
               font-size: 13px;
               font-weight: 600;
-              color: #64748B;
+              color: $text-secondary;
             }
 
             .status-badge {
+              display: flex;
+              align-items: center;
+              gap: 6px;
               padding: 4px 12px;
               border-radius: 12px;
               font-size: 12px;
               font-weight: 600;
 
+              .status-dot {
+                width: 6px;
+                height: 6px;
+                border-radius: 50%;
+              }
+
               &.status-active {
                 background: rgba(34, 197, 94, 0.1);
                 color: $active-color;
+
+                .status-dot {
+                  background: $active-color;
+                }
               }
 
               &.status-expired {
                 background: rgba(239, 68, 68, 0.1);
                 color: $expired-color;
+
+                .status-dot {
+                  background: $expired-color;
+                }
               }
 
               &.status-draft {
                 background: rgba(107, 114, 128, 0.1);
                 color: $draft-color;
+
+                .status-dot {
+                  background: $draft-color;
+                }
               }
 
               &.status-under-review {
                 background: rgba(245, 158, 11, 0.1);
                 color: $under-review-color;
+
+                .status-dot {
+                  background: $under-review-color;
+                }
+              }
+
+              &.status-archived {
+                background: rgba(139, 92, 246, 0.1);
+                color: $archived-color;
+
+                .status-dot {
+                  background: $archived-color;
+                }
               }
             }
 
@@ -664,7 +762,7 @@ $under-review-color: #F59E0B;
               border-radius: 12px;
               font-size: 12px;
               font-weight: 600;
-              color: #64748B;
+              color: $text-secondary;
             }
           }
         }
@@ -678,7 +776,7 @@ $under-review-color: #F59E0B;
           transition: all 0.2s;
 
           &:hover {
-            color: $text;
+            color: $text-primary;
             background: $background;
             border-radius: 8px;
           }
@@ -698,13 +796,13 @@ $under-review-color: #F59E0B;
           cursor: pointer;
           font-size: 14px;
           font-weight: 500;
-          color: #64748B;
+          color: $text-secondary;
           border-radius: 8px;
           transition: all 0.2s;
 
           &.active {
             background: $background;
-            color: $primary;
+            color: $text-primary;
             font-weight: 600;
           }
 
@@ -724,14 +822,14 @@ $under-review-color: #F59E0B;
           padding: 16px;
           background: $background;
           border-radius: 12px;
-          color: #64748B;
+          color: $text-secondary;
         }
 
         .document-info {
           .document-name {
             font-size: 16px;
             font-weight: 600;
-            color: $text;
+            color: $text-primary;
             margin-bottom: 4px;
           }
 
@@ -739,7 +837,7 @@ $under-review-color: #F59E0B;
             display: flex;
             gap: 12px;
             font-size: 13px;
-            color: #64748B;
+            color: $text-secondary;
           }
         }
       }
@@ -757,11 +855,11 @@ $under-review-color: #F59E0B;
           padding: 12px 16px;
           border: 1px solid $border;
           border-radius: 8px;
-          background: white;
+          background: $surface;
           cursor: pointer;
           font-size: 14px;
           font-weight: 500;
-          color: $text;
+          color: $text-primary;
           transition: all 0.2s;
 
           &:hover {
@@ -770,9 +868,9 @@ $under-review-color: #F59E0B;
           }
 
           &.primary {
-            background: $primary;
+            background: #0F172A;
             color: white;
-            border-color: $primary;
+            border-color: #0F172A;
 
             &:hover {
               background: #1E293B;
@@ -786,6 +884,242 @@ $under-review-color: #F59E0B;
             &:hover {
               background: rgba(239, 68, 68, 0.1);
               border-color: $danger;
+            }
+          }
+        }
+      }
+
+      .tab-content {
+        padding: 24px;
+        overflow-y: auto;
+        max-height: calc(100vh - 400px);
+
+        .details-tab-content {
+          .detail-section {
+            margin-bottom: 24px;
+
+            .detail-section-title {
+              font-size: 16px;
+              font-weight: 600;
+              color: $text-primary;
+              margin: 0 0 16px 0;
+            }
+
+            .detail-grid {
+              display: grid;
+              grid-template-columns: repeat(2, 1fr);
+              gap: 16px;
+
+              .detail-item {
+                display: flex;
+                flex-direction: column;
+                gap: 4px;
+
+                label {
+                  font-size: 12px;
+                  font-weight: 500;
+                  color: $text-secondary;
+                  text-transform: uppercase;
+                }
+
+                span {
+                  font-size: 14px;
+                  color: $text-primary;
+                }
+              }
+            }
+
+            .parties-list {
+              display: flex;
+              flex-direction: column;
+              gap: 8px;
+
+              .party-item {
+                padding: 8px 12px;
+                background: $background;
+                border-radius: 6px;
+                font-size: 14px;
+              }
+            }
+
+            .detail-description {
+              font-size: 14px;
+              color: $text-primary;
+              line-height: 1.6;
+              margin: 0;
+            }
+
+            .tags-list {
+              display: flex;
+              flex-wrap: wrap;
+              gap: 8px;
+
+              .tag-item {
+                padding: 4px 12px;
+                background: rgba(245, 158, 11, 0.1);
+                color: $primary;
+                border-radius: 12px;
+                font-size: 12px;
+                font-weight: 500;
+              }
+            }
+          }
+        }
+
+        .versions-tab-content {
+          .versions-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+
+            .versions-title {
+              font-size: 16px;
+              font-weight: 600;
+              color: $text-primary;
+              margin: 0;
+            }
+
+            .btn-sm {
+              padding: 6px 12px;
+              font-size: 13px;
+            }
+          }
+
+          .versions-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+
+            .version-item {
+              padding: 16px;
+              background: $background;
+              border-radius: 8px;
+              border: 1px solid $border;
+
+              &.current {
+                border-color: $primary;
+                background: rgba(245, 158, 11, 0.05);
+              }
+
+              .version-header {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                margin-bottom: 8px;
+
+                .version-number {
+                  font-size: 14px;
+                  font-weight: 600;
+                  color: $text-primary;
+                }
+
+                .version-current-badge {
+                  padding: 2px 8px;
+                  background: $primary;
+                  color: white;
+                  border-radius: 12px;
+                  font-size: 11px;
+                  font-weight: 600;
+                }
+              }
+
+              .version-details {
+                margin-bottom: 12px;
+
+                .version-description {
+                  font-size: 14px;
+                  color: $text-primary;
+                  margin: 0 0 8px 0;
+                }
+
+                .version-meta {
+                  display: flex;
+                  gap: 16px;
+                  font-size: 12px;
+                  color: $text-secondary;
+                }
+              }
+
+              .version-actions {
+                display: flex;
+                gap: 8px;
+
+                .version-btn {
+                  padding: 6px 12px;
+                  border: 1px solid $border;
+                  border-radius: 6px;
+                  background: $surface;
+                  cursor: pointer;
+                  font-size: 13px;
+                  color: $text-primary;
+                  transition: all 0.2s;
+
+                  &:hover {
+                    background: $background;
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        .activity-tab-content {
+          .activity-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: $text-primary;
+            margin: 0 0 20px 0;
+          }
+
+          .activity-timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            padding-left: 20px;
+            border-left: 2px solid $border;
+
+            .activity-item {
+              position: relative;
+              padding-left: 20px;
+
+              .activity-dot {
+                position: absolute;
+                left: -26px;
+                top: 4px;
+                width: 10px;
+                height: 10px;
+                border-radius: 50%;
+                background: $primary;
+                border: 2px solid $surface;
+              }
+
+              .activity-content {
+                .activity-header {
+                  display: flex;
+                  justify-content: space-between;
+                  align-items: center;
+                  margin-bottom: 4px;
+
+                  .activity-event {
+                    font-size: 14px;
+                    font-weight: 600;
+                    color: $text-primary;
+                  }
+
+                  .activity-date {
+                    font-size: 12px;
+                    color: $text-secondary;
+                  }
+                }
+
+                .activity-description {
+                  font-size: 13px;
+                  color: $text-secondary;
+                  margin: 0;
+                  line-height: 1.5;
+                }
+              }
             }
           }
         }
