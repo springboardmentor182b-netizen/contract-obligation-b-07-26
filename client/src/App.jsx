@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { forgotPassword } from './features/authentication/services/forgotPassword'
 import { login } from './features/authentication/services/login'
 import { signup } from './features/authentication/services/signup'
 import './App.css'
@@ -24,12 +25,17 @@ const emptyRegistration = {
   role: '',
   department: '',
 }
+const emptyPasswordReset = {
+  email: '',
+  new_password: '',
+}
 const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[^A-Za-z0-9]).{8,}$/
 
 function App() {
   const [mode, setMode] = useState('login')
   const [formData, setFormData] = useState(emptyCredentials)
   const [registrationData, setRegistrationData] = useState(emptyRegistration)
+  const [passwordResetData, setPasswordResetData] = useState(emptyPasswordReset)
   const [rememberMe, setRememberMe] = useState(true)
   const [status, setStatus] = useState('idle')
   const [message, setMessage] = useState('')
@@ -47,6 +53,10 @@ function App() {
     )
   }, [registrationData])
 
+  const canResetPassword = useMemo(() => {
+    return passwordResetData.email.includes('@') && passwordPattern.test(passwordResetData.new_password)
+  }, [passwordResetData])
+
   function handleChange(event) {
     const { name, value } = event.target
     if (name === 'role') {
@@ -58,6 +68,11 @@ function App() {
   function handleRegistrationChange(event) {
     const { name, value } = event.target
     setRegistrationData((current) => ({ ...current, [name]: value }))
+  }
+
+  function handlePasswordResetChange(event) {
+    const { name, value } = event.target
+    setPasswordResetData((current) => ({ ...current, [name]: value }))
   }
 
   function switchMode(nextMode) {
@@ -120,6 +135,34 @@ function App() {
       setMode('login')
       setStatus('success')
       setMessage('Account created. Sign in with your registered email.')
+    } catch (error) {
+      setStatus('error')
+      setMessage(error.message)
+    }
+  }
+
+  async function handlePasswordResetSubmit(event) {
+    event.preventDefault()
+
+    if (!canResetPassword) {
+      setStatus('error')
+      setMessage('Enter your registered email and a stronger new password.')
+      return
+    }
+
+    setStatus('loading')
+    setMessage('')
+
+    try {
+      await forgotPassword(API_BASE_URL, passwordResetData)
+      setFormData({
+        ...emptyCredentials,
+        email: passwordResetData.email,
+      })
+      setPasswordResetData(emptyPasswordReset)
+      setMode('login')
+      setStatus('success')
+      setMessage('Password reset successful. Sign in with your new password.')
     } catch (error) {
       setStatus('error')
       setMessage(error.message)
@@ -194,7 +237,7 @@ function App() {
                   />
                   <span>Remember me</span>
                 </label>
-                <button className="link-button" type="button">
+                <button className="link-button" onClick={() => switchMode('forgot-password')} type="button">
                   Forgot password?
                 </button>
               </div>
@@ -212,7 +255,7 @@ function App() {
                 </button>
               </div>
             </form>
-          ) : (
+          ) : mode === 'register' ? (
             <form className="login-form" onSubmit={handleRegisterSubmit}>
               <label className="field">
                 <span>Full name</span>
@@ -287,6 +330,47 @@ function App() {
 
               <div className="register-row">
                 <span>Already registered?</span>
+                <button className="link-button" onClick={() => switchMode('login')} type="button">
+                  Back to sign in
+                </button>
+              </div>
+            </form>
+          ) : (
+            <form className="login-form" onSubmit={handlePasswordResetSubmit}>
+              <label className="field">
+                <span>Registered email</span>
+                <input
+                  autoComplete="email"
+                  name="email"
+                  onChange={handlePasswordResetChange}
+                  placeholder="Enter your registered email"
+                  type="email"
+                  value={passwordResetData.email}
+                />
+                <span className="field-hint">Use the email linked to your account.</span>
+              </label>
+
+              <label className="field">
+                <span>New password</span>
+                <input
+                  autoComplete="new-password"
+                  name="new_password"
+                  onChange={handlePasswordResetChange}
+                  placeholder="Create a new password"
+                  type="password"
+                  value={passwordResetData.new_password}
+                />
+                <span className="field-hint">Use 8+ characters with uppercase, lowercase, and a special character.</span>
+              </label>
+
+              {message ? <p className={`status-message ${status}`}>{message}</p> : null}
+
+              <button className="primary-button" disabled={!canResetPassword || status === 'loading'} type="submit">
+                {status === 'loading' ? 'Resetting password...' : 'Reset password'}
+              </button>
+
+              <div className="register-row">
+                <span>Remember your password?</span>
                 <button className="link-button" onClick={() => switchMode('login')} type="button">
                   Back to sign in
                 </button>
