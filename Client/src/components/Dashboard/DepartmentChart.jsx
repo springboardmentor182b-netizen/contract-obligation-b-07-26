@@ -27,16 +27,17 @@ const DepartmentChart = () => {
     }
   };
 
-  const getBarColor = (department, score) => {
+  const getBarColor = (score) => {
+  if (score >= 90) {
+    return "#10B981";
+  }
+
+  return "#EF4444";
+};
   // Green if score is at or above target (90%)
   // Red otherwise
 
-  if (score >= 90) {
-    return "#10B981"; // Green
-  }
 
-  return "#EF4444"; // Red
-};
 
   return (
     <div className="chart-card">
@@ -77,7 +78,7 @@ const DepartmentChart = () => {
             {departments.map((entry, index) => (
               <Cell
   key={index}
-  fill={getBarColor(entry.department, entry.score)}
+ fill={getBarColor(entry.score)}
 />
             ))}
 

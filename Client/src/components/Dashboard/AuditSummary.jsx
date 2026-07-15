@@ -28,8 +28,8 @@ const AuditSummary = () => {
           (a) => a.status === "In Progress"
         ).length,
         failed: audits.filter(
-          (a) => a.status === "Terminated"
-        ).length,
+    (a) => a.status === "Failed"
+    ).length,
       });
     } catch (error) {
       console.error(error);

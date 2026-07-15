@@ -1,130 +1,79 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
+
+from src.database.core import get_db
+from src.entities.dashboard import (
+    DashboardMetric,
+    Department,
+    RiskTrend,
+    Audit,
+    Risk,
+)
 
 router = APIRouter()
 
 
 @router.get("/dashboard/metrics")
-def get_metrics():
+def get_metrics(db: Session = Depends(get_db)):
+
+    metric = db.query(DashboardMetric).order_by(DashboardMetric.id.desc()).first()
+
+    if metric is None:
+        return {"message": "No data found"}
 
     return {
-        "overallCompliance": 50,
-        "missedDeadlines": 3,
-        "riskFlags": 5,
-        "auditsCompleted": "18/22"
+        "overallCompliance": metric.overall_compliance,
+        "missedDeadlines": metric.missed_deadlines,
+        "riskFlags": metric.risk_flags,
+        "auditsCompleted": metric.audits_completed
     }
 
 
+
 @router.get("/dashboard/departments")
-def get_departments():
-
+def get_departments(db: Session = Depends(get_db)):
     return [
         {
-            "department": "Legal",
-            "score": 98
-        },
-        {
-            "department": "Finance",
-            "score": 91
-        },
-        {
-            "department": "HR",
-            "score": 87
-        },
-        {
-            "department": "IT",
-            "score": 95
-        },
-        {
-            "department": "Operations",
-            "score": 80
-        },
-        {
-            "department": "Procurement",
-            "score": 89
+            "department": d.department,
+            "score": d.score,
         }
+        for d in db.query(Department).all()
     ]
+
+
 @router.get("/dashboard/risk-trend")
-def get_risk_trend():
+def get_risk_trend(db: Session = Depends(get_db)):
 
     return [
         {
-            "month": "Jan",
-            "risk": 85
-        },
-        {
-            "month": "Feb",
-            "risk": 78
-        },
-        {
-            "month": "Mar",
-            "risk": 45
-        },
-        {
-            "month": "Apr",
-            "risk": 70
-        },
-        {
-            "month": "May",
-            "risk": 75
-        },
-        {
-            "month": "Jun",
-            "risk": 65
+            "month": r.month,
+            "low": r.low,
+            "medium": r.medium,
+            "high": r.high,
         }
+        for r in db.query(RiskTrend).all()
     ]
 @router.get("/dashboard/audits")
-def get_audits():
-
+def get_audits(db: Session = Depends(get_db)):
     return [
         {
-            "audit": "Q2 Vendor Contracts Audit",
-            "department": "Procurement",
-            "auditor": "David Park",
-            "status": "Completed",
-            "score": 97
-        },
-        {
-            "audit": "GDPR Compliance Audit",
-            "department": "IT",
-            "auditor": "Sarah Chen",
-            "status": "In Progress",
-            "score": 85
-        },
-        {
-            "audit": "HR Policy Review",
-            "department": "HR",
-            "auditor": "John Smith",
-            "status": "Terminated",
-            "score": 60
+            "audit": a.audit,
+            "department": a.department,
+            "auditor": a.auditor,
+            "status": a.status,
+            "score": a.score,
         }
+        for a in db.query(Audit).all()
     ]
-@router.get("/dashboard/risks")
-def get_risks():
 
+
+@router.get("/dashboard/risks")
+def get_risks(db: Session = Depends(get_db)):
     return [
         {
-            "title": "Expired Contracts",
-            "level": "High",
-            "count": 2
-        },
-        {
-            "title": "Contracts Without Owner",
-            "level": "Medium",
-            "count": 7
-        },
-        {
-            "title": "Past Due Obligations",
-            "level": "High",
-            "count": 3
-        },
-        {
-            "title": "Missing Documentation",
-            "level": "Medium",
-            "count": 5
-        },
-        {
-            "title": "Renewal Notices",
-            "level": "Low",
-            "count": 4
+            "title": r.title,
+            "level": r.level,
+            "count": r.count,
         }
+        for r in db.query(Risk).all()
     ]

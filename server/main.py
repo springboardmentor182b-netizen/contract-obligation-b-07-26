@@ -1,11 +1,12 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-
+from src.database.core import engine, Base
+from src.entities import dashboard
 from src.routers.dashboard import router as dashboard_router
 
 
 app = FastAPI()
-
+Base.metadata.create_all(bind=engine)
 
 # Allow React frontend
 app.add_middleware(
@@ -25,10 +26,3 @@ app.include_router(
     prefix="/api"
 )
 
-
-@app.get("/")
-def hello_world():
-
-    return {
-        "Hello": "World"
-    }

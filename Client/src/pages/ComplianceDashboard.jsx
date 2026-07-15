@@ -69,7 +69,7 @@ const ComplianceDashboard = () => {
             </h1>
 
             <p className="dashboard-subtitle">
-              June 3, 2024
+              June 3, 2026
             </p>
           </div>
         </div>

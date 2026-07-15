@@ -13,8 +13,14 @@ const Sidebar = () => {
   return (
     <aside className="sidebar">
       {/* Logo */}
-     <div className="logo">
-  <h2>ContractIQ</h2>
+    <div className="logo">
+  <div className="logo-icon">
+    CI
+  </div>
+
+  <h2>
+    Contract<span>IQ</span>
+  </h2>
 </div>
 
       {/* User Card */}
