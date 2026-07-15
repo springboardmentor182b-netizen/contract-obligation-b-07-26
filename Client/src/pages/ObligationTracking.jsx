@@ -1,4 +1,11 @@
-import { useState } from "react";
+import {
+  getObligations,
+  addObligation as createObligation,
+  updateObligation,
+  deleteObligation as deleteObligationApi,
+} from "../services/obligationApi";
+
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 import Header from "../components/ObligationTracker/Header";
@@ -12,66 +19,57 @@ import AddObligationModal from "../components/ObligationTracker/AddObligationMod
 const ObligationTracking = () => {
   const [showModal, setShowModal] = useState(false);
   const [editingObligation, setEditingObligation] = useState(null);
-  const [obligations, setObligations] = useState([
-  {
-    id: "OBL-001",
-    obligation: "Review Vendor Contract",
-    contract: "Vendor Agreement",
-    owner: "John Smith",
-    priority: "High",
-    status: "Pending",
-    dueDate: "2026-07-20",
-  },
-  {
-    id: "OBL-002",
-    obligation: "Submit Compliance Report",
-    contract: "Service Contract",
-    owner: "Sarah Lee",
-    priority: "Medium",
-    status: "In Progress",
-    dueDate: "2026-07-25",
-  },
-  {
-    id: "OBL-003",
-    obligation: "Renew Insurance Policy",
-    contract: "Insurance Contract",
-    owner: "David Wilson",
-    priority: "Low",
-    status: "Completed",
-    dueDate: "2026-07-15",
-  },
-]);
-const addObligation = (formData) => {
-  if (editingObligation) {
-    // Update existing obligation
-    setObligations((prev) =>
-      prev.map((item) =>
-        item.id === editingObligation.id
-          ? {
-              ...item,
-              ...formData,
-            }
-          : item
-      )
-    );
-  } else {
-    // Add new obligation
-    setObligations((prev) => [
-      ...prev,
-      {
-        id: `OBL-${String(prev.length + 1).padStart(3, "0")}`,
-        ...formData,
-      },
-    ]);
-  }
+  const [obligations, setObligations] = useState([]);
 
-  setEditingObligation(null);
-  setShowModal(false);
+const loadObligations = async () => {
+  try {
+    const response = await getObligations();
+
+    console.log("API Response:", response.data);
+
+    setObligations(response.data);
+  } catch (error) {
+    console.error("API Error:", error);
+  }
 };
-   const deleteObligation = (id) => {
-  setObligations((prev) =>
-    prev.filter((item) => item.id !== id)
-  );
+useEffect(() => {
+  loadObligations();
+}, []);
+
+const addObligation = async (formData) => {
+  try {
+    if (editingObligation) {
+      const updated = {
+        ...editingObligation,
+        ...formData,
+      };
+
+      await updateObligation(updated.id, updated);
+    } else {
+      const newObligation = {
+        id: `OBL-${Date.now()}`,
+        ...formData,
+      };
+
+      await createObligation(newObligation);
+    }
+
+    await loadObligations();
+
+    setEditingObligation(null);
+    setShowModal(false);
+  } catch (error) {
+    console.error(error);
+  }
+};
+  const deleteObligation = async (id) => {
+  try {
+    await deleteObligationApi(id);
+
+    await loadObligations();
+  } catch (error) {
+    console.error("Delete Error:", error);
+  }
 };
 const editObligation = (obligation) => {
   setEditingObligation(obligation);
