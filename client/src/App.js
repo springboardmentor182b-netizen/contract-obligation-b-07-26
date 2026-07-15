@@ -1,7 +1,27 @@
-import React from 'react'
+import React from "react";
+import "./App.css";
+import{
 
-import Home from './pages/Home'
+ToastContainer
 
-export default function App() {
-  return React.createElement(Home)
 }
+
+from"react-toastify";
+
+import"react-toastify/dist/ReactToastify.css";
+
+import ObligationTracker from "./pages/ObligationTracker";
+
+function App() {
+  return (
+    <div className="App">
+      <ObligationTracker />
+<ToastContainer
+position="top-right"
+autoClose={3000}
+/>
+    </div>
+  );
+}
+
+export default App;
