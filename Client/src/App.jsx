@@ -1,12 +1,16 @@
 
-
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import ComplianceDashboard from "./pages/ComplianceDashboard";
 
 function App() {
-  
-
   return (
-  <h1>Hello Basant Singh</h1>
-  )
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<ComplianceDashboard />} />
+        <Route path="/compliance" element={<ComplianceDashboard />} />
+      </Routes>
+    </BrowserRouter>
+  );
 }
 
-export default App
+export default App;
