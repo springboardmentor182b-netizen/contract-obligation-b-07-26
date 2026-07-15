@@ -1,4 +1,6 @@
-const BASE_URL = "http://127.0.0.1:8000";
+import CONFIG from "../config/config";
+
+const BASE_URL = CONFIG.BASE_URL;
 
 export default BASE_URL;
 
