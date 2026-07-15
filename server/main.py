@@ -1,10 +1,15 @@
 from fastapi import FastAPI
-from pydantic import BaseModel
-from typing import List
 
-app = FastAPI()
+from src.dashboard.controller import router as dashboard_router
+
+app = FastAPI(
+    title="Contract Management API",
+    version="1.0.0"
+)
+
+app.include_router(dashboard_router)
 
 
-@app.get('/')
+@app.get("/")
 def hello_world():
-    return{'HEllo':'World'}
+    return {"message": "Contract Management API is running"}
