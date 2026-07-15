@@ -3,7 +3,7 @@ import Navbar from "../components/Navbar";
 import DashboardCard from "../components/DashboardCard";
 import RecentContracts from "../components/RecentContracts";
 import ComplianceLevels from "../components/ComplianceLevels";
-import "../styles/dashboard.css";
+// import "../styles/dashboard.css";
 import ContractsByDepartment from "../components/ContractsByDepartment";
 import RecentActivity from "../components/RecentActivity";
 import UpcomingRenewals from "../components/UpcomingRenewals";
