@@ -3,28 +3,27 @@ import Navbar from "../components/Navbar";
 import DashboardCard from "../components/DashboardCard";
 import RecentContracts from "../components/RecentContracts";
 import ComplianceLevels from "../components/ComplianceLevels";
-import "../styles/dashboard.css";
+// import "../styles/dashboard.css";
 import ContractsByDepartment from "../components/ContractsByDepartment";
 import RecentActivity from "../components/RecentActivity";
-import UpcomingRenewals from"../components/UpcomingRenewals";
+import UpcomingRenewals from "../components/UpcomingRenewals";
 
 function Dashboard() {
   return (
     <div className="dashboard">
-
       <Sidebar />
 
       <main className="main-content">
-
         <Navbar />
 
         <div className="dashboard-header">
           <h1>Dashboard Overview</h1>
-          <p>Welcome back, Jennifer. Here is your compliance snapshot for today.</p>
+          <p>
+            Welcome back, Jennifer. Here is your compliance snapshot for today.
+          </p>
         </div>
 
         <div className="cards">
-
           <DashboardCard
             title="Total Contracts"
             value="214"
@@ -60,38 +59,25 @@ function Dashboard() {
             value="91.4%"
             percent="+2%"
           />
-
         </div>
 
         <div className="dashboard-grid">
-
           <div className="left-column">
-
             <div className="card-placeholder">
               <h2>Contract Growth</h2>
               <p>Graph will be added here.</p>
             </div>
-            <ComplianceLevels/>
-            {/*<ContractsByDepartment/>*/}
+
+            <ComplianceLevels />
+            {/* <ContractsByDepartment /> */}
             <RecentContracts />
-            <RecentActivity/>
-            <UpcomingRenewals/>
-
+            <RecentActivity />
+            <UpcomingRenewals />
           </div>
 
-          <div className="right-column">
-
-          
-
-            
-            
-
-          </div>
-
+          <div className="right-column"></div>
         </div>
-
       </main>
-
     </div>
   );
 }
