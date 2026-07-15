@@ -31,4 +31,24 @@ Use the returned `access_token` as a bearer token for protected endpoints.
 
 ## Storage
 
-This starter uses `server/data/contractiq.json` for local persistence so it can run with the packages already present in the project virtual environment. The module boundaries are intentionally close to a future PostgreSQL/SQLAlchemy migration.
+User registration and login use PostgreSQL.
+
+Local database:
+
+```text
+contractiq_db
+```
+
+Default local connection:
+
+```text
+postgresql://postgres:<password>@localhost:5432/contractiq_db
+```
+
+You can override it with:
+
+```powershell
+$env:DATABASE_URL="postgresql://postgres:<password>@localhost:5432/contractiq_db"
+```
+
+Contract, obligation, renewal, report, notification, and activity demo data still use `server/data/contractiq.json`.

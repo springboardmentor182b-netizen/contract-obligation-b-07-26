@@ -12,7 +12,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 
 from ..config import TOKEN_SECRET, TOKEN_TTL_SECONDS
-from ..storage import store
+from ..database import find_user_by_id
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
@@ -77,7 +77,7 @@ def decode_token(token: str) -> dict[str, Any]:
 
 def get_current_user(token: str = Depends(oauth2_scheme)) -> dict[str, Any]:
     payload = decode_token(token)
-    user = store.get("users", payload["sub"])
+    user = find_user_by_id(payload["sub"])
     if not user or not user.get("is_active", True):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User is inactive or missing")
     return user
