@@ -1,3 +1,4 @@
+GROUP-C-FEATURE/compliance-dashboard/Rakhi-v2
 Compliance Dashboard — React + FastAPI
 
 Feature-branch code for the Compliance Dashboard page of the Contract Obligation Tracking & Compliance Management platform (Infosys Springboard internship group project).
@@ -334,5 +335,9 @@ This implementation recreates the **Compliance Dashboard** from the approved Fig
 - Modular and reusable React components
 
 The current implementation uses mock data stored in `backend/app/data.py`. During backend integration, these mock values can be replaced with live database data without requiring changes to the frontend components.
-```
-business logic without requiring changes to the frontend components.
+# contract-obligation-b-07-26
+## 🎨 Figma Design
+
+View the UI Design here:
+
+https://www.figma.com/design/NyML0FgGMeOIo1pqKsUR4N/Contract-Obligation-Tracking-Assistant?node-id=0-1&t=qm7Vdw4owmwsovpw-1
