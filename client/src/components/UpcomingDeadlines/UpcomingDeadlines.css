@@ -1,0 +1,59 @@
+.deadlines-card{
+
+    padding:20px;
+
+}
+
+.deadline-item{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:15px 0;
+
+    border-bottom:1px solid #EEF2F7;
+
+}
+
+.deadline-item:last-child{
+
+    border-bottom:none;
+
+}
+
+.deadline-item h4{
+
+    font-size:15px;
+
+    margin-bottom:4px;
+
+    color:#1F2937;
+
+}
+
+.deadline-item p{
+
+    color:#6B7280;
+
+    font-size:13px;
+
+}
+
+.deadline-date{
+
+    background:#DBEAFE;
+
+    color:#2563EB;
+
+    padding:6px 12px;
+
+    border-radius:8px;
+
+    font-size:13px;
+
+    font-weight:600;
+
+}

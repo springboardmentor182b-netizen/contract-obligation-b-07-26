@@ -1,0 +1,201 @@
+/* ===========================
+   PAGE
+=========================== */
+
+.tracker-page{
+
+    padding:30px;
+
+    background:#F8F9FC;
+
+    min-height:100vh;
+
+}
+
+/* ===========================
+   KPI SECTION
+=========================== */
+
+
+.kpi-row {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 15px;
+    margin: 25px 0 30px;
+    width: 100%;
+}
+
+/* ===========================
+   MAIN DASHBOARD
+=========================== */
+
+.dashboard-content{
+
+    display:grid;
+
+    grid-template-columns:3fr 1.1fr;
+
+    gap:25px;
+
+    align-items:start;
+
+}
+
+/* ===========================
+   LEFT SIDE
+=========================== */
+
+.left-content{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:25px;
+
+}
+
+.obligation-table{
+
+    width:100%;
+
+}
+
+.bottom-widgets{
+
+    width:100%;
+
+}
+
+/* ===========================
+   RIGHT SIDE
+=========================== */
+
+.right-content{
+
+    display:flex;
+
+    flex-direction:column;
+
+  
+
+}
+
+/* Bottom */
+
+.bottom-widgets{
+    width:100%;
+    display:block;
+    margin-top:25px;
+}
+
+.deadlines-section{
+
+    width:100%;
+
+}
+
+.chart-section{
+
+    width:100%;
+
+
+   display:block;
+}
+.chart-section .weekly-card{
+
+    width:100%;
+
+    height:380px;
+
+}
+
+/* ===========================
+   COMMON CARD STYLE
+=========================== */
+
+.left-content > *,
+
+.right-content > *{
+
+    background:#FFFFFF;
+
+    border-radius:18px;
+
+    border:1px solid #E5E7EB;
+
+    box-shadow:0 4px 12px rgba(15,23,42,.05);
+
+    transition:.3s;
+
+}
+
+.left-content > *:hover,
+
+.right-content > *:hover{
+
+    box-shadow:0 10px 30px rgba(15,23,42,.08);
+
+}
+
+/* ===========================
+   RESPONSIVE
+=========================== */
+
+@media(max-width:1500px){
+
+.kpi-row{
+
+grid-template-columns:repeat(4,1fr);
+
+}
+
+}
+
+@media(max-width:1200px){
+
+.dashboard-content{
+
+grid-template-columns:1fr;
+
+}
+
+.bottom-widgets{
+
+grid-template-columns:1fr;
+
+}
+
+}
+
+@media(max-width:900px){
+
+.kpi-row{
+
+grid-template-columns:repeat(2,1fr);
+
+}
+
+.right-content{
+
+grid-template-columns:1fr;
+
+}
+
+}
+
+@media(max-width:600px){
+
+.tracker-page{
+
+padding:15px;
+
+}
+
+.kpi-row{
+
+grid-template-columns:1fr;
+
+}
+
+}
