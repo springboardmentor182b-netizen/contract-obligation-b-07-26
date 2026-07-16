@@ -1,15 +1,12 @@
-import React from "react";
+import React from 'react'
+
+import Home from './pages/Home'
 import "./App.css";
 import{
-
 ToastContainer
-
 }
-
 from"react-toastify";
-
 import"react-toastify/dist/ReactToastify.css";
-
 import ObligationTracker from "./pages/ObligationTracker";
 
 function App() {
@@ -25,3 +22,6 @@ autoClose={3000}
 }
 
 export default App;
+export default function App() {
+  return React.createElement(Home)
+}
