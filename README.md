@@ -1,4 +1,4 @@
-GROUP-C-FEATURE/compliance-dashboard/Rakhi-v2
+
 Compliance Dashboard — React + FastAPI
 
 Feature-branch code for the Compliance Dashboard page of the Contract Obligation Tracking & Compliance Management platform (Infosys Springboard internship group project).
