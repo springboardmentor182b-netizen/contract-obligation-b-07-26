@@ -2,13 +2,9 @@ from __future__ import annotations
 
 from datetime import date, datetime
 from typing import Any
-from fastapi import FastAPI
-from app.config.database import Base, engine
+
 from fastapi import Depends, FastAPI, HTTPException, Query, status
 from fastapi.middleware.cors import CORSMiddleware
-
-from app.routers.obligation_routers import router as obligation_router
-from app.routers.dashboard_routers import router as dashboard_router
 
 from .auth.security import create_token, get_current_user, hash_password, require_roles, verify_password
 from .schemas import (
@@ -33,8 +29,12 @@ from .schemas import (
     UserPublic,
 )
 from .storage import store
-
-
+from fastapi import FastAPI
+from app.config.database import Base, engine
+from app.routers.obligation_routers import router as obligation_router
+from app.routers.dashboard_routers import router as dashboard_router
+from app.models.obligation import Obligation
+Base.metadata.create_all(bind=engine)
 app = FastAPI(
     title="ContractIQ: Contract Obligation Tracking API",
     version="1.0.0",
@@ -48,9 +48,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 app.include_router(obligation_router)
-
 app.include_router(dashboard_router)
 
 def public_user(user: dict[str, Any]) -> dict[str, Any]:
@@ -75,7 +73,11 @@ def ensure_record(table: str, record_id: str) -> dict[str, Any]:
 
 def parse_date(value: str | None) -> date | None:
     return date.fromisoformat(value) if value else None
-
+@app.get("/")
+def home():
+    return {
+        "message": "Contract Obligation Tracking API"
+    }
 
 @app.get("/health")
 def health() -> dict[str, str]:
@@ -353,13 +355,3 @@ def list_audit_logs(_: dict[str, Any] = Depends(require_roles(Role.administrator
 @app.get("/api/activities", response_model=list[APIRecord])
 def list_activities(_: dict[str, Any] = Depends(get_current_user)) -> list[dict[str, Any]]:
     return sorted(store.list("activities"), key=lambda item: item["created_at"], reverse=True)
-
-@app.get("/")
-
-def home():
-
-    return {
-
-        "message": "Contract Obligation Tracking API"
-
-    }
