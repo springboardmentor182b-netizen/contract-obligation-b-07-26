@@ -8,23 +8,25 @@ import {
   Tooltip,
 } from "recharts";
 import { FaCalendarAlt } from "react-icons/fa";
+import {useEffect,useState}from "react";
+import { getContractGrowth } from "../api/dashboardApi";
 
-const data = [
-  { month: "Jan", total: 42, active: 38 },
-  { month: "Feb", total: 55, active: 49 },
-  { month: "Mar", total: 74, active: 61 },
-  { month: "Apr", total: 88, active: 75 },
-  { month: "May", total: 102, active: 88 },
-  { month: "Jun", total: 118, active: 101 },
-  { month: "Jul", total: 132, active: 114 },
-  { month: "Aug", total: 145, active: 126 },
-  { month: "Sep", total: 160, active: 140 },
-  { month: "Oct", total: 174, active: 153 },
-  { month: "Nov", total: 190, active: 167 },
-  { month: "Dec", total: 214, active: 182 },
-];
 
 export default function ContractGrowth() {
+  const[data, setData]=useState([]);
+
+  useEffect(()=>{
+    async function fetchGrowth(){
+      try{
+        const response=await getContractGrowth();
+        setData(response);
+      }catch(error){
+        console.error("Error fetching contract growth:",error);
+      }
+    }
+    fetchGrowth();
+  },[]);
+
   return (
     <div className="contract-growth-card">
 

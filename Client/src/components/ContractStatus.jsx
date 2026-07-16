@@ -5,16 +5,40 @@ import {
   Cell,
   Tooltip,
 } from "recharts";
+import {useEffect, useState} from "react";
+import {getContractStatus} from "../api/dashboardApi";
 
-const data = [
-  { name: "Active", value: 124, color: "#22C55E" },
-  { name: "Pending", value: 36, color: "#3B82F6" },
-  { name: "Under Review", value: 28, color: "#F59E0B" },
-  { name: "Draft", value: 19, color: "#9CA3AF" },
-  { name: "Expired", value: 12, color: "#EF4444" },
-];
 
 export default function ContractStatus() {
+  const [data, setData] = useState([]);
+
+useEffect(() => {
+  async function fetchStatus() {
+    try {
+      const response = await getContractStatus();
+
+      const colors = {
+        Active: "#22C55E",
+        Pending: "#3B82F6",
+        Draft: "#9CA3AF",
+        Expired: "#EF4444",
+        "Under Review": "#F59E0B",
+      };
+
+      const formattedData = response.map((item) => ({
+        name: item.status,
+        value: item.count,
+        color: colors[item.status] || "#8884d8",
+      }));
+
+      setData(formattedData);
+    } catch (error) {
+      console.error("Error fetching contract status:", error);
+    }
+  }
+
+  fetchStatus();
+}, []);
   return (
     <div className="contract-status-card">
 

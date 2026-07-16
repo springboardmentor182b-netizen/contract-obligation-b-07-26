@@ -17,8 +17,23 @@ import{
   FiClipboard,
   FiDownload
 }from "react-icons/fi";
+import {useEffect, useState}from "react";
+import {getDashboardSummary}from "../api/dashboardApi";
 
 function Dashboard() {
+  const[summary, setSummary]=useState(null);
+  useEffect(()=>{
+    async function fetchSummary(){
+      try{
+        const data=await getDashboardSummary();
+        console.log(JSON.stringify(data,null,2));
+        setSummary(data);
+      } catch(error){
+        console.error("Error fetching dashboard summary:",error);
+      }
+    }
+    fetchSummary();
+  },[]);
   return (
     <div className="dashboard">
 
@@ -53,13 +68,13 @@ function Dashboard() {
 
           <DashboardCard
             title="Total Contracts"
-            value="214"
+            value={summary ? summary.total_contracts:"..."}
             percent="+12%"
           />
 
           <DashboardCard
             title="Active Contracts"
-            value="179"
+            value={summary ? summary.active_contracts:"..."}
             percent="+8%"
           />
 
@@ -71,7 +86,7 @@ function Dashboard() {
 
           <DashboardCard
             title="Upcoming Renewals"
-            value="18"
+            value={summary ? summary.expiring_soon:"..."}
             percent="-2%"
           />
 
