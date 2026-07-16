@@ -64,6 +64,12 @@ class UserCreate(BaseModel):
 class UserLogin(BaseModel):
     email: str = Field(pattern=r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
     password: str
+    role: Role
+
+
+class PasswordReset(BaseModel):
+    email: str = Field(pattern=r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+    new_password: str = Field(min_length=8)
 
 
 class UserPublic(BaseModel):
