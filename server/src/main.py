@@ -7,6 +7,7 @@ from fastapi import Depends, FastAPI, HTTPException, Query, status
 from fastapi.middleware.cors import CORSMiddleware
 
 from .auth.security import create_token, get_current_user, hash_password, require_roles, verify_password
+from .database import create_user, find_user_by_email, initialize_database, list_users as list_database_users, update_user_password
 from .schemas import (
     APIRecord,
     ComplianceLevel,
@@ -22,6 +23,7 @@ from .schemas import (
     RenewalStatus,
     RenewalUpdate,
     ReportCreate,
+    PasswordReset,
     Role,
     TokenResponse,
     UserCreate,
@@ -51,17 +53,17 @@ app.add_middleware(
 app.include_router(obligation_router)
 app.include_router(dashboard_router)
 
+@app.on_event("startup")
+def startup() -> None:
+    initialize_database()
+
+
 def public_user(user: dict[str, Any]) -> dict[str, Any]:
     return {key: value for key, value in user.items() if key != "password_hash"}
 
 
 def model_payload(model: Any) -> dict[str, Any]:
     return model.model_dump(mode="json", exclude_unset=True)
-
-
-def find_user_by_email(email: str) -> dict[str, Any] | None:
-    normalized = email.lower()
-    return next((user for user in store.list("users") if user["email"].lower() == normalized), None)
 
 
 def ensure_record(table: str, record_id: str) -> dict[str, Any]:
@@ -89,15 +91,13 @@ def register(payload: UserCreate) -> dict[str, Any]:
     if find_user_by_email(payload.email):
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email is already registered")
 
-    user = store.create(
-        "users",
+    user = create_user(
         {
             "name": payload.name,
             "email": payload.email.lower(),
             "password_hash": hash_password(payload.password),
             "role": payload.role.value,
             "department": payload.department,
-            "is_active": True,
         },
     )
     store.audit("registered", "user", user["id"], user["id"])
@@ -109,8 +109,20 @@ def login(payload: UserLogin) -> dict[str, str]:
     user = find_user_by_email(payload.email)
     if not user or not verify_password(payload.password, user["password_hash"]):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid email or password")
+    if user["role"] != payload.role.value:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Selected role does not match this account")
     store.audit("logged in", "user", user["id"], user["id"])
     return {"access_token": create_token(user), "token_type": "bearer"}
+
+
+@app.post("/api/auth/forgot-password")
+def forgot_password(payload: PasswordReset) -> dict[str, str]:
+    if not find_user_by_email(payload.email):
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No account found for this email")
+
+    user = update_user_password(payload.email, hash_password(payload.new_password))
+    store.audit("reset password", "user", user["id"], user["id"])
+    return {"message": "Password reset successful. You can sign in with the new password."}
 
 
 @app.get("/api/auth/me", response_model=UserPublic)
@@ -120,7 +132,7 @@ def me(current_user: dict[str, Any] = Depends(get_current_user)) -> dict[str, An
 
 @app.get("/api/users", response_model=list[UserPublic])
 def list_users(_: dict[str, Any] = Depends(require_roles(Role.administrator.value, Role.legal_manager.value))) -> list[dict[str, Any]]:
-    return [public_user(user) for user in store.list("users")]
+    return [public_user(user) for user in list_database_users()]
 
 
 @app.get("/api/contracts", response_model=list[APIRecord])
@@ -280,8 +292,38 @@ def compliance_summary(_: dict[str, Any] = Depends(get_current_user)) -> dict[st
     return {"total_obligations": len(obligations), "by_compliance_level": by_level, "overdue_obligations": overdue}
 
 
+def role_dashboard(role: str) -> dict[str, Any]:
+    dashboards = {
+        Role.administrator.value: {
+            "name": "Admin Dashboard",
+            "features": ["User Management", "Contract Statistics", "System Monitoring", "Activity Logs"],
+        },
+        Role.legal_manager.value: {
+            "name": "Legal Dashboard",
+            "features": ["Active Contracts", "Upcoming Renewals", "Pending Obligations", "Recent Activities"],
+        },
+        Role.compliance_officer.value: {
+            "name": "Compliance Dashboard",
+            "features": ["Compliance Reports", "Missed Deadlines", "Risk Indicators", "Audit Summary"],
+        },
+        Role.contract_manager.value: {
+            "name": "Contract Manager Dashboard",
+            "features": ["Contract Repository", "Approval Workflow", "Version Management", "Assignments"],
+        },
+        Role.department_head.value: {
+            "name": "Department Head Dashboard",
+            "features": ["Department Contracts", "Obligation Ownership", "Renewal Approvals", "Performance"],
+        },
+        Role.employee.value: {
+            "name": "Employee Dashboard",
+            "features": ["Assigned Obligations", "Notifications", "Contract Access", "Profile"],
+        },
+    }
+    return dashboards.get(role, dashboards[Role.employee.value])
+
+
 @app.get("/api/dashboard")
-def dashboard(_: dict[str, Any] = Depends(get_current_user)) -> dict[str, Any]:
+def dashboard(current_user: dict[str, Any] = Depends(get_current_user)) -> dict[str, Any]:
     contracts = store.list("contracts")
     obligations = store.list("obligations")
     renewals = store.list("renewals")
@@ -295,6 +337,8 @@ def dashboard(_: dict[str, Any] = Depends(get_current_user)) -> dict[str, Any]:
         "unread_notifications": sum(1 for item in notifications if not item.get("read", False)),
         "compliance": compliance_summary(),
         "recent_activities": activities,
+        "user": public_user(current_user),
+        "role_dashboard": role_dashboard(current_user["role"]),
     }
 
 
