@@ -2,3 +2,8 @@ __pycache__/
 *.py[cod]
 server/data/
 server/venv/
+# Environment
+server/.env
+
+# SQLite Database
+server/*.db
