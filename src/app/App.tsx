@@ -53,7 +53,7 @@ const FRAME_TITLES = [
   "Contract Repository",
   "Contract Management",
   "Obligation Tracker",
-  "Renewal Management",
+  "             Management",
   "Compliance Monitoring",
   "Analytics Overview",
   "Reports Dashboard",
@@ -1171,7 +1171,7 @@ function LoginPage({ onLogin }: { onLogin: () => void }) {
     { icon: Users,       text: "Role-based access control" },
   ];
 
-  function handleLogin() {
+  function () {
     if (!email || !password) { setError("Please enter your email and password."); return; }
     setError(""); setLoading(true);
     setTimeout(() => { setLoading(false); toast.success("Welcome back! Signing in…"); setTimeout(onLogin, 600); }, 1000);
