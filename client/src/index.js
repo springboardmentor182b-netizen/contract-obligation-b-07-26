@@ -1,8 +1,12 @@
-import React from "react";
+import React from 'react'
+import { createRoot } from 'react-dom/client'
+
+import App from './App'
+import './assets/global.css'
 import ReactDOM from "react-dom/client";
 import 'react-toastify/dist/ReactToastify.css';
 import "./App.css";
-import App from "./App";
+createRoot(document.getElementById('root')).render(React.createElement(App))
 
 const root = ReactDOM.createRoot(
   document.getElementById("root")
