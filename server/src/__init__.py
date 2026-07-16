@@ -1,1 +1,1 @@
-"""ContractIQ backend package."""
+# src module
