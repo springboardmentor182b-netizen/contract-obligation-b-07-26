@@ -159,6 +159,3 @@ http://127.0.0.1:8000
 **Pragna Sree**
 
 Built as part of a Contract Management project using React and FastAPI.
-![alt text](image.png)
-![alt text](image-1.png)
-![alt text](image-2.png)
