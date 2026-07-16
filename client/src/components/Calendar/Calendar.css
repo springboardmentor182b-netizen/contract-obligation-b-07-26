@@ -1,0 +1,101 @@
+.calendar-card{
+
+    background:white;
+
+    border-radius:16px;
+
+    padding:20px;
+
+    box-shadow:0 4px 12px rgba(0,0,0,.06);
+
+}
+
+.calendar-header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:20px;
+
+}
+
+.calendar-header h3{
+
+    margin:0;
+
+    color:#1E293B;
+
+}
+
+.week{
+
+    display:grid;
+
+    grid-template-columns:repeat(7,1fr);
+
+    margin-bottom:15px;
+
+    text-align:center;
+
+    color:#64748B;
+
+    font-size:14px;
+
+}
+
+.dates{
+
+    display:grid;
+
+    grid-template-columns:repeat(7,1fr);
+
+    gap:10px;
+
+}
+
+.date{
+
+    height:35px;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    cursor:pointer;
+
+    border-radius:50%;
+
+}
+
+.date:hover{
+
+    background:#F1F5F9;
+
+}
+
+.active-day{
+
+    height:35px;
+
+    width:35px;
+
+    margin:auto;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    background:#00BFFF;
+
+    color:white;
+
+    border-radius:50%;
+
+}

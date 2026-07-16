@@ -29,8 +29,12 @@ from .schemas import (
     UserPublic,
 )
 from .storage import store
-
-
+from fastapi import FastAPI
+from app.config.database import Base, engine
+from app.routers.obligation_routers import router as obligation_router
+from app.routers.dashboard_routers import router as dashboard_router
+from app.models.obligation import Obligation
+Base.metadata.create_all(bind=engine)
 app = FastAPI(
     title="ContractIQ: Contract Obligation Tracking API",
     version="1.0.0",
@@ -44,7 +48,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
+app.include_router(obligation_router)
+app.include_router(dashboard_router)
 
 def public_user(user: dict[str, Any]) -> dict[str, Any]:
     return {key: value for key, value in user.items() if key != "password_hash"}
@@ -68,7 +73,11 @@ def ensure_record(table: str, record_id: str) -> dict[str, Any]:
 
 def parse_date(value: str | None) -> date | None:
     return date.fromisoformat(value) if value else None
-
+@app.get("/")
+def home():
+    return {
+        "message": "Contract Obligation Tracking API"
+    }
 
 @app.get("/health")
 def health() -> dict[str, str]:

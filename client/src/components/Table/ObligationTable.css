@@ -1,0 +1,241 @@
+.table-card{
+
+    background:white;
+
+    border-radius:16px;
+
+    padding:20px;
+
+    box-shadow:0 3px 12px rgba(0,0,0,.05);
+
+}
+
+.table-card h2{
+
+    margin-bottom:20px;
+
+    color:#1E293B;
+
+}
+
+table{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+}
+
+th{
+
+    text-align:left;
+
+    padding:14px;
+
+    background:#F8FAFC;
+
+    color:#475569;
+
+    font-weight:600;
+
+}
+
+td{
+
+    padding:16px 14px;
+
+    border-bottom:1px solid #E2E8F0;
+
+}
+
+tbody tr:hover{
+
+    background:#FAFAFA;
+
+}
+
+.high{
+
+    background:#FEE2E2;
+
+    color:#DC2626;
+
+    padding:5px 12px;
+
+    border-radius:20px;
+
+    font-size:13px;
+
+}
+
+.medium{
+
+    background:#FEF3C7;
+
+    color:#B45309;
+
+    padding:5px 12px;
+
+    border-radius:20px;
+
+    font-size:13px;
+
+}
+
+.low{
+
+    background:#FFEE8C;
+
+    color:#15803D;
+
+    padding:5px 12px;
+
+    border-radius:20px;
+
+    font-size:13px;
+
+}
+
+.pending{
+
+    background:#FFEDD5;
+
+    color:#EA580C;
+
+    padding:5px 12px;
+
+    border-radius:20px;
+
+    font-size:13px;
+
+}
+
+.progress{
+
+    background:#DBEAFE;
+
+    color:#2563EB;
+
+    padding:5px 12px;
+
+    border-radius:20px;
+
+    font-size:13px;
+
+}
+
+.completed{
+
+    background:#DCFCE7;
+
+    color:#16A34A;
+
+    padding:5px 12px;
+
+    border-radius:20px;
+
+    font-size:13px;
+
+}
+
+.overdue{
+
+    background:#FEE2E2;
+
+    color:#DC2626;
+
+    padding:5px 12px;
+
+    border-radius:20px;
+
+    font-size:13px;
+
+}
+
+.in-progress{
+
+    background:#DCFCE7;
+
+    color:#16A34A;
+
+    padding:5px 12px;
+
+    border-radius:20px;
+
+    font-size:13px;
+
+}
+.view-btn{
+
+    padding:7px 14px;
+
+    border-radius:8px;
+
+    border:none;
+
+    background:#10B981;
+
+    cursor:pointer;
+ 
+    color:white;
+
+    transition:.3s;
+
+    margin-right:8px;
+}
+
+.view-btn:hover{
+
+    background:#047857;
+
+    color:white;
+
+    border:none;
+
+}
+
+.edit-btn{
+
+    background:#2563EB;
+
+    color:white;
+
+    border:none;
+
+    padding:7px 14px;
+
+    border-radius:8px;
+
+    cursor:pointer;
+
+    margin-right:8px;
+
+}
+
+.edit-btn:hover{
+
+    background:#1D4ED8;
+
+}
+
+.delete-btn{
+
+    background:#DC2626;
+
+    color:white;
+
+    border:none;
+
+    padding:7px 14px;
+
+    border-radius:8px;
+
+    cursor:pointer;
+
+}
+
+.delete-btn:hover{
+
+    background:#B91C1C;
+
+}
