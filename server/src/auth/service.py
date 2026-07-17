@@ -49,3 +49,15 @@ def login(db: Session, user_login: UserLogin):
         )
     access_token = create_access_token(data={"sub": user.email})
     return {"access_token": access_token, "token_type": "bearer"}
+def forgot_password(db: Session, email: str):
+    user = db.query(User).filter(User.email == email).first()
+
+    if not user:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found"
+        )
+
+    return {
+        "message": "Password reset request received"
+    }

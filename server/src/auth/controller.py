@@ -4,6 +4,8 @@ from src.database.core import SessionLocal
 from src.auth.schemas import UserCreate, UserLogin, UserResponse, Token
 from src.auth.service import create_user, login
 from src.auth.jwt import get_current_user
+from src.auth.schemas import ForgotPassword
+from src.auth.service import forgot_password
 router = APIRouter(prefix="/auth", tags=["Authentication"])
 def get_db():
     db = SessionLocal()
@@ -20,3 +22,9 @@ def login_endpoint(user: UserLogin, db: Session = Depends(get_db)):
 @router.get("/me", response_model=UserResponse)
 def read_users_me(current_user = Depends(get_current_user)):
     return current_user
+@router.post("/forgot-password")
+def forgot_password_endpoint(
+    payload: ForgotPassword,
+    db: Session = Depends(get_db)
+):
+    return forgot_password(db, payload.email)

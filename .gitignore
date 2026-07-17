@@ -1,0 +1,15 @@
+# Node dependencies
+node_modules/
+Client/node_modules/
+
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Environment files
+.env
+server/.env
+
+# Build files
+dist/
+Client/dist/
