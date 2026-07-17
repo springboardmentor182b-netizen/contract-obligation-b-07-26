@@ -6,6 +6,10 @@ import {
 } from "react-icons/fa";
 
 const Navbar = () => {
+  const currentUser = {
+    fullName: "XXXXXX",
+    role: "Compliance Officer",
+  };
   return (
     <header className="navbar">
       {/* Search */}
@@ -33,19 +37,22 @@ const Navbar = () => {
         {/* User */}
         <div className="user-info">
 
-          <div className="user-avatar">
-            SC
-          </div>
+  <div className="user-avatar">
+    {currentUser.fullName
+      .split(" ")
+      .map((name) => name[0])
+      .join("")}
+  </div>
 
-          <div className="user-details">
-            <h4 className="user-name">Sarah Chen</h4>
+  <div className="user-details">
+    <h4 className="user-name">{currentUser.fullName}</h4>
 
-<p className="user-role">
-  Compliance Officer
-</p>
-          </div>
+    <p className="user-role">
+      {currentUser.role}
+    </p>
+  </div>
 
-        </div>
+</div>
 
         {/* Logout */}
         <div className="logout-btn">
