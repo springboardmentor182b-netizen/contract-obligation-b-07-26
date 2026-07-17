@@ -1,7 +1,8 @@
+from datetime import timedelta
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
-from datetime import timedelta
 
 from src.database.session import get_db
 from src.services.user_service import get_user_by_email
@@ -10,8 +11,6 @@ from src.auth.utils import (
     create_access_token,
     ACCESS_TOKEN_EXPIRE_MINUTES,
 )
-
-# ADD THESE IMPORTS
 from src.auth.dependencies import get_current_active_user
 from src.models.user import User
 
@@ -45,7 +44,6 @@ def login_for_access_token(
     }
 
 
-# NEW ENDPOINT
 @router.get("/me")
 def get_current_logged_in_user(
     current_user: User = Depends(get_current_active_user),
