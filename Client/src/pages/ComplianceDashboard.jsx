@@ -27,7 +27,7 @@ const ComplianceDashboard = () => {
           id: 1,
           title: "Overall Compliance",
           value: response.data.overallCompliance + "%",
-          trend: "+1.8% vs last qtr",
+          trend: response.data.complianceTrend || "Current",
           color: "#22C55E",
         },
         {
@@ -68,9 +68,13 @@ const ComplianceDashboard = () => {
               Compliance Dashboard
             </h1>
 
-            <p className="dashboard-subtitle">
-              June 3, 2026
-            </p>
+           <p className="dashboard-subtitle">
+  {new Date().toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  })}
+</p>
           </div>
         </div>
 
