@@ -29,11 +29,11 @@ const Sidebar = () => {
 
     <div className="profile-info">
         <div className="profile-avatar">
-            SC
+            XX
         </div>
 
         <div>
-            <h4 className="user-name">Sarah Chen</h4>
+            <h4 className="user-name">XXXXXX</h4>
             <p className="user-role">Compliance Officer</p>
         </div>
     </div>
