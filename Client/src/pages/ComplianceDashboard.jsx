@@ -27,7 +27,7 @@ const ComplianceDashboard = () => {
           id: 1,
           title: "Overall Compliance",
           value: response.data.overallCompliance + "%",
-          trend: response.data.complianceTrend || "Current",
+          trend: "Current",
           color: "#22C55E",
         },
         {
