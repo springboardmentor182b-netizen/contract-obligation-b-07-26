@@ -4,7 +4,7 @@ import { FileText, Shield, Users, LayoutDashboard, CheckSquare, Settings, Bell, 
 
 // ── Types ──────────────────────────────────────────────────────────────────
 import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
-import AddRenewalModal from './AddRenewalModal.js';
+import AddRenewalModal from "./components/AddRenewalModal.js";
 // ── Mock Data ──────────────────────────────────────────────────────────────
 const CONTRACTS = [{
   id: "CTR-2024-001",
