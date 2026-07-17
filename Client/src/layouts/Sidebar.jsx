@@ -10,6 +10,11 @@ import {
 } from "react-icons/fa";
 
 const Sidebar = () => {
+   const currentUser = {
+    fullName: "XXXXXXX",
+    role: "Compliance Officer",
+  };
+
   return (
     <aside className="sidebar">
       {/* Logo */}
@@ -28,15 +33,17 @@ const Sidebar = () => {
     <p className="signed-text">SIGNED IN AS</p>
 
     <div className="profile-info">
-        <div className="profile-avatar">
-            XX
-        </div>
-
-        <div>
-            <h4 className="user-name">XXXXXX</h4>
-            <p className="user-role">Compliance Officer</p>
-        </div>
-    </div>
+  <div className="profile-avatar">
+    {currentUser.fullName
+      .split(" ")
+      .map((name) => name[0])
+      .join("")}
+  </div>
+      </div>
+  <div>
+    <h4 className="user-name">{currentUser.fullName}</h4>
+    <p className="user-role">{currentUser.role}</p>
+  </div>
 </div>
 
       {/* Workspace */}
