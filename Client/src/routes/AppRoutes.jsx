@@ -17,8 +17,12 @@ import Settings from "../pages/Settings";
 const AppRoutes = () => {
   return (
     <Routes>
+
+      {/* Dashboard uses its own Sidebar and Navbar */}
+      <Route path="/" element={<Dashboard />} />
+
+      {/* All other pages use DashboardLayout */}
       <Route element={<DashboardLayout />}>
-        <Route path="/" element={<Dashboard />} />
         <Route path="/repository" element={<ContractRepository />} />
         <Route path="/management" element={<ContractManagement />} />
         <Route path="/tracking" element={<ObligationTracking />} />
@@ -30,6 +34,7 @@ const AppRoutes = () => {
         <Route path="/users" element={<UserManagement />} />
         <Route path="/settings" element={<Settings />} />
       </Route>
+
     </Routes>
   );
 };

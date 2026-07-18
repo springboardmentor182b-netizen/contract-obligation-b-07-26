@@ -1,23 +1,30 @@
 import { FaHistory, FaArrowRight } from "react-icons/fa";
-import {useState,useEffect} from "react";
-import { getUpcomingRenewals } from "../api/dashboardApi";
 
+const renewals = [
+  {
+    name: "Office Lease – Floor 12 & 13",
+    owner: "Tom Weston",
+    expiry: "2024-12-31",
+    days: 26,
+    risk: "High Risk",
+  },
+  {
+    name: "Microsoft Azure Enterprise Agreement",
+    owner: "Sarah Chen",
+    expiry: "2025-03-15",
+    days: 52,
+    risk: "Medium Risk",
+  },
+  {
+    name: "Data Processing Agreement – EU",
+    owner: "James Park",
+    expiry: "2025-05-20",
+    days: 78,
+    risk: "Low Risk",
+  },
+];
 
 export default function UpcomingRenewals() {
-  const [renewals, setRenewals] = useState([]);
-
-useEffect(() => {
-  async function fetchRenewals() {
-    try {
-      const response = await getUpcomingRenewals();
-      setRenewals(response);
-    } catch (error) {
-      console.error("Error fetching upcoming renewals:", error);
-    }
-  }
-
-  fetchRenewals();
-}, []);
   return (
     <div className="renewals-card">
 
@@ -30,7 +37,7 @@ useEffect(() => {
           </h3>
 
           <span className="badge">
-            {renewals.length}expiring soon
+            3 expiring soon
           </span>
         </div>
 
