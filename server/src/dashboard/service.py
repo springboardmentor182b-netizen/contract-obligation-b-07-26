@@ -5,6 +5,9 @@ from .models import (
     ContractStatus,
     UpcomingRenewal,
     RecentContract,
+    ContractByDepartment,
+    RecentActivity,
+    ComplianceSummaryItem,
 )
 
 
@@ -12,7 +15,10 @@ def get_dashboard_summary():
     return DashboardSummary(
         total_contracts=214,
         active_contracts=182,
+        under_review=31,
         expiring_soon=3,
+        pending_obligations=43,
+        compliance_rate=91.4,
         high_risk=6,
     )
 
@@ -78,23 +84,145 @@ def get_upcoming_renewals():
         ),
     ]
 
-
 def get_recent_contracts():
     return [
         RecentContract(
-            contract_id="CTR-1001",
-            name="Cloud Service Agreement",
+            contract_id="CTR-2024-001",
+            name="Microsoft Azure Enterprise Agreement",
+            category="Vendor",
             department="IT",
             owner="Sarah Chen",
             status="Active",
-            renewal_version="V2.1",
+            renewal="2025-03-15",
+            renewal_version="v3.1",
         ),
         RecentContract(
-            contract_id="CTR-1002",
-            name="Office Lease",
-            department="Admin",
-            owner="Tom Weston",
-            status="Pending",
-            renewal_version="V1.0",
+            contract_id="CTR-2024-002",
+            name="Goldman Sachs Advisory Services",
+            category="Service",
+            department="Finance",
+            owner="Marcus Reid",
+            status="Under Review",
+            renewal="2025-06-22",
+            renewal_version="v1.0",
         ),
+        RecentContract(
+            contract_id="CTR-2024-003",
+            name="Senior VP Employment Agreement",
+            category="Employment",
+            department="HR",
+            owner="Priya Nair",
+            status="Active",
+            renewal="2026-01-10",
+            renewal_version="v2.0",
+        ),
+        RecentContract(
+            contract_id="CTR-2024-004",
+            name="Office Lease - Floor 12 & 13",
+            category="Lease",
+            department="Operations",
+            owner="Tom Weston",
+            status="Expired",
+            renewal="2024-12-31",
+            renewal_version="v1.2",
+        ),
+        RecentContract(
+            contract_id="CTR-2024-005",
+            name="Supplier NDA - Techparts Ltd",
+            category="NDA",
+            department="Procurement",
+            owner="Dana Kim",
+            status="Active",
+            renewal="2025-09-01",
+            renewal_version="v1.0",
+        ),
+        RecentContract(
+            contract_id="CTR-2024-006",
+            name="SaaS Platform License - Salesforce",
+            category="Vendor",
+            department="Sales",
+            owner="Alex Ruiz",
+            status="Active",
+            renewal="2025-07-15",
+            renewal_version="v4.0",
+        ),
+        RecentContract(
+            contract_id="CTR-2024-007",
+            name="Strategic Partnership - Deloitte",
+            category="Partnership",
+            department="Legal",
+            owner="Nia Foster",
+            status="Draft",
+            renewal="2026-03-30",
+            renewal_version="v0.3",
+        ),
+        RecentContract(
+            contract_id="CTR-2024-008",
+            name="Data Processing Agreement - EU",
+            category="Compliance",
+            department="Legal",
+            owner="James Park",
+            status="Active",
+            renewal="2025-05-20",
+            renewal_version="v2.1",
+        ),
+    ]
+
+def get_contracts_by_department():
+    return[
+        ContractByDepartment(department="Legal",compliance=54),
+        ContractByDepartment(department="Procurement",compliance=38),
+        ContractByDepartment(department="HR",compliance=29),
+        ContractByDepartment(department="Finance",compliance=43),
+        ContractByDepartment(department="IT",compliance=22),
+        ContractByDepartment(department="Operations",compliance=18),
+    ]
+
+def get_recent_activity():
+    return [
+        RecentActivity(
+            title="Contract uploaded",
+            description="Goldman Sachs Advisory Services uploaded by Marcus Reid",
+            time="2 min ago",
+            type="upload",
+        ),
+        RecentActivity(
+            title="Contract approved",
+            description="SaaS Platform License – Salesforce approved by CEO",
+            time="18 min ago",
+            type="approved",
+        ),
+        RecentActivity(
+            title="Renewal reminder sent",
+            description="Office Lease – Floor 12 & 13 renewal reminder dispatched",
+            time="1 hr ago",
+            type="reminder",
+        ),
+        RecentActivity(
+            title="Compliance issue detected",
+            description="Data Processing Agreement flagged for GDPR gap",
+            time="3 hr ago",
+            type="warning",
+        ),
+        RecentActivity(
+            title="New user added",
+            description="Priya Nair added as Contract Owner role",
+            time="Yesterday",
+            type="user",
+        ),
+        RecentActivity(
+            title="Version updated",
+            description="Senior VP Employment Agreement updated to v2.0",
+            time="Yesterday",
+            type="history",
+        ),
+    ]
+
+def get_compliance_summary():
+    return [
+        ComplianceSummaryItem(name="Compliant", value=142),
+        ComplianceSummaryItem(name="Pending", value=28),
+        ComplianceSummaryItem(name="Delayed", value=19),
+        ComplianceSummaryItem(name="Non-Compliant", value=11),
+        ComplianceSummaryItem(name="High Risk", value=6),
     ]

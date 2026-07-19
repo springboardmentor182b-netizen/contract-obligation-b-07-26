@@ -33,3 +33,18 @@ export const getRecentContracts = async() =>{
   const response=await API.get("/dashboard/recent-contracts");
   return response.data;
 };
+
+export const getContractsByDepartment = async () => {
+  const response = await API.get("/dashboard/contracts-by-department");
+  return response.data;
+};
+
+export const getRecentActivity = async() => {
+  const response = await API.get("/dashboard/recent-activity");
+  return response.data;
+};
+
+export const getComplianceSummary = async () => {
+  const response = await API.get("/dashboard/compliance-summary");
+  return response.data;
+}

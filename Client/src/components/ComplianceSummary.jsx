@@ -3,51 +3,55 @@ import {
   FaClock,
   FaExclamationCircle,
 } from "react-icons/fa";
+import { useEffect, useState } from "react";
+import { getComplianceSummary } from "../api/dashboardApi";
 
 function ComplianceSummary() {
+  const [summary, setSummary] = useState([]);
+
+  useEffect(() => {
+    async function fetchSummary() {
+      try {
+        const response = await getComplianceSummary();
+        setSummary(response);
+      } catch (error) {
+        console.error("Error fetching compliance summary:", error);
+      }
+    }
+
+    fetchSummary();
+  }, []);
+
+  const cardClass = {
+    Compliant: "green",
+    Pending: "orange",
+    Delayed: "red",
+    "Non-Compliant": "pink",
+    "High Risk": "purple",
+  };
+
+  const iconMap = {
+    Compliant: <FaShieldAlt />,
+    Pending: <FaClock />,
+    Delayed: <FaShieldAlt />,
+    "Non-Compliant": <FaShieldAlt />,
+    "High Risk": <FaExclamationCircle />,
+  };
+
   return (
     <div className="summary-section">
-
-      <div className="summary-card green">
-        <FaShieldAlt />
-        <div>
-          <h2>142</h2>
-          <p>Compliant</p>
+      {summary.map((item) => (
+        <div
+          key={item.name}
+          className={`summary-card ${cardClass[item.name]}`}
+        >
+          {iconMap[item.name]}
+          <div>
+            <h2>{item.value}</h2>
+            <p>{item.name}</p>
+          </div>
         </div>
-      </div>
-
-      <div className="summary-card orange">
-        <FaClock />
-        <div>
-          <h2>28</h2>
-          <p>Pending</p>
-        </div>
-      </div>
-
-      <div className="summary-card red">
-        <FaShieldAlt />
-        <div>
-          <h2>19</h2>
-          <p>Delayed</p>
-        </div>
-      </div>
-
-      <div className="summary-card pink">
-        <FaShieldAlt />
-        <div>
-          <h2>11</h2>
-          <p>Non-Compliant</p>
-        </div>
-      </div>
-
-      <div className="summary-card purple">
-        <FaExclamationCircle />
-        <div>
-          <h2>6</h2>
-          <p>High Risk</p>
-        </div>
-      </div>
-
+      ))}
     </div>
   );
 }

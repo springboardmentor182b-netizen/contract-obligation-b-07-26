@@ -7,17 +7,23 @@ import {
   CartesianGrid,
   Tooltip,
 } from "recharts";
+import { useEffect,useState } from "react";
+import { getContractsByDepartment } from "../api/dashboardApi";
 
-const data = [
-  { department: "Legal", compliance: 54 },
-  { department: "Procurement", compliance: 38 },
-  { department: "HR", compliance: 29 },
-  { department: "Finance", compliance: 43 },
-  { department: "IT", compliance: 22 },
-  { department: "Operations", compliance:18},
-];
+function ContractsByDepartment() {
+  const[data, setData] = useState([]);
 
-function ComplianceLevels() {
+  useEffect(() => {
+    async function fetchDepartments(){
+      try{
+        const response = await getContractsByDepartment();
+        setData(response);
+      } catch (error){
+        console.error("Error fetching contracts by department:",error);
+      }
+    }
+    fetchDepartments();
+  },[]);
   return (
     <div className="compliance-card">
 
@@ -61,4 +67,4 @@ function ComplianceLevels() {
   );
 }
 
-export default ComplianceLevels;
+export default ContractsByDepartment;

@@ -5,36 +5,36 @@ import {
   Cell,
   Tooltip,
 } from "recharts";
-
-const data = [
-  {
-    name: "Compliant",
-    value: 142,
-    color: "#22C55E",
-  },
-  {
-    name: "Pending",
-    value: 28,
-    color: "#F59E0B",
-  },
-  {
-    name: "Delayed",
-    value: 19,
-    color: "#F97316",
-  },
-  {
-    name: "Non-Compliant",
-    value: 11,
-    color: "#DC2626",
-  },
-  {
-    name: "High Risk",
-    value: 6,
-    color: "#7C3AED",
-  },
-];
+import { useEffect, useState } from "react";
+import { getComplianceLevels } from "../api/dashboardApi";
 
 function ComplianceLevels() {
+  const[data, setData] = useState([]);
+
+  useEffect(() => {
+    async function fetchComplianceLevels(){
+      try{
+        const response = await getComplianceLevels();
+
+        const colors = {
+          Compliant:"#22C55E",
+          Pending:"#F59E0B",
+          Delayed:"#F97316",
+          "Non-Compliant":"#DC2626",
+          "High Risk":"#7C3AED",
+        };
+        const formatted = response.map((item) => ({
+          name:item.name,
+          value:item.value,
+          color:colors[item.name] || "#9CA3AF",
+        }));
+        setData(formatted);
+      } catch (error){
+        console.error("Error fetching compliance levels:",error);
+      }
+    }
+    fetchComplianceLevels();
+  },[]);
   return (
     <div className="compliance-card">
 

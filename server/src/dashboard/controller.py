@@ -7,6 +7,9 @@ from .service import (
     get_contract_status,
     get_upcoming_renewals,
     get_recent_contracts,
+    get_contracts_by_department,
+    get_recent_activity,
+    get_compliance_summary,
 )
 
 router = APIRouter(
@@ -43,3 +46,15 @@ def upcoming_renewals():
 @router.get("/recent-contracts")
 def recent_contracts():
     return get_recent_contracts()
+
+@router.get("/contracts-by-department")
+def contracts_by_department():
+    return get_contracts_by_department()
+
+@router.get("/recent-activity")
+def recent_activity():
+    return get_recent_activity()
+
+@router.get("/compliance-summary")
+def compliance_summary():
+    return get_compliance_summary()
