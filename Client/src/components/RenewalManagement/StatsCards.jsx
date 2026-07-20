@@ -1,41 +1,181 @@
-const stats = [
-  { title: "Total Renewals", value: 25, badge: "+4" },
-  { title: "Upcoming", value: 8, badge: "Next 30 Days" },
-  { title: "In Progress", value: 5, badge: "Active" },
-  { title: "Renewed", value: 10, badge: "+2" },
-  { title: "Expired", value: 2, badge: "Action" },
-  { title: "Cancelled", value: 1, badge: "Closed" },
-  { title: "Due Soon", value: 4, badge: "7 Days" },
-  { title: "Renewal Rate", value: "92%", badge: "+3%" },
-];
+import {
+  FileText,
+  CheckCircle,
+  Clock,
+  AlertTriangle,
+} from "lucide-react";
 
-const StatsCards = () => {
+
+const StatsCards = ({ renewals = [] }) => {
+
+  const totalRenewals = renewals.length;
+
+
+  const completedRenewals = renewals.filter(
+    (item) =>
+      item.renewal_status?.toLowerCase() === "completed"
+  ).length;
+
+
+  const pendingRenewals = renewals.filter(
+    (item) =>
+      item.renewal_status?.toLowerCase() === "pending"
+  ).length;
+
+
+  const overdueRenewals = renewals.filter((item) => {
+
+    if (!item.renewal_date) return false;
+
+    return (
+      new Date(item.renewal_date) < new Date() &&
+      item.renewal_status?.toLowerCase() !== "completed"
+    );
+
+  }).length;
+
+
+
+  const cards = [
+
+    {
+      title: "Total Renewals",
+      value: totalRenewals,
+      icon: FileText,
+      bg: "bg-blue-100",
+      iconColor: "text-blue-600",
+    },
+
+
+    {
+      title: "Completed",
+      value: completedRenewals,
+      icon: CheckCircle,
+      bg: "bg-green-100",
+      iconColor: "text-green-600",
+    },
+
+
+    {
+      title: "Pending",
+      value: pendingRenewals,
+      icon: Clock,
+      bg: "bg-yellow-100",
+      iconColor: "text-yellow-600",
+    },
+
+
+    {
+      title: "Overdue",
+      value: overdueRenewals,
+      icon: AlertTriangle,
+      bg: "bg-red-100",
+      iconColor: "text-red-600",
+    },
+
+  ];
+
+
+
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-8 gap-4">
-      {stats.map((item, index) => (
-        <div
-          key={index}
-          className="bg-white border rounded-xl p-4 shadow-sm"
-        >
-          <div className="flex justify-between">
-            <div className="w-8 h-8 rounded-full bg-gray-100"></div>
 
-            <span className="text-xs bg-gray-100 rounded-full px-2 py-1">
-              {item.badge}
-            </span>
+    <div
+      className="
+        grid
+        grid-cols-1
+        sm:grid-cols-2
+        lg:grid-cols-4
+        gap-4
+        w-full
+      "
+    >
+
+      {cards.map((card) => {
+
+        const Icon = card.icon;
+
+
+        return (
+
+          <div
+            key={card.title}
+            className="
+              bg-white
+              rounded-xl
+              border
+              border-gray-200
+              p-4
+              min-h-[120px]
+              flex
+              items-center
+              justify-between
+              shadow-sm
+              hover:shadow-md
+              transition
+            "
+          >
+
+
+            <div>
+
+              <p
+                className="
+                  text-sm
+                  text-gray-500
+                  font-medium
+                "
+              >
+                {card.title}
+              </p>
+
+
+              <h2
+                className="
+                  text-3xl
+                  font-bold
+                  text-gray-800
+                  mt-2
+                "
+              >
+                {card.value}
+              </h2>
+
+
+            </div>
+
+
+
+            <div
+              className={`
+                ${card.bg}
+                rounded-full
+                p-3
+              `}
+            >
+
+              <Icon
+                className={`
+                  w-6
+                  h-6
+                  ${card.iconColor}
+                `}
+              />
+
+            </div>
+
+
           </div>
 
-          <h2 className="text-3xl font-bold mt-4">
-            {item.value}
-          </h2>
+        );
 
-          <p className="text-sm text-gray-500">
-            {item.title}
-          </p>
-        </div>
-      ))}
+      })}
+
+
     </div>
+
   );
+
 };
+
 
 export default StatsCards;

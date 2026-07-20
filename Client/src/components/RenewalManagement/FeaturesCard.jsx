@@ -25,51 +25,167 @@ const features = [
   },
 ];
 
+
 const FeaturesCard = () => {
+
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-      <div className="mb-5">
-        <h2 className="text-lg font-semibold text-gray-900">
+
+    <div
+      className="
+        h-full
+        rounded-xl
+        bg-white
+        border
+        border-gray-200
+        p-5
+      "
+    >
+
+
+      <div className="mb-4">
+
+        <h2
+          className="
+            text-lg
+            font-semibold
+            text-gray-800
+          "
+        >
           Renewal Features
         </h2>
 
-        <p className="text-sm text-gray-500">
+
+        <p
+          className="
+            text-sm
+            text-gray-500
+          "
+        >
           Available renewal management features
         </p>
+
       </div>
 
-      <div className="space-y-4">
-        {features.map((feature) => (
-          <div
-            key={feature.title}
-            className="flex items-center justify-between rounded-lg border border-gray-100 p-3 hover:bg-gray-50"
-          >
-            <div className="flex items-center gap-3">
+
+
+
+      <div
+        className="
+          space-y-3
+        "
+      >
+
+        {
+          features.map((feature)=>(
+
+
+            <div
+              key={feature.title}
+              className="
+                flex
+                items-center
+                justify-between
+                rounded-lg
+                border
+                border-gray-100
+                px-4
+                py-3
+                transition
+                hover:bg-gray-50
+              "
+            >
+
+
               <div
-                className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-semibold text-white ${feature.color}`}
+                className="
+                  flex
+                  items-center
+                  gap-3
+                "
               >
-                {feature.title.charAt(0)}
+
+
+                <div
+                  className={`
+                    flex
+                    h-9
+                    w-9
+                    items-center
+                    justify-center
+                    rounded-full
+                    text-sm
+                    font-semibold
+                    text-white
+                    ${feature.color}
+                  `}
+                >
+                  {feature.title.charAt(0)}
+                </div>
+
+
+
+                <div>
+
+                  <h3
+                    className="
+                      text-sm
+                      font-semibold
+                      text-gray-800
+                    "
+                  >
+                    {feature.title}
+                  </h3>
+
+
+                  <p
+                    className="
+                      text-xs
+                      text-gray-500
+                    "
+                  >
+                    {feature.description}
+                  </p>
+
+
+                </div>
+
+
               </div>
 
-              <div>
-                <h3 className="text-sm font-semibold text-gray-900">
-                  {feature.title}
-                </h3>
 
-                <p className="text-xs text-gray-500">
-                  {feature.description}
-                </p>
-              </div>
+
+
+              <span
+                className="
+                  rounded-full
+                  bg-green-50
+                  px-3
+                  py-1
+                  text-xs
+                  font-medium
+                  text-green-600
+                "
+              >
+                {feature.status}
+              </span>
+
+
+
             </div>
 
-            <span className="text-sm font-medium text-green-600">
-              {feature.status}
-            </span>
-          </div>
-        ))}
+
+          ))
+        }
+
+
       </div>
+
+
     </div>
+
   );
+
 };
+
 
 export default FeaturesCard;

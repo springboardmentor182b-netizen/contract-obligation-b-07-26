@@ -1,34 +1,75 @@
-const SearchBar = () => {
+import { Search } from "lucide-react";
+
+const SearchBar = ({ onSearch }) => {
+
+  const handleChange = (e) => {
+    onSearch(e.target.value);
+  };
+
+
   return (
-    <div className="flex justify-between items-center">
 
-      <div className="flex gap-3">
+    <div
+      className="
+        w-full
+        bg-white
+        rounded-xl
+        border
+        border-gray-200
+        px-5
+        py-3
+      "
+    >
 
-        <input
-          placeholder="Search renewals..."
-          className="border rounded-full px-4 py-2 w-72"
+      <div
+        className="
+          relative
+          w-full
+        "
+      >
+
+        <Search
+          className="
+            absolute
+            left-3
+            top-1/2
+            -translate-y-1/2
+            text-gray-400
+          "
+          size={18}
         />
 
-        <button className="border rounded-full px-5 py-2">
-          All Status
-        </button>
 
-        <button className="border rounded-full px-5 py-2">
-          Renewal Type
-        </button>
+        <input
+          type="text"
+          placeholder="Search by Contract ID, Status, Notes..."
+          onChange={handleChange}
+          className="
+            w-full
+            rounded-lg
+            border
+            border-gray-300
+            py-2.5
+            pl-10
+            pr-4
+            text-sm
+            outline-none
+            transition
+            focus:border-yellow-500
+            focus:ring-2
+            focus:ring-yellow-200
+          "
+        />
 
-        <button className="border rounded-full px-5 py-2">
-          All Owners
-        </button>
 
       </div>
 
-      <p className="text-gray-500">
-        25 of 25 renewals
-      </p>
 
     </div>
+
   );
+
 };
+
 
 export default SearchBar;

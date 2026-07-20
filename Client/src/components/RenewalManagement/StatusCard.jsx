@@ -31,49 +31,148 @@ const statuses = [
   },
 ];
 
+
 const StatusCard = () => {
+
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
-      <div className="mb-5">
-        <h2 className="text-lg font-semibold text-gray-900">
+
+    <div
+      className="
+        h-full
+        rounded-xl
+        bg-white
+        border
+        border-gray-200
+        p-5
+      "
+    >
+
+
+      <div className="mb-4">
+
+        <h2
+          className="
+            text-lg
+            font-semibold
+            text-gray-800
+          "
+        >
           Renewal Status
         </h2>
 
-        <p className="text-sm text-gray-500">
+
+        <p
+          className="
+            text-sm
+            text-gray-500
+          "
+        >
           Current renewal progress
         </p>
+
+
       </div>
 
-      <div className="space-y-5">
-        {statuses.map((item) => {
-          const percentage = Math.round(
-            (item.completed / item.total) * 100
-          );
 
-          return (
-            <div key={item.name}>
-              <div className="mb-2 flex items-center justify-between">
-                <span className="text-sm font-medium">
-                  {item.name}
-                </span>
 
-                <span className="text-sm text-gray-500">
-                  {percentage}%
-                </span>
-              </div>
+      <div
+        className="
+          space-y-4
+        "
+      >
 
-              <div className="h-2 rounded-full bg-gray-200">
+        {
+          statuses.map((item)=>{
+
+
+            const percentage = Math.round(
+              (item.completed / item.total) * 100
+            );
+
+
+            return (
+
+              <div
+                key={item.name}
+              >
+
+
                 <div
-                  className={`${item.color} h-2 rounded-full`}
-                  style={{ width: `${percentage}%` }}
-                />
+                  className="
+                    mb-2
+                    flex
+                    items-center
+                    justify-between
+                  "
+                >
+
+                  <span
+                    className="
+                      text-sm
+                      font-medium
+                      text-gray-700
+                    "
+                  >
+                    {item.name}
+                  </span>
+
+
+                  <span
+                    className="
+                      text-xs
+                      font-medium
+                      text-gray-500
+                    "
+                  >
+                    {percentage}%
+                  </span>
+
+
+                </div>
+
+
+
+
+                <div
+                  className="
+                    h-2
+                    rounded-full
+                    bg-gray-100
+                    overflow-hidden
+                  "
+                >
+
+                  <div
+                    className={`
+                      h-full
+                      rounded-full
+                      ${item.color}
+                    `}
+                    style={{
+                      width:`${percentage}%`
+                    }}
+                  />
+
+
+                </div>
+
+
               </div>
-            </div>
-          );
-        })}
+
+            );
+
+          })
+        }
+
+
       </div>
+
+
     </div>
+
   );
+
 };
+
 
 export default StatusCard;
