@@ -82,7 +82,6 @@ export default function UserFormModal({ open, user, onSubmit, onClose }) {
               value={form.name}
               onChange={(e) => update('name', e.target.value)}
               className="w-full mt-1 px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Jane Doe"
             />
           </div>
 
@@ -93,7 +92,6 @@ export default function UserFormModal({ open, user, onSubmit, onClose }) {
               value={form.email}
               onChange={(e) => update('email', e.target.value)}
               className="w-full mt-1 px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="jane@company.com"
             />
           </div>
 
@@ -104,7 +102,6 @@ export default function UserFormModal({ open, user, onSubmit, onClose }) {
               value={form.department}
               onChange={(e) => update('department', e.target.value)}
               className="w-full mt-1 px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder="Legal, Procurement, etc."
             />
           </div>
 
@@ -131,7 +128,6 @@ export default function UserFormModal({ open, user, onSubmit, onClose }) {
                 value={form.password}
                 onChange={(e) => update('password', e.target.value)}
                 className="w-full mt-1 px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="User will be asked to change it on first login"
               />
             </div>
           )}
