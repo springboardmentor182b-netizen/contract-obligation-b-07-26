@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Eye, Edit, Trash2, X } from 'lucide-react';
+import { API_BASE_URL } from '../../config';
 
 export default function RepositoryTable({ data = [] }) {
   const [tableData, setTableData] = useState([]);
@@ -21,13 +22,15 @@ export default function RepositoryTable({ data = [] }) {
 
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this contract?")) {
-      await fetch(`http://127.0.0.1:8000/contracts/${id}`, { method: 'DELETE' });
+      // UPDATED: Using API_BASE_URL
+      await fetch(`${API_BASE_URL}/contracts/${id}`, { method: 'DELETE' });
       setTableData(tableData.filter(row => row.id !== id));
     }
   };
 
   const handleSave = async (updatedContract) => {
-    await fetch(`http://127.0.0.1:8000/contracts/${updatedContract.id}`, {
+    // UPDATED: Using API_BASE_URL
+    await fetch(`${API_BASE_URL}/contracts/${updatedContract.id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

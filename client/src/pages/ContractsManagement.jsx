@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FileText, Clock, CheckCircle, Star, Plus } from 'lucide-react';
+import { API_BASE_URL } from '../config';
 
 import StatCard from '../features/repository/StatCard'; 
 import ContractStatusChart from '../features/contracts/ContractStatusChart';
@@ -13,7 +14,8 @@ export default function Contracts() {
 
   // Reusable function to fetch dashboard statistics
   const fetchStats = () => {
-    fetch('http://127.0.0.1:8000/dashboard/stats/')
+   
+    fetch(`${API_BASE_URL}/dashboard/stats/`)
       .then(response => response.json())
       .then(data => {
         setStats({

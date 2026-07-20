@@ -1,21 +1,18 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, Download, Eye, Edit, Trash2 } from 'lucide-react';
 import Button from '../../components/common/Button';
-
-const tableData = [
-  { id: 'CTR-001', name: 'Master Services Agreement — Vertex Corp', category: 'Services', status: 'Active', version: 'v3.2', size: '2.4 MB', uploaded: 'Jan 15, 2026' },
-  { id: 'CTR-002', name: 'Software License — CloudSys Inc', category: 'Technology', status: 'Active', version: 'v1.0', size: '1.1 MB', uploaded: 'Feb 3, 2026' },
-  { id: 'CTR-003', name: 'NDA — Finport Ltd', category: 'NDA', status: 'Archived', version: 'v2.1', size: '0.6 MB', uploaded: 'Mar 22, 2026' },
-  { id: 'CTR-004', name: 'Vendor Contract — SupplyGrid Global', category: 'Procurement', status: 'Active', version: 'v1.4', size: '3.2 MB', uploaded: 'Apr 10, 2026' },
-  { id: 'CTR-005', name: 'Employment Contract — Sr. Engineer', category: 'HR', status: 'Active', version: 'v1.0', size: '0.8 MB', uploaded: 'May 1, 2026' },
-  { id: 'CTR-006', name: 'Consulting Agreement — Apex Strategy', category: 'Consulting', status: 'Expired', version: 'v1.1', size: '1.7 MB', uploaded: 'Jun 20, 2026' },
-];
+import { API_BASE_URL } from '../../config';
 
 const getStatusBadge = (status) => {
-  let config = { bg: '', text: '', dot: '' };
-  if (status === 'Active') { config = { bg: '#ecfdf5', text: '#10b981', dot: '#10b981' }; } 
-  else if (status === 'Archived') { config = { bg: '#f1f5f9', text: '#64748b', dot: '#64748b' }; } 
-  else if (status === 'Expired') { config = { bg: '#fef2f2', text: '#ef4444', dot: '#ef4444' }; }
+  let config = { bg: '#f1f5f9', text: '#64748b', dot: '#64748b' }; // Default fallback
+  
+  if (status === 'Active' || status === 'Approved') { 
+    config = { bg: '#ecfdf5', text: '#10b981', dot: '#10b981' }; 
+  } else if (status === 'Archived' || status === 'Draft') { 
+    config = { bg: '#f1f5f9', text: '#64748b', dot: '#64748b' }; 
+  } else if (status === 'Expired' || status === 'In Review') { 
+    config = { bg: '#fef2f2', text: '#ef4444', dot: '#ef4444' }; 
+  }
 
   return (
     <span style={{ background: config.bg, color: config.text, padding: '4px 10px', borderRadius: '20px', fontSize: '12px', fontWeight: '600', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
@@ -26,13 +23,24 @@ const getStatusBadge = (status) => {
 };
 
 export default function ContractTable() {
+  // 1. Create a state to hold the database data
+  const [contracts, setContracts] = useState([]);
+
+  // 2. Fetch the data when the component loads
+  useEffect(() => {
+    fetch(`${API_BASE_URL}/contracts/`)
+      .then(response => response.json())
+      .then(data => setContracts(data))
+      .catch(error => console.error('Error fetching contracts:', error));
+  }, []);
+
   return (
     <div style={{ background: 'white', borderRadius: '12px', border: '1px solid #f1f5f9', boxShadow: '0 2px 4px rgba(0,0,0,0.02)', overflow: 'hidden' }}>
       
-      {/* Managed by CSS for mobile stacking */}
-      <div className="table-toolbar">
+      {/* Toolbar */}
+      <div className="table-toolbar" style={{ padding: '20px', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h3 style={{ margin: 0, fontSize: '16px', color: '#0f172a' }}>Contract Repository</h3>
-        <div style={{ display: 'flex', gap: '12px', alignItems: 'center', width: '100%', justifyContent: 'flex-end' }} className="nav-tools">
+        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }} className="nav-tools">
           <div className="search-input-wrapper" style={{ position: 'relative' }}>
             <Search size={16} color="#94a3b8" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />
             <input 
@@ -64,17 +72,23 @@ export default function ContractTable() {
             </tr>
           </thead>
           <tbody>
-            {tableData.map((row) => (
-              <tr key={row.id} style={{ borderBottom: '1px solid #f8fafc', transition: 'background 0.2s', ':hover': { background: '#f8fafc' } }}>
-                <td style={{ padding: '16px 24px', fontSize: '13px', color: '#3b82f6', fontWeight: '500' }}>{row.id}</td>
-                <td style={{ padding: '16px 24px', fontSize: '13px', color: '#0f172a', fontWeight: '500' }}>{row.name}</td>
+            {/* 3. Map over the fetched 'contracts' instead of the dummy 'tableData' */}
+            {contracts.map((row) => (
+              <tr key={row.id} style={{ borderBottom: '1px solid #f8fafc', transition: 'background 0.2s' }}>
+                
+                {/* 4. Update the variables to match your FastAPI Models (e.g. contract_name, file_size) */}
+                <td style={{ padding: '16px 24px', fontSize: '13px', color: '#3b82f6', fontWeight: '500' }}>{row.contract_id || row.id}</td>
+                <td style={{ padding: '16px 24px', fontSize: '13px', color: '#0f172a', fontWeight: '500' }}>{row.contract_name || "Untitled"}</td>
                 <td style={{ padding: '16px 24px' }}>
-                  <span style={{ background: '#f1f5f9', color: '#475569', padding: '4px 8px', borderRadius: '6px', fontSize: '12px' }}>{row.category}</span>
+                  <span style={{ background: '#f1f5f9', color: '#475569', padding: '4px 8px', borderRadius: '6px', fontSize: '12px' }}>
+                    {row.category || "General"}
+                  </span>
                 </td>
-                <td style={{ padding: '16px 24px' }}>{getStatusBadge(row.status)}</td>
-                <td style={{ padding: '16px 24px', fontSize: '13px', color: '#64748b' }}>{row.version}</td>
-                <td style={{ padding: '16px 24px', fontSize: '13px', color: '#64748b' }}>{row.size}</td>
-                <td style={{ padding: '16px 24px', fontSize: '13px', color: '#64748b' }}>{row.uploaded}</td>
+                <td style={{ padding: '16px 24px' }}>{getStatusBadge(row.status || "Draft")}</td>
+                <td style={{ padding: '16px 24px', fontSize: '13px', color: '#64748b' }}>{row.version || "v1.0"}</td>
+                <td style={{ padding: '16px 24px', fontSize: '13px', color: '#64748b' }}>{row.file_size || "0 MB"}</td>
+                <td style={{ padding: '16px 24px', fontSize: '13px', color: '#64748b' }}>{row.uploaded_date}</td>
+                
                 <td style={{ padding: '16px 24px', display: 'flex', gap: '8px' }}>
                   <button style={{ background: '#eff6ff', border: 'none', padding: '6px', borderRadius: '6px', color: '#3b82f6', cursor: 'pointer' }}><Eye size={14} /></button>
                   <button style={{ background: '#fffbeb', border: 'none', padding: '6px', borderRadius: '6px', color: '#f59e0b', cursor: 'pointer' }}><Edit size={14} /></button>

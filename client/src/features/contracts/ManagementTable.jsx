@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Eye, Edit, Trash2, X } from 'lucide-react';
+import { API_BASE_URL } from '../../config';
 
 export default function ManagementTable() {
   const [tableData, setTableData] = useState([]);
@@ -11,7 +12,7 @@ export default function ManagementTable() {
   }, []);
 
   const fetchContracts = () => {
-    fetch('http://127.0.0.1:8000/contracts/')
+    fetch(`${API_BASE_URL}/contracts/`)
       .then(response => response.json())
       .then(data => {
         const formattedData = data.map(item => ({

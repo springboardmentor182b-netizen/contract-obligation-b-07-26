@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Clock, Target, Edit3, XCircle } from 'lucide-react';
+import { API_BASE_URL } from '../../config';
 
 export default function ApprovalWorkflow() {
   const [stats, setStats] = useState({
@@ -10,7 +11,7 @@ export default function ApprovalWorkflow() {
   });
 
   useEffect(() => {
-    fetch('http://127.0.0.1:8000/dashboard/stats/')
+    fetch(`${API_BASE_URL}/contracts/`)
       .then(response => response.json())
       .then(data => {
         setStats({

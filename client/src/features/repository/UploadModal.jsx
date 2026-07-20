@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { X } from 'lucide-react';
+import { API_BASE_URL } from '../../config';
 
 export default function UploadModal({ onClose }) {
   // We include all fields expected by schemas.py to avoid 422/500 errors
@@ -21,7 +22,7 @@ export default function UploadModal({ onClose }) {
 
   const handleUpload = async () => {
     try {
-      const response = await fetch('http://127.0.0.1:8000/contracts/', {
+      const response = await fetch(`${API_BASE_URL}/contracts/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from 'recharts';
+import { API_BASE_URL } from '../../config';
 
 export default function ContractStatusChart() {
   // We start with an empty chart
@@ -7,7 +8,8 @@ export default function ContractStatusChart() {
 
   // Fetch the real stats from the backend when the component loads
   useEffect(() => {
-    fetch('http://127.0.0.1:8000/dashboard/stats/')
+    // FIXED: Changed endpoint to /dashboard/stats/
+    fetch(`${API_BASE_URL}/dashboard/stats/`)
       .then(response => response.json())
       .then(data => {
         // Transform the backend data into the exact format the Pie Chart needs
