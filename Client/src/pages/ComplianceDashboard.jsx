@@ -23,14 +23,16 @@ const ComplianceDashboard = () => {
       const response = await api.get("/dashboard/metrics");
 
       setMetrics([
-        {
-          id: 1,
-          title: "Overall Compliance",
-          value: response.data.overallCompliance + "%",
-          trend: "Current",
-          color: "#22C55E",
-        },
-        {
+        
+          {
+         id: 1,
+        title: "Overall Compliance",
+        value: response.data.overallCompliance + "%",
+        trend: "Current",
+      color: "#22C55E",
+          },    
+
+          {
           id: 2,
           title: "Missed Deadlines",
           value: response.data.missedDeadlines,
@@ -41,7 +43,7 @@ const ComplianceDashboard = () => {
           id: 3,
           title: "Risk Flags",
           value: response.data.riskFlags,
-          trend: "Current",
+         trend: "Current",
           color: "#F59E0B",
         },
         {
@@ -68,7 +70,7 @@ const ComplianceDashboard = () => {
               Compliance Dashboard
             </h1>
 
-           <p className="dashboard-subtitle">
+            <p className="dashboard-subtitle">
   {new Date().toLocaleDateString("en-US", {
     month: "long",
     day: "numeric",
