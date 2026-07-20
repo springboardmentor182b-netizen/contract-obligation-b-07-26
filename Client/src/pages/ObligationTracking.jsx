@@ -1,5 +1,6 @@
 import {
   getObligations,
+  getObligationStats,
   addObligation as createObligation,
   updateObligation,
   deleteObligation as deleteObligationApi,
@@ -21,6 +22,17 @@ const ObligationTracking = () => {
   const [editingObligation, setEditingObligation] = useState(null);
   const [obligations, setObligations] = useState([]);
 
+const [stats, setStats] = useState({
+  total: 0,
+  pending: 0,
+  progress: 0,
+  completed: 0,
+  overdue: 0,
+  risk: 0,
+  due: 0,
+  compliance: 0,
+});
+
 const loadObligations = async () => {
   try {
     const response = await getObligations();
@@ -34,7 +46,17 @@ const loadObligations = async () => {
 };
 useEffect(() => {
   loadObligations();
+  loadStats();
 }, []);
+
+const loadStats = async () => {
+  try {
+    const response = await getObligationStats();
+    setStats(response.data);
+  } catch (error) {
+    console.error("Stats Error:", error);
+  }
+};
 
 const addObligation = async (formData) => {
   try {
@@ -55,6 +77,7 @@ const addObligation = async (formData) => {
     }
 
     await loadObligations();
+    await loadStats();
 
     setEditingObligation(null);
     setShowModal(false);
@@ -67,6 +90,7 @@ const addObligation = async (formData) => {
     await deleteObligationApi(id);
 
     await loadObligations();
+    await loadStats();
   } catch (error) {
     console.error("Delete Error:", error);
   }
@@ -92,7 +116,7 @@ const editObligation = (obligation) => {
   }}
 />
 
-      <StatsCards />
+      <StatsCards stats={stats} />
 
       <FilterBar />
 
@@ -103,14 +127,14 @@ const editObligation = (obligation) => {
 />
 
       <div className="grid grid-cols-12 gap-5">
-        <div className="col-span-8">
-          <ResponsibilityCard />
-        </div>
+  <div className="col-span-8">
+    <ResponsibilityCard obligations={obligations} />
+  </div>
 
-        <div className="col-span-4">
-          <ComplianceCard />
-        </div>
-      </div>
+  <div className="col-span-4">
+    <ComplianceCard obligations={obligations} />
+  </div>
+</div>
 
       <AnimatePresence>
   {showModal && (

@@ -16,6 +16,7 @@ const AddObligationModal = ({
   dueDate: "",
   description: "",
 });
+const [errors, setErrors] = useState({});
 
 useEffect(() => {
   if (editingObligation) {
@@ -32,7 +33,30 @@ useEffect(() => {
     });
   }
 }, [editingObligation]);
-  return (
+const validateForm = () => {
+  const newErrors = {};
+
+  if (!formData.obligation.trim()) {
+    newErrors.obligation = "Obligation name is required";
+  }
+
+  if (!formData.contract.trim()) {
+    newErrors.contract = "Contract name is required";
+  }
+
+  if (!formData.owner.trim()) {
+    newErrors.owner = "Owner is required";
+  }
+
+  if (!formData.dueDate) {
+    newErrors.dueDate = "Due date is required";
+  }
+
+  setErrors(newErrors);
+
+  return Object.keys(newErrors).length === 0;
+};
+return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
       onClick={onClose}
@@ -108,6 +132,11 @@ useEffect(() => {
         className="w-full rounded-lg border p-3 outline-none focus:border-[#D4AF37]"
         placeholder="Enter obligation name"
       />
+      {errors.obligation && (
+  <p className="mt-1 text-sm text-red-500">
+    {errors.obligation}
+  </p>
+)}
     </div>
 
     {/* Contract */}
@@ -127,6 +156,11 @@ useEffect(() => {
         className="w-full rounded-lg border p-3"
         placeholder="Enter contract name"
       />
+      {errors.contract && (
+  <p className="mt-1 text-sm text-red-500">
+    {errors.contract}
+  </p>
+)}
     </div>
 
     {/* Owner */}
@@ -146,6 +180,11 @@ useEffect(() => {
         className="w-full rounded-lg border p-3"
         placeholder="Owner"
       />
+      {errors.owner && (
+  <p className="mt-1 text-sm text-red-500">
+    {errors.owner}
+  </p>
+)}
     </div>
 
     {/* Due Date */}
@@ -165,6 +204,11 @@ useEffect(() => {
         }
         className="w-full rounded-lg border p-3"
       />
+      {errors.dueDate && (
+  <p className="mt-1 text-sm text-red-500">
+    {errors.dueDate}
+  </p>
+)}
     </div>
 
     {/* Priority */}
@@ -258,15 +302,8 @@ useEffect(() => {
 
           <button
   onClick={() => {
-    if (
-      !formData.obligation ||
-      !formData.contract ||
-      !formData.owner ||
-      !formData.dueDate
-    ) {
-      alert("Please fill all required fields.");
-      return;
-    }
+    if (!validateForm()) return;
+    
 
     onSave(formData);
   }}

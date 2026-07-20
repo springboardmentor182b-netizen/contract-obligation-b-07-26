@@ -7,6 +7,9 @@ const API = axios.create({
 export const getObligations = () =>
   API.get("/obligations");
 
+export const getObligationStats = () =>
+  API.get("/obligations/stats");
+
 export const addObligation = (data) =>
   API.post("/obligations", data);
 

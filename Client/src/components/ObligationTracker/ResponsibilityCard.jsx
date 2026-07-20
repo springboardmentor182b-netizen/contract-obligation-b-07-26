@@ -1,100 +1,83 @@
-const team = [
-  {
-    name: "James Park",
-    role: "Legal Manager",
-    tasks: 12,
-    overdue: 1,
-    color: "bg-blue-500",
-  },
-  {
-    name: "Sarah Chen",
-    role: "Compliance Officer",
-    tasks: 8,
-    overdue: 0,
-    color: "bg-green-500",
-  },
-  {
-    name: "Marcus Reid",
-    role: "Contract Manager",
-    tasks: 10,
-    overdue: 2,
-    color: "bg-orange-500",
-  },
-  {
-    name: "Dana Kim",
-    role: "Finance Lead",
-    tasks: 6,
-    overdue: 0,
-    color: "bg-purple-500",
-  },
-];
+const ResponsibilityCard = ({ obligations }) => {
+  const owners = {};
 
-const ResponsibilityCard = () => {
+  obligations.forEach((item) => {
+    if (!owners[item.owner]) {
+      owners[item.owner] = {
+        owner: item.owner,
+        total: 0,
+        overdue: 0,
+      };
+    }
+
+    owners[item.owner].total++;
+
+    if (item.status === "Pending") {
+      owners[item.owner].overdue++;
+    }
+  });
+
+  const data = Object.values(owners);
+
+  const colors = [
+    "bg-blue-500",
+    "bg-green-500",
+    "bg-orange-500",
+    "bg-purple-500",
+    "bg-pink-500",
+  ];
+
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+    <div className="bg-white rounded-xl shadow-sm border p-5">
+      <h1 className="text-2xl font-semibold">
+        Responsibility Assignments
+      </h1>
 
-      <div className="mb-5">
-        <h2 className="text-lg font-semibold text-gray-900">
-          Responsibility Assignments
-        </h2>
+      <p className="text-gray-500 mb-4">
+        Obligation workload by assignee
+      </p>
 
-        <p className="text-sm text-gray-500">
-          Obligation workload by assignee
-        </p>
-      </div>
-
-      <div className="space-y-4">
-        {team.map((member) => (
+      <div className="space-y-3">
+        {data.map((item, index) => (
           <div
-            key={member.name}
-            className="flex items-center justify-between rounded-lg border border-gray-100 p-3 hover:bg-gray-50"
+            key={item.owner}
+            className="flex items-center justify-between border rounded-xl p-3"
           >
-            <div className="flex items-center gap-3">
-
+            <div className="flex items-center gap-4">
               <div
-                className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-semibold text-white ${member.color}`}
+                className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold ${
+                  colors[index % colors.length]
+                }`}
               >
-                {member.name
-                  .split(" ")
-                  .map((n) => n[0])
-                  .join("")}
+                {item.owner.substring(0, 2).toUpperCase()}
               </div>
 
               <div>
-                <h3 className="text-sm font-semibold text-gray-900">
-                  {member.name}
-                </h3>
+                <h3 className="text-sm font-semibold">{item.owner}</h3>
 
-                <p className="text-xs text-gray-500">
-                  {member.role}
+                <p className="text-sm text-gray-500">
+                  Contract Owner
                 </p>
               </div>
-
             </div>
 
             <div className="text-right">
-
-              <p className="text-sm font-semibold">
-                {member.tasks} Tasks
-              </p>
+              <h3 className="text-sm font-semibold">
+                {item.total} Tasks
+              </h3>
 
               <p
-                className={`text-xs ${
-                  member.overdue
-                    ? "text-red-500"
-                    : "text-green-600"
-                }`}
+                className={
+                  item.overdue > 0
+                    ? "text-red-500 text-sm"
+                    : "text-green-600 text-sm"
+                }
               >
-                {member.overdue}
-                {member.overdue === 1
-                  ? " Overdue"
-                  : member.overdue === 0
-                  ? " On Track"
-                  : " Overdue"}
+                {item.overdue > 0
+                  ? `${item.overdue} Pending`
+                  : "All Completed"}
               </p>
-
             </div>
-
           </div>
         ))}
       </div>
