@@ -1,4 +1,21 @@
-export default function ComplianceMonitoring() {
+import { useEffect, useState } from "react";
+
+export default function ComplianceMonitoring() {const [dashboardData, setDashboardData] = useState({
+    compliance_score: 0,
+    high_risk: 0,
+    pending_reviews: 0,
+    compliant: 0,
+});
+
+useEffect(() => {
+    fetch("http://127.0.0.1:8000/dashboard")
+        .then((res) => res.json())
+        .then((data) => {
+            console.log("API Data:", data);
+            setDashboardData(data);
+        })
+        .catch((err) => console.error(err));
+}, []);
     return (
         <div className="container-fluid p-0">
             <div className="row g-0">
@@ -115,7 +132,7 @@ export default function ComplianceMonitoring() {
                                     <div className="d-flex justify-content-between">
                                         <div>
                                             <small className="card-label">COMPLIANCE SCORE</small>
-                                            <h1 className="card-number mb-1">89%</h1>
+                                            <h1 className="card-number mb-1">{dashboardData.compliance_score}%</h1>
                                             <small className="text-success">↗ +2.3 pts this month</small>
                                         </div>
 
@@ -130,7 +147,7 @@ export default function ComplianceMonitoring() {
                                     <div className="d-flex justify-content-between">
                                         <div>
                                             <small className="card-label">HIGH RISK CONTRACTS</small>
-                                            <h1 className="card-number mb-1">20</h1>
+                                            <h1 className="card-number mb-1">{dashboardData.high_risk}</h1>
                                             <small className="text-danger">↘ Needs immediate review</small>
                                         </div>
 
@@ -145,7 +162,7 @@ export default function ComplianceMonitoring() {
                                     <div className="d-flex justify-content-between">
                                         <div>
                                             <small className="card-label">PENDING REVIEWS</small>
-                                            <h1 className="card-number mb-1">34</h1>
+                                            <h1 className="card-number mb-1">{dashboardData.pending_reviews}</h1>
                                             <small className="text-secondary">Scheduled this month</small>
                                         </div>
 
@@ -160,7 +177,7 @@ export default function ComplianceMonitoring() {
                                     <div className="d-flex justify-content-between">
                                         <div>
                                             <small className="card-label">COMPLIANT</small>
-                                            <h1 className="card-number mb-1">198</h1>
+                                            <h1 className="card-number mb-1">{dashboardData.compliant}</h1>
                                             <small className="text-secondary">91.7% compliance rate</small>
                                         </div>
 
