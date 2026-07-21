@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { mainMenu, accountMenu, logoutMenu } from "../../data/sidebarMenu";
+import { mainMenu, accountMenu, logoutMenu } from "../../Data/sidebarMenu";
 
 const Sidebar = () => {
   return (
