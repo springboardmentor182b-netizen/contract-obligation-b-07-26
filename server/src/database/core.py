@@ -1,11 +1,19 @@
+import os
+from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 
-# 🚨 CHANGE "your_password_here" to your actual pgAdmin password!
-# We are connecting to the default "postgres" database.
-SQLALCHEMY_DATABASE_URL = "postgresql://postgres:postgres@localhost:5432/postgres"
+# 1. Load the environment variables from your local .env file
+load_dotenv()
 
-# PostgreSQL doesn't need the check_same_thread argument that SQLite used
+# 2. Fetch the database URL dynamically from the .env file
+SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL")
+
+# Safety check: throw an error if the .env file is missing
+if not SQLALCHEMY_DATABASE_URL:
+    raise ValueError("🚨 DATABASE_URL is missing! Please create a .env file.")
+
+# PostgreSQL connection
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
