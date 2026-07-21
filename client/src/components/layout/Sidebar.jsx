@@ -10,17 +10,17 @@ const menuItems = [
   { name: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
   { name: 'Contracts', icon: FileText, path: '/contracts/management' },
   { name: 'Repository', icon: Folder, path: '/contracts/repository' },
-  { name: 'Obligations', icon: CheckCircle, path: '/obligations', badge: 7 },
+  { name: 'Obligations', icon: CheckCircle, path: '/obligations' },
   { name: 'Renewals', icon: RefreshCw, path: '/renewals' },
   { name: 'Compliance', icon: ShieldCheck, path: '/compliance' },
   { name: 'Reports', icon: BarChart2, path: '/reports' },
-  { name: 'Notifications', icon: Bell, path: '/notifications', badge: 14 },
+  { name: 'Notifications', icon: Bell, path: '/notifications' },
   { name: 'Users', icon: Users, path: '/users' },
   { name: 'Audit & Logs', icon: Activity, path: '/audit' },
   { name: 'Settings', icon: Settings, path: '/settings' },
 ];
 
-export default function Sidebar({ onClose }) {
+export default function Sidebar({ onClose, user }) {
   const location = useLocation();
 
   return (
@@ -56,7 +56,6 @@ export default function Sidebar({ onClose }) {
 
             return (
               <li key={item.name}>
-                {/* Added onClick={onClose} to close menu on mobile selection */}
                 <Link to={item.path} onClick={onClose} style={{
                   display: 'flex', alignItems: 'center', justifyContent: 'space-between',
                   padding: '10px 12px', borderRadius: '8px', textDecoration: 'none',
@@ -88,11 +87,11 @@ export default function Sidebar({ onClose }) {
       <div style={{ padding: '20px', borderTop: '1px solid #1e293b', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: '#2563eb', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '14px' }}>
-            AT
+            {user?.initials || 'U'}
           </div>
           <div>
-            <div style={{ color: 'white', fontSize: '14px', fontWeight: '500' }}>Alexandra Thornton</div>
-            <div style={{ color: '#64748b', fontSize: '12px' }}>System Admin</div>
+            <div style={{ color: 'white', fontSize: '14px', fontWeight: '500' }}>{user?.name || 'User Name'}</div>
+            <div style={{ color: '#64748b', fontSize: '12px' }}>{user?.role || 'Role'}</div>
           </div>
         </div>
         <button style={{ background: 'transparent', border: 'none', color: '#64748b', cursor: 'pointer', display: 'flex' }}>

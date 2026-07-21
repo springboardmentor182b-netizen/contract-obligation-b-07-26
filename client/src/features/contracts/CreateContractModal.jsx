@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { X } from 'lucide-react';
+import { API_BASE_URL } from '../../config'; // Import the base URL
 
 export default function CreateContractModal({ isOpen, onClose, onSuccess }) {
   const [formData, setFormData] = useState({
@@ -34,7 +35,8 @@ export default function CreateContractModal({ isOpen, onClose, onSuccess }) {
     };
 
     try {
-      const response = await fetch('http://127.0.0.1:8000/contracts/', {
+      // Use the imported API_BASE_URL here with template literals
+      const response = await fetch(`${API_BASE_URL}/contracts/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),

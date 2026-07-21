@@ -3,28 +3,35 @@ import { Clock, Target, Edit3, XCircle } from 'lucide-react';
 import { API_BASE_URL } from '../../config';
 
 export default function ApprovalWorkflow() {
+  // 1. Added the new metrics to our initial state
   const [stats, setStats] = useState({
     draft: 0,
     review: 0,
     approved: 0,
-    active: 0
+    active: 0,
+    avgApprovalTime: 0,
+    slaCompliance: 0,
+    rejected: 0
   });
 
   useEffect(() => {
-    fetch(`${API_BASE_URL}/contracts/`)
+    fetch(`${API_BASE_URL}/dashboard/stats/`)
       .then(response => response.json())
       .then(data => {
+        // 2. Map the new metrics to the backend response (with fallbacks to 0)
         setStats({
           draft: data.draft_count || 0,
           review: data.in_review_count || 0,
           approved: data.approved_count || 0,
-          active: data.active_count || 0
+          active: data.active_count || 0,
+          avgApprovalTime: data.avg_approval_time || 0,
+          slaCompliance: data.sla_compliance || 0,
+          rejected: data.rejected_count || 0
         });
       })
       .catch(error => console.error('Error fetching stats:', error));
   }, []);
 
-  // We map the 4 stages we track in our database to the pipeline circles
   const steps = [
     { name: 'Draft', count: stats.draft, color: '#64748b' },
     { name: 'Review', count: stats.review, color: '#3b82f6' },
@@ -51,36 +58,49 @@ export default function ApprovalWorkflow() {
         ))}
       </div>
 
-      {/* Static Sub-metrics */}
+      {/* Dynamic Sub-metrics (No more hardcoded dummy data!) */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+         
          <div style={{ padding: '15px', backgroundColor: '#f8fafc', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div style={{ backgroundColor: '#eff6ff', padding: '8px', borderRadius: '50%', color: '#3b82f6' }}><Clock size={16} /></div>
             <div>
                <div style={{ fontSize: '12px', color: '#64748b' }}>Avg. Approval Time</div>
-               <div style={{ fontSize: '14px', fontWeight: '600', color: '#0f172a' }}>4.2 days</div>
+               <div style={{ fontSize: '14px', fontWeight: '600', color: '#0f172a' }}>
+                 {stats.avgApprovalTime} days
+               </div>
             </div>
          </div>
+         
          <div style={{ padding: '15px', backgroundColor: '#f8fafc', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div style={{ backgroundColor: '#ecfdf5', padding: '8px', borderRadius: '50%', color: '#10b981' }}><Target size={16} /></div>
             <div>
                <div style={{ fontSize: '12px', color: '#64748b' }}>SLA Compliance</div>
-               <div style={{ fontSize: '14px', fontWeight: '600', color: '#0f172a' }}>94.1%</div>
+               <div style={{ fontSize: '14px', fontWeight: '600', color: '#0f172a' }}>
+                 {stats.slaCompliance}%
+               </div>
             </div>
          </div>
+         
          <div style={{ padding: '15px', backgroundColor: '#f8fafc', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div style={{ backgroundColor: '#fef3c7', padding: '8px', borderRadius: '50%', color: '#d97706' }}><Edit3 size={16} /></div>
             <div>
                <div style={{ fontSize: '12px', color: '#64748b' }}>Pending Signatures</div>
-               <div style={{ fontSize: '14px', fontWeight: '600', color: '#0f172a' }}>2 contracts</div>
+               <div style={{ fontSize: '14px', fontWeight: '600', color: '#0f172a' }}>
+                 {stats.review} contracts
+               </div>
             </div>
          </div>
+         
          <div style={{ padding: '15px', backgroundColor: '#f8fafc', borderRadius: '8px', display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div style={{ backgroundColor: '#fef2f2', padding: '8px', borderRadius: '50%', color: '#ef4444' }}><XCircle size={16} /></div>
             <div>
                <div style={{ fontSize: '12px', color: '#64748b' }}>Rejected This Month</div>
-               <div style={{ fontSize: '14px', fontWeight: '600', color: '#0f172a' }}>0 contracts</div>
+               <div style={{ fontSize: '14px', fontWeight: '600', color: '#0f172a' }}>
+                 {stats.rejected} contracts
+               </div>
             </div>
          </div>
+
       </div>
     </div>
   );

@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FileText, CheckCircle, Archive, AlertCircle, Upload } from 'lucide-react';
+import { API_BASE_URL } from '../config'; // Added config import
+
 import StatCard from '../features/repository/StatCard'; 
 import CategoryChart from '../features/repository/CategoryChart';
 import VersionHistory from '../features/repository/VersionHistory';
@@ -11,7 +13,8 @@ export default function ContractsRepository() {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
-    fetch('http://127.0.0.1:8000/contracts/')
+    // Replaced hardcoded URL with API_BASE_URL
+    fetch(`${API_BASE_URL}/contracts/`)
       .then(res => res.json())
       .then(data => setContracts(data));
   }, []);
