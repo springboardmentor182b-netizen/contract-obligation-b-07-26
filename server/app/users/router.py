@@ -19,10 +19,10 @@ def list_users(
     role: Optional[str] = Query(None, description="Filter by role"),
     status: Optional[str] = Query(None, description="Filter by status"),
     department: Optional[str] = Query(None, description="Filter by department"),
-    sort_by: str = Query("name", description="Sort field"),
-    sort_order: str = Query("asc", description="asc or desc"),
-    page: int = Query(1, ge=1, description="Page number"),
-    per_page: int = Query(10, ge=1, le=100, description="Items per page"),
+    sort_by: str = Query("name"),
+    sort_order: str = Query("asc"),
+    page: int = Query(1, ge=1),
+    per_page: int = Query(10, ge=1, le=100),
 ):
     return get_users(
         search=search,
