@@ -1,51 +1,54 @@
-# Authentication Module
+# Contract Obligation Management System
 
 ## Project Overview
 
-This is a full-stack Authentication Module developed using React and FastAPI. It includes Login, Registration, Forgot Password, JWT Authentication, and SQLite database integration.
+This project is developed as part of the Infosys Springboard Internship.
 
-## Features
+The application is built using **React + Vite** for the frontend and **FastAPI** for the backend.
+
+## Modules
+
+- Authentication Module (Login, Register, Forgot Password)
+- Compliance Dashboard
+- Contract Repository
+- Obligation Tracker
+- Reports Dashboard
+
+## Authentication Module Features
 
 - User Registration
 - User Login
-- Forgot Password UI
+- Forgot Password
 - JWT Authentication
-- Password Hashing using bcrypt
+- Password Hashing
 - SQLite Database
-- React Frontend
-- FastAPI Backend
 - Protected Dashboard
-- Logout
 
 ## Technologies Used
 
 ### Frontend
+
 - React
 - Vite
 - Bootstrap
 - React Router
+- Axios
+- Recharts
+- Chart.js
+- React Icons
 
 ### Backend
+
 - FastAPI
 - SQLAlchemy
 - SQLite
 - Passlib (bcrypt)
 - Python-JOSE (JWT)
 
-## Project Structure
-
-```text
-auth-module/
-├── client/
-├── server/
-├── README.md
-└── .gitignore
-```
-
 ## Run Frontend
 
 ```bash
-cd client
+cd Client
 npm install
 npm run dev
 ```
@@ -58,12 +61,6 @@ pip install -r requirements.txt
 python -m uvicorn app.main:app --reload --port 8001
 ```
 
-## API Endpoints
-
-- POST /register
-- POST /login
-
 ## Developed By
 
-Mahesh Ingale
-Infosys Springboard Virtual Internship Project
+Infosys Springboard Internship Team
