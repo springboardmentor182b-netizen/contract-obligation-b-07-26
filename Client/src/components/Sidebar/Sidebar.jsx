@@ -4,22 +4,17 @@ import { mainMenu, accountMenu, logoutMenu } from "../../data/sidebarMenu";
 const Sidebar = () => {
   return (
     <aside className="w-70 bg-[#1B1B1B] flex flex-col justify-between shadow-2xl">
-      {/* Top */}
       <div>
-
         {/* Logo */}
         <div className="px-6 py-6 border-t border-[#ECE7DE]">
-  <h1 className="text-2xl font-bold text-white">
-    ContractIQ
-  </h1>
+          <h1 className="text-2xl font-bold text-white">
+            ContractIQ
+          </h1>
 
-  <p className="mt-1 text-xs uppercase tracking-[0.1em] text-[#9CA3AF]">
-    Compliance Platform
-  </p>
-</div>
-
-        
-        
+          <p className="mt-1 text-xs uppercase tracking-[0.1em] text-[#9CA3AF]">
+            Compliance Platform
+          </p>
+        </div>
 
         {/* Main Menu */}
         <div className="px-5">
@@ -72,32 +67,11 @@ const Sidebar = () => {
 
       {/* Bottom */}
       <div className="border-b border-[#fdfdfd] p-4">
-
-        <button className="mb-1 flex w-full items-center gap-3 rounded-xl px-4  text-[#f7f7f7] hover:bg-red-100 hover:text-red-600 transition">
+        <button className="mb-1 flex w-full items-center gap-3 rounded-xl px-4 text-[#f7f7f7] hover:bg-red-100 hover:text-red-600 transition">
           <logoutMenu.icon size={20} />
           Logout
         </button>
-
-        {/* <div className="flex items-center gap-3">
-
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#D4AF37] font-bold text-[#f8f8f8]">
-            JD
-          </div>
-
-          <div>
-            <h4 className="font-semibold text-[#ECE7DE]">
-              Jennifer Davis
-            </h4>
-
-            <p className="text-sm text-[#6B7280]">
-              Chief Compliance Officer
-            </p>
-          </div>
-
-        </div> */}
-
       </div>
-
     </aside>
   );
 };
