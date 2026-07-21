@@ -1,18 +1,38 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { FiArrowRight } from "react-icons/fi";
+import { fetchContractStats } from "../api";
 import "./StatusTabs.css";
 
-const statuses = [
-  { id: "All", label: "All", count: 12, type: "all" },
-  { id: "Draft", label: "Draft", count: 1, type: "draft" },
-  { id: "Under Review", label: "Under Review", count: 1, type: "review" },
-  { id: "Approved", label: "Approved", count: 1, type: "approved" },
-  { id: "Active", label: "Active", count: 7, type: "active" },
-  { id: "Expired", label: "Expired", count: 1, type: "expired" },
-  { id: "Terminated", label: "Terminated", count: 1, type: "terminated" },
+const statusConfig = [
+  { id: "All", label: "All", type: "all", key: "total" },
+  { id: "Draft", label: "Draft", type: "draft", key: "draft" },
+  { id: "Under Review", label: "Under Review", type: "review", key: "under_review" },
+  { id: "Approved", label: "Approved", type: "approved", key: "approved" },
+  { id: "Active", label: "Active", type: "active", key: "active" },
+  { id: "Expired", label: "Expired", type: "expired", key: "expired" },
+  { id: "Terminated", label: "Terminated", type: "terminated", key: "terminated" },
 ];
 
 const StatusTabs = ({ selectedStatus, setSelectedStatus }) => {
+  const [stats, setStats] = useState({});
+
+  useEffect(() => {
+    const loadStats = async () => {
+      try {
+        const data = await fetchContractStats();
+        setStats(data);
+      } catch (error) {
+        console.error("Failed to fetch contract stats:", error);
+      }
+    };
+    loadStats();
+  }, []);
+
+  const statuses = statusConfig.map(status => ({
+    ...status,
+    count: stats[status.key] || 0
+  }));
+
   return (
     <div className="status-flow">
       {statuses.map((status, index) => (

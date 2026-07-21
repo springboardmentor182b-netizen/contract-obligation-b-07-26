@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   FiSearch,
   FiBell,
@@ -6,9 +6,24 @@ import {
   FiUpload,
   FiChevronRight,
 } from "react-icons/fi";
+import { get } from "../api";
 import "./Navbar.css";
 
 const Navbar = ({ onNewContract }) => {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const data = await get("/auth/me");
+        setUser(data);
+      } catch (err) {
+        console.error("Failed to fetch user:", err);
+      }
+    };
+    fetchUser();
+  }, []);
+
   return (
     <header className="navbar">
       <div className="navbar-left">
@@ -26,10 +41,7 @@ const Navbar = ({ onNewContract }) => {
             Import
           </button>
 
-          <button
-            className="btn btn-primary"
-            onClick={onNewContract}
-          >
+          <button className="btn btn-primary" onClick={onNewContract}>
             <FiPlus className="btn-icon" />
             New Contract
           </button>
@@ -50,11 +62,23 @@ const Navbar = ({ onNewContract }) => {
         </button>
 
         <div className="user-profile">
-          <div className="avatar">PS</div>
+          <div className="avatar">
+            {user?.full_name
+              ? user.full_name
+                  .split(" ")
+                  .map((n) => n[0])
+                  .join("")
+                  .toUpperCase()
+              : "U"}
+          </div>
 
           <div className="user-info">
             <span className="user-name">
-              Pragna Sree
+              {user?.full_name || "Loading..."}
+            </span>
+
+            <span className="user-role">
+              {user?.role || ""}
             </span>
           </div>
         </div>

@@ -54,8 +54,10 @@ def create_token(user: dict[str, Any]) -> str:
         "role": user["role"],
         "exp": int((datetime.now(timezone.utc) + timedelta(seconds=TOKEN_TTL_SECONDS)).timestamp()),
     }
+
     body = _b64encode(json.dumps(payload, separators=(",", ":")).encode())
     signature = hmac.new(TOKEN_SECRET.encode(), body.encode(), hashlib.sha256).digest()
+
     return f"{body}.{_b64encode(signature)}"
 
 
@@ -63,30 +65,57 @@ def decode_token(token: str) -> dict[str, Any]:
     try:
         body, signature = token.split(".", 1)
     except ValueError as exc:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token") from exc
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token"
+        ) from exc
 
-    expected = _b64encode(hmac.new(TOKEN_SECRET.encode(), body.encode(), hashlib.sha256).digest())
+    expected = _b64encode(
+        hmac.new(TOKEN_SECRET.encode(), body.encode(), hashlib.sha256).digest()
+    )
+
     if not hmac.compare_digest(signature, expected):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token signature")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid token signature"
+        )
 
     payload = json.loads(_b64decode(body))
+
     if payload["exp"] < int(datetime.now(timezone.utc).timestamp()):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token expired")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token expired"
+        )
+
     return payload
 
 
 def get_current_user(token: str = Depends(oauth2_scheme)) -> dict[str, Any]:
     payload = decode_token(token)
+
     user = find_user_by_id(payload["sub"])
+
     if not user or not user.get("is_active", True):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User is inactive or missing")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User is inactive or missing"
+        )
+
     return user
 
 
 def require_roles(*roles: str):
-    def dependency(current_user: dict[str, Any] = Depends(get_current_user)) -> dict[str, Any]:
+    def dependency(
+        current_user: dict[str, Any] = Depends(get_current_user)
+    ) -> dict[str, Any]:
+
         if roles and current_user["role"] not in roles:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient permissions")
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Insufficient permissions"
+            )
+
         return current_user
 
     return dependency

@@ -6,15 +6,15 @@ from sqlalchemy import func
 
 from datetime import date, timedelta
 
-from app.config.database import get_db
+from src.database.session import get_db
 
-from app.services.dashboard_service import get_dashboard_kpis
+from src.services.dashboard_service import get_dashboard_kpis
 
-from app.services.dashboard_service import get_upcoming_deadlines
+from src.services.dashboard_service import get_upcoming_deadlines
 
-from app.services.dashboard_service import get_calendar_events
+from src.services.dashboard_service import get_calendar_events
 
-from app.services.dashboard_service import get_weekly_chart
+from src.services.dashboard_service import get_weekly_chart
 
 router = APIRouter(
 

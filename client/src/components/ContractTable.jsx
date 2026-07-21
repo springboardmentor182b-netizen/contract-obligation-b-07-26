@@ -1,52 +1,39 @@
 import React from "react";
-import { FiEdit2, FiMoreHorizontal } from "react-icons/fi";
+import { FiEdit2, FiMoreHorizontal, FiTrash2 } from "react-icons/fi";
 import StatusBadge from "./StatusBadge";
 import SearchBar from "./SearchBar";
 import "./ContractTable.css";
 
-  const ContractTable = ({
+const ContractTable = ({
   contracts,
-  statusFilter,
-  categoryFilter,
   searchTerm,
   setSearchTerm,
+  onEdit,
+  onDelete,
 }) => {
-
   const filteredData = contracts.filter((contract) => {
-
-    const matchesStatus =
-      statusFilter === "All" || contract.status === statusFilter;
-
-    const matchesCategory =
-    categoryFilter === "All" ||
-    contract.category === categoryFilter;
-
     const matchesSearch =
       contract.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       contract.party.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      contract.id.toLowerCase().includes(searchTerm.toLowerCase());
+      contract.contract_id.toLowerCase().includes(searchTerm.toLowerCase());
 
-    return matchesStatus && matchesCategory && matchesSearch;
+    return matchesSearch;
   });
 
   return (
     <div className="table-container">
-
       <SearchBar
         searchTerm={searchTerm}
         setSearchTerm={setSearchTerm}
-        activeFilter={statusFilter}
-        setActiveFilter={() => {}}
       />
 
       <div className="table-responsive">
         <table className="contract-table">
-
           <thead>
             <tr>
               <th>CONTRACT</th>
               <th>PARTY</th>
-              <th>DEPT</th>
+              <th>DEPARTMENT</th>
               <th>STATUS</th>
               <th>VALUE</th>
               <th>EXPIRY</th>
@@ -56,42 +43,70 @@ import "./ContractTable.css";
           </thead>
 
           <tbody>
-            {filteredData.map((row) => (
-              <tr key={row.id}>
-                <td>
-                  <div className="contract-name">{row.name}</div>
-                  <div className="contract-id">{row.id}</div>
-                </td>
+            {filteredData.length > 0 ? (
+              filteredData.map((row) => (
+                <tr key={row.id}>
+                  <td>
+                    <div className="contract-name">{row.name}</div>
+                    <div className="contract-id">{row.contract_id}</div>
+                  </td>
 
-                <td className="text-secondary">{row.party}</td>
+                  <td>{row.party}</td>
 
-                <td className="text-secondary">{row.dept}</td>
+                  <td>{row.department}</td>
 
-                <td>
-                  <StatusBadge status={row.status} />
-                </td>
+                  <td>
+                    <StatusBadge status={row.status} />
+                  </td>
 
-                <td className="font-semibold">{row.value}</td>
+                  <td>
+                    {row.value
+                      ? `$${Number(row.value).toLocaleString()}`
+                      : "-"}
+                  </td>
 
-                <td className="text-secondary">{row.expiry}</td>
+                  <td>
+                    {row.expiry
+                      ? new Date(row.expiry).toLocaleDateString()
+                      : "-"}
+                  </td>
 
-                <td className="text-muted">{row.version}</td>
+                  <td>{row.version}</td>
 
-                <td>
-                  <div className="action-btns">
-                    <button className="action-icon-btn">
-                      <FiEdit2 />
-                    </button>
+                  <td>
+                    <div className="action-btns">
+                      <button
+                        className="action-icon-btn"
+                        onClick={() => onEdit(row)}
+                      >
+                        <FiEdit2 />
+                      </button>
 
-                    <button className="action-icon-btn">
-                      <FiMoreHorizontal />
-                    </button>
-                  </div>
+                      <button
+                        className="action-icon-btn delete-btn"
+                        onClick={() => onDelete(row.id)}
+                      >
+                        <FiTrash2 />
+                      </button>
+
+                      <button className="action-icon-btn">
+                        <FiMoreHorizontal />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td
+                  colSpan="8"
+                  style={{ textAlign: "center", padding: "20px" }}
+                >
+                  No contracts found.
                 </td>
               </tr>
-            ))}
+            )}
           </tbody>
-
         </table>
       </div>
     </div>

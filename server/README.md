@@ -235,3 +235,4 @@ http://127.0.0.1:8000/docs
 ```
 
 
+This starter uses `server/data/contractiq.json` for local persistence so it can run with the packages already present in the project virtual environment. The module boundaries are intentionally close to a future PostgreSQL/SQLAlchemy migration.

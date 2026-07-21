@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from app.config.database import get_db
+from src.database.session import get_db
 
-from app.schemas.obligation import *
+from src.schemas.obligation import *
 
-from app.services.obligation_service import *
+from src.services.obligation_service import *
 
 router = APIRouter(
     prefix="/obligations",

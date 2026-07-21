@@ -9,6 +9,7 @@ export default function useFetch(url, options) {
     if (!url) return undefined
 
     const controller = new AbortController()
+    setLoading(true)
 
     fetch(url, { ...options, signal: controller.signal })
       .then((response) => {

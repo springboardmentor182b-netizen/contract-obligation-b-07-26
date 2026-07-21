@@ -62,7 +62,7 @@ export function Auth() {
       const result = await login(API_BASE_URL, formData)
 
       if (rememberMe) {
-        window.localStorage.setItem('contractiq_token', result.access_token)
+        window.localStorage.setItem('access_token', result.access_token)
         window.localStorage.setItem('contractiq_role', formData.role)
       }
 
