@@ -1,41 +1,4 @@
-const obligations = [
-  {
-    id: "OBL-001",
-    obligation: "Submit Monthly Compliance Report",
-    contract: "Vendor Agreement",
-    owner: "James Park",
-    dueDate: "15 Jul 2026",
-    priority: "High",
-    status: "Pending",
-  },
-  {
-    id: "OBL-002",
-    obligation: "Review Insurance Certificate",
-    contract: "Insurance Policy",
-    owner: "Sarah Chen",
-    dueDate: "18 Jul 2026",
-    priority: "Medium",
-    status: "In Progress",
-  },
-  {
-    id: "OBL-003",
-    obligation: "Renew NDA Agreement",
-    contract: "NDA",
-    owner: "Marcus Reid",
-    dueDate: "22 Jul 2026",
-    priority: "High",
-    status: "Completed",
-  },
-  {
-    id: "OBL-004",
-    obligation: "Update Vendor Documents",
-    contract: "Service Contract",
-    owner: "Dana Kim",
-    dueDate: "28 Jul 2026",
-    priority: "Low",
-    status: "Pending",
-  },
-];
+
 
 const getBadge = (value, type) => {
   const styles = {
@@ -60,7 +23,11 @@ const getBadge = (value, type) => {
   );
 };
 
-const ObligationTable = () => {
+const ObligationTable = ({
+  obligations,
+  onDelete,
+  onEdit,
+}) => {
   return (
     <div className="mt-6 rounded-xl border border-gray-200 bg-white shadow-sm">
       <div className="border-b border-gray-200 px-5 py-4">
@@ -101,9 +68,31 @@ const ObligationTable = () => {
                 {getBadge(item.status, "status")}
               </td>
               <td className="px-5 py-4 text-center">
-                <button className="rounded-lg border px-3 py-1 text-xs hover:bg-gray-100">
-                  View
-                </button>
+                <div className="flex justify-center gap-2">
+
+  <button
+  onClick={() => onEdit(item)}
+  className="rounded-md border border-blue-200 px-3 py-1 text-xs text-blue-600 hover:bg-blue-50"
+>
+  Edit
+</button>
+
+  <button
+  onClick={() => {
+  const confirmDelete = window.confirm(
+    `Delete "${item.obligation}"?`
+  );
+
+  if (confirmDelete) {
+    onDelete(item.id);
+  }
+}}
+  className="rounded-md border border-red-200 px-3 py-1 text-xs text-red-600 hover:bg-red-50"
+>
+  Delete
+</button>
+
+</div>
               </td>
             </tr>
           ))}

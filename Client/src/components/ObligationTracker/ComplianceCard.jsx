@@ -1,85 +1,69 @@
-const categories = [
-  {
-    name: "Vendor Agreements",
-    completed: 18,
-    total: 20,
-    color: "bg-green-500",
-  },
-  {
-    name: "Employment",
-    completed: 9,
-    total: 12,
-    color: "bg-blue-500",
-  },
-  {
-    name: "Service Contracts",
-    completed: 11,
-    total: 15,
-    color: "bg-yellow-500",
-  },
-  {
-    name: "NDA",
-    completed: 14,
-    total: 14,
-    color: "bg-purple-500",
-  },
-  {
-    name: "Lease Agreements",
-    completed: 4,
-    total: 8,
-    color: "bg-red-500",
-  },
-];
+const ComplianceCard = ({ obligations }) => {
+  const contracts = {};
 
-const ComplianceCard = () => {
+  obligations.forEach((item) => {
+    if (!contracts[item.contract]) {
+      contracts[item.contract] = {
+        contract: item.contract,
+        total: 0,
+        completed: 0,
+      };
+    }
+
+    contracts[item.contract].total++;
+
+    if (item.status === "Completed") {
+      contracts[item.contract].completed++;
+    }
+  });
+
+  const data = Object.values(contracts).map((item) => ({
+    ...item,
+    percent: Math.round(
+      (item.completed / item.total) * 100
+    ),
+  }));
+
+  const colors = [
+    "bg-green-500",
+    "bg-blue-500",
+    "bg-yellow-500",
+    "bg-purple-500",
+    "bg-red-500",
+  ];
+
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+    <div className="bg-white rounded-xl shadow-sm border p-6">
+      <h2 className="text-2xl font-semibold">
+        Compliance by Category
+      </h2>
 
-      <div className="mb-5">
-        <h2 className="text-lg font-semibold text-gray-900">
-          Compliance by Category
-        </h2>
-
-        <p className="text-sm text-gray-500">
-          Completion status across contract categories
-        </p>
-      </div>
+      <p className="text-gray-500 mb-6">
+        Completion status across contracts
+      </p>
 
       <div className="space-y-5">
-        {categories.map((item) => {
-          const percentage = Math.round(
-            (item.completed / item.total) * 100
-          );
+        {data.map((item, index) => (
+          <div key={item.contract}>
+            <div className="flex justify-between mb-2">
+              <span>{item.contract}</span>
 
-          return (
-            <div key={item.name}>
-
-              <div className="mb-2 flex items-center justify-between">
-
-                <span className="text-sm font-medium">
-                  {item.name}
-                </span>
-
-                <span className="text-sm text-gray-500">
-                  {percentage}%
-                </span>
-
-              </div>
-
-              <div className="h-2 rounded-full bg-gray-200">
-
-                <div
-                  className={`${item.color} h-2 rounded-full`}
-                  style={{ width: `${percentage}%` }}
-                />
-
-              </div>
-
+              <span>{item.percent}%</span>
             </div>
-          );
-        })}
-      </div>
 
+            <div className="h-2 rounded-full bg-gray-200 overflow-hidden">
+              <div
+                className={`h-full ${
+                  colors[index % colors.length]
+                }`}
+                style={{
+                  width: `${item.percent}%`,
+                }}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
