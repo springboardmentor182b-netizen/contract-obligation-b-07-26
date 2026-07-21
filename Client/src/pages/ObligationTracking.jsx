@@ -21,6 +21,8 @@ const ObligationTracking = () => {
   const [showModal, setShowModal] = useState(false);
   const [editingObligation, setEditingObligation] = useState(null);
   const [obligations, setObligations] = useState([]);
+  console.log("Obligations:",obligations);
+  console.log("Stats:",stats);
 
 const [stats, setStats] = useState({
   total: 0,

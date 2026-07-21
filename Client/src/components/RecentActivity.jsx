@@ -16,11 +16,13 @@ function RecentActivity() {
     async function fetchActivity(){
       try{
         const response = await getRecentActivity();
+        console.log(response);
         setActivities(response);
       }catch(error){
         console.error("Error fetching recent activity:",error);
       }
     }
+    fetchActivity();
   },[]);
   return (
     <div className="recent-activity">

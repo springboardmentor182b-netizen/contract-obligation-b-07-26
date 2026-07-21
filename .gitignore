@@ -1,2 +1,7 @@
 node_modules/
 Client/node_modules/
+server/venv/
+server/__pycache__/
+server/src/**/__pycache__/
+*.pyc
+.env

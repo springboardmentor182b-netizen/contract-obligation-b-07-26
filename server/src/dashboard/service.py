@@ -1,3 +1,4 @@
+from src.database.core import get_connection
 from .models import (
     DashboardSummary,
     ComplianceLevel,
@@ -10,219 +11,248 @@ from .models import (
     ComplianceSummaryItem,
 )
 
-
 def get_dashboard_summary():
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT
+            total_contracts,
+            active_contracts,
+            under_review,
+            expiring_soon,
+            pending_obligations,
+            compliance_rate,
+            high_risk
+        FROM dashboard_summary
+        ORDER BY id DESC
+        LIMIT 1
+    """)
+
+    row = cursor.fetchone()
+
+    cursor.close()
+    conn.close()
+
     return DashboardSummary(
-        total_contracts=214,
-        active_contracts=182,
-        under_review=31,
-        expiring_soon=3,
-        pending_obligations=43,
-        compliance_rate=91.4,
-        high_risk=6,
+        total_contracts=row[0],
+        active_contracts=row[1],
+        under_review=row[2],
+        expiring_soon=row[3],
+        pending_obligations=row[4],
+        compliance_rate=float(row[5]),
+        high_risk=row[6],
     )
 
-
 def get_compliance_levels():
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT name, value
+        FROM compliance_levels
+        ORDER BY id;
+    """)
+
+    rows = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
     return [
-        ComplianceLevel(name="Compliant", value=142),
-        ComplianceLevel(name="Pending", value=28),
-        ComplianceLevel(name="Delayed", value=19),
-        ComplianceLevel(name="Non-Compliant", value=11),
-        ComplianceLevel(name="High Risk", value=6),
+        ComplianceLevel(
+            name=row[0],
+            value=row[1],
+        )
+        for row in rows
     ]
 
 
 def get_contract_growth():
-    return [
-        ContractGrowth(month="Jan", total=42, active=38),
-        ContractGrowth(month="Feb", total=55, active=49),
-        ContractGrowth(month="Mar", total=74, active=61),
-        ContractGrowth(month="Apr", total=88, active=75),
-        ContractGrowth(month="May", total=102, active=88),
-        ContractGrowth(month="Jun", total=118, active=101),
-        ContractGrowth(month="Jul", total=132, active=114),
-        ContractGrowth(month="Aug", total=145, active=126),
-        ContractGrowth(month="Sep", total=160, active=140),
-        ContractGrowth(month="Oct", total=174, active=153),
-        ContractGrowth(month="Nov", total=190, active=167),
-        ContractGrowth(month="Dec", total=214, active=182),
-    ]
+    conn = get_connection()
+    cursor = conn.cursor()
 
+    cursor.execute("""
+        SELECT month, total, active
+        FROM contract_growth
+        ORDER BY id;
+    """)
+
+    rows = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    return [
+        ContractGrowth(
+            month=row[0],
+            total=row[1],
+            active=row[2],
+        )
+        for row in rows
+    ]
 
 def get_contract_status():
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT status, count
+        FROM contract_status
+        ORDER BY id;
+    """)
+
+    rows = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
     return [
-        ContractStatus(status="Active", count=182),
-        ContractStatus(status="Expired", count=14),
-        ContractStatus(status="Pending", count=12),
-        ContractStatus(status="Draft", count=6),
+        ContractStatus(
+            status=row[0],
+            count=row[1],
+        )
+        for row in rows
     ]
 
-
 def get_upcoming_renewals():
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT
+            name,
+            owner,
+            expiry,
+            days,
+            risk
+        FROM upcoming_renewals
+        ORDER BY expiry;
+    """)
+
+    rows = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
     return [
         UpcomingRenewal(
-            name="Office Lease – Floor 12 & 13",
-            owner="Tom Weston",
-            expiry="2024-12-31",
-            days=26,
-            risk="High Risk",
-        ),
-        UpcomingRenewal(
-            name="Microsoft Azure Enterprise Agreement",
-            owner="Sarah Chen",
-            expiry="2025-03-15",
-            days=52,
-            risk="Medium Risk",
-        ),
-        UpcomingRenewal(
-            name="Data Processing Agreement – EU",
-            owner="James Park",
-            expiry="2025-05-20",
-            days=78,
-            risk="Low Risk",
-        ),
+            name=row[0],
+            owner=row[1],
+            expiry=str(row[2]),
+            days=row[3],
+            risk=row[4],
+        )
+        for row in rows
     ]
 
 def get_recent_contracts():
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT
+            contract_id,
+            name,
+            category,
+            department,
+            owner,
+            status,
+            renewal,
+            renewal_version
+        FROM recent_contracts
+        ORDER BY contract_id;
+    """)
+
+    rows = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
     return [
         RecentContract(
-            contract_id="CTR-2024-001",
-            name="Microsoft Azure Enterprise Agreement",
-            category="Vendor",
-            department="IT",
-            owner="Sarah Chen",
-            status="Active",
-            renewal="2025-03-15",
-            renewal_version="v3.1",
-        ),
-        RecentContract(
-            contract_id="CTR-2024-002",
-            name="Goldman Sachs Advisory Services",
-            category="Service",
-            department="Finance",
-            owner="Marcus Reid",
-            status="Under Review",
-            renewal="2025-06-22",
-            renewal_version="v1.0",
-        ),
-        RecentContract(
-            contract_id="CTR-2024-003",
-            name="Senior VP Employment Agreement",
-            category="Employment",
-            department="HR",
-            owner="Priya Nair",
-            status="Active",
-            renewal="2026-01-10",
-            renewal_version="v2.0",
-        ),
-        RecentContract(
-            contract_id="CTR-2024-004",
-            name="Office Lease - Floor 12 & 13",
-            category="Lease",
-            department="Operations",
-            owner="Tom Weston",
-            status="Expired",
-            renewal="2024-12-31",
-            renewal_version="v1.2",
-        ),
-        RecentContract(
-            contract_id="CTR-2024-005",
-            name="Supplier NDA - Techparts Ltd",
-            category="NDA",
-            department="Procurement",
-            owner="Dana Kim",
-            status="Active",
-            renewal="2025-09-01",
-            renewal_version="v1.0",
-        ),
-        RecentContract(
-            contract_id="CTR-2024-006",
-            name="SaaS Platform License - Salesforce",
-            category="Vendor",
-            department="Sales",
-            owner="Alex Ruiz",
-            status="Active",
-            renewal="2025-07-15",
-            renewal_version="v4.0",
-        ),
-        RecentContract(
-            contract_id="CTR-2024-007",
-            name="Strategic Partnership - Deloitte",
-            category="Partnership",
-            department="Legal",
-            owner="Nia Foster",
-            status="Draft",
-            renewal="2026-03-30",
-            renewal_version="v0.3",
-        ),
-        RecentContract(
-            contract_id="CTR-2024-008",
-            name="Data Processing Agreement - EU",
-            category="Compliance",
-            department="Legal",
-            owner="James Park",
-            status="Active",
-            renewal="2025-05-20",
-            renewal_version="v2.1",
-        ),
+            contract_id=row[0],
+            name=row[1],
+            category=row[2],
+            department=row[3],
+            owner=row[4],
+            status=row[5],
+            renewal=str(row[6]),
+            renewal_version=row[7],
+        )
+        for row in rows
     ]
 
 def get_contracts_by_department():
-    return[
-        ContractByDepartment(department="Legal",compliance=54),
-        ContractByDepartment(department="Procurement",compliance=38),
-        ContractByDepartment(department="HR",compliance=29),
-        ContractByDepartment(department="Finance",compliance=43),
-        ContractByDepartment(department="IT",compliance=22),
-        ContractByDepartment(department="Operations",compliance=18),
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT department, compliance
+        FROM contracts_by_department
+        ORDER BY id;
+    """)
+
+    rows = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    return [
+        ContractByDepartment(
+            department=row[0],
+            compliance=row[1],
+        )
+        for row in rows
     ]
 
 def get_recent_activity():
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT title,
+               description,
+               activity_time,
+               activity_type
+        FROM recent_activity
+        ORDER BY id DESC
+    """)
+
+    rows = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
     return [
         RecentActivity(
-            title="Contract uploaded",
-            description="Goldman Sachs Advisory Services uploaded by Marcus Reid",
-            time="2 min ago",
-            type="upload",
-        ),
-        RecentActivity(
-            title="Contract approved",
-            description="SaaS Platform License – Salesforce approved by CEO",
-            time="18 min ago",
-            type="approved",
-        ),
-        RecentActivity(
-            title="Renewal reminder sent",
-            description="Office Lease – Floor 12 & 13 renewal reminder dispatched",
-            time="1 hr ago",
-            type="reminder",
-        ),
-        RecentActivity(
-            title="Compliance issue detected",
-            description="Data Processing Agreement flagged for GDPR gap",
-            time="3 hr ago",
-            type="warning",
-        ),
-        RecentActivity(
-            title="New user added",
-            description="Priya Nair added as Contract Owner role",
-            time="Yesterday",
-            type="user",
-        ),
-        RecentActivity(
-            title="Version updated",
-            description="Senior VP Employment Agreement updated to v2.0",
-            time="Yesterday",
-            type="history",
-        ),
+            title=row[0],
+            description=row[1],
+            time=row[2],
+            type=row[3],
+        )
+        for row in rows
     ]
 
 def get_compliance_summary():
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT name, value
+        FROM compliance_summary
+        ORDER BY id;
+    """)
+
+    rows = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
     return [
-        ComplianceSummaryItem(name="Compliant", value=142),
-        ComplianceSummaryItem(name="Pending", value=28),
-        ComplianceSummaryItem(name="Delayed", value=19),
-        ComplianceSummaryItem(name="Non-Compliant", value=11),
-        ComplianceSummaryItem(name="High Risk", value=6),
+        ComplianceSummaryItem(
+            name=row[0],
+            value=row[1],
+        )
+        for row in rows
     ]

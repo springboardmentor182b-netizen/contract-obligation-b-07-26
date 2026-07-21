@@ -13,8 +13,8 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:5173",
-        "http://localhost:5176"
-    ]
+        "http://localhost:5176",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -70,11 +70,6 @@ class Obligation(BaseModel):
 #         description="Review legal clauses",
 #     )
 # ]
-
-
-@app.get("/")
-def home():
-    return {"message": "ContractIQ API Running"}
 
 
 @app.get("/obligations")
@@ -250,4 +245,4 @@ def delete_obligation(obligation_id: str):
     return {
         "message": "Obligation deleted successfully"
     }
->>>>>>> 4ad32899271d0cfbfbf193f92e65f668cfe80e72
+
