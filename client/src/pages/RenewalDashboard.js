@@ -1,6 +1,59 @@
 function RenewalDashboard({ renewals = [], searchQuery = '', onExport, onAdd }) {
-  const q = (searchQuery || '').toLowerCase()
-  const list = renewals.filter(r => r.name.toLowerCase().includes(q) || r.department.toLowerCase().includes(q))
+ 
+  const q = (searchQuery || '').toLowerCase();
+  const list = renewals.filter(r => 
+    (r.name && r.name.toLowerCase().includes(q)) || 
+    ((r.department || r.dept || '').toLowerCase().includes(q))
+  );
+
+ 
+  const totalContracts = renewals.length;
+  const upcomingCount = renewals.filter(r => r.status === "Upcoming" || (r.daysRemaining > 0 && r.daysRemaining <= 30)).length;
+  const pendingCount = renewals.filter(r => r.status === "In Progress" || r.priority === "High").length;
+  const expiringThisWeek = renewals.filter(r => r.daysRemaining >= 0 && r.daysRemaining <= 7).length;
+  // Calculate compliance as percentage of contracts that are NOT expired
+  const complianceScore = totalContracts > 0 
+    ? Math.round((renewals.filter(r => r.status !== "Expired" && r.daysRemaining >= 0).length / totalContracts) * 100) 
+    : 100;
+
+
+  const deptCounts = renewals.reduce((acc, r) => {
+    const d = r.department || r.dept || 'Unassigned';
+    acc[d] = (acc[d] || 0) + 1;
+    return acc;
+  }, {});
+  
+  const portfolioData = Object.keys(deptCounts).map((key) => ({
+    name: key,
+    value: deptCounts[key],
+    percentage: Math.round((deptCounts[key] / (totalContracts || 1)) * 100)
+  })).sort((a, b) => b.value - a.value).slice(0, 4); // Show top 4 departments
+  const dotColors = ["blue", "green", "orange", "purple"];
+
+  
+  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const currentMonthIndex = new Date().getMonth();
+  const last6Months = Array.from({length: 6}, (_, i) => {
+    const d = new Date();
+    d.setMonth(currentMonthIndex - 5 + i);
+    return { label: monthNames[d.getMonth()], count: 0 };
+  });
+
+  renewals.forEach(r => {
+    if(r.renewalDate) {
+      const m = parseInt(r.renewalDate.split('-')[1], 10) - 1; 
+      const match = last6Months.find(lm => lm.label === monthNames[m]);
+      if(match) match.count += 1;
+    }
+  });
+  const maxMonthlyCount = Math.max(...last6Months.map(m => m.count), 1);
+
+ 
+  const recentActivity = [...renewals].reverse().slice(0, 3);
+  const upcomingDeadlines = [...renewals]
+    .filter(r => r.daysRemaining !== undefined)
+    .sort((a, b) => a.daysRemaining - b.daysRemaining)
+    .slice(0, 2); 
 
   return (
     <div className="renewal-dashboard">
@@ -23,31 +76,31 @@ function RenewalDashboard({ renewals = [], searchQuery = '', onExport, onAdd }) 
           <div className="stat-card">
             <div className="stat-icon">📄</div>
             <p className="stat-label">Active Contracts</p>
-            <p className="stat-value">244</p>
-            <p className="stat-note">+12 this month</p>
+            <p className="stat-value">{totalContracts}</p>
+            <p className="stat-note">Live Database</p>
           </div>
           <div className="stat-card">
             <div className="stat-icon">⏳</div>
             <p className="stat-label">Upcoming Renewals</p>
-            <p className="stat-value">23</p>
+            <p className="stat-value">{upcomingCount}</p>
             <p className="stat-note">Next 30 days</p>
           </div>
           <div className="stat-card">
             <div className="stat-icon">⚠️</div>
             <p className="stat-label">Pending Obligations</p>
-            <p className="stat-value">40</p>
-            <p className="stat-note">+3 since yesterday</p>
+            <p className="stat-value">{pendingCount}</p>
+            <p className="stat-note">Action Needed</p>
           </div>
           <div className="stat-card">
             <div className="stat-icon">🛡️</div>
             <p className="stat-label">Compliance Score</p>
-            <p className="stat-value">94.2%</p>
-            <p className="stat-note">+1.8% vs last qtr</p>
+            <p className="stat-value">{complianceScore}%</p>
+            <p className="stat-note">Active vs Expired</p>
           </div>
           <div className="stat-card">
             <div className="stat-icon">🚨</div>
             <p className="stat-label">Expiring This Week</p>
-            <p className="stat-value">8</p>
+            <p className="stat-value">{expiringThisWeek}</p>
             <p className="stat-note">Action required</p>
           </div>
         </div>
@@ -72,9 +125,9 @@ function RenewalDashboard({ renewals = [], searchQuery = '', onExport, onAdd }) 
             </thead>
             <tbody>
               {list.map(item => (
-                <tr key={item.id} style={{ borderTop: '1px solid var(--border)', background: 'white' }}>
+                <tr key={item.id || item.contractId} style={{ borderTop: '1px solid var(--border)', background: 'white' }}>
                   <td style={{ padding: '14px 18px' }}>{item.name}</td>
-                  <td style={{ padding: '14px 18px', color: 'var(--muted)' }}>{item.department}</td>
+                  <td style={{ padding: '14px 18px', color: 'var(--muted)' }}>{item.department || item.dept}</td>
                   <td style={{ padding: '14px 18px' }}>{item.renewalDate}</td>
                   <td style={{ padding: '14px 18px', color: item.daysRemaining < 0 ? 'var(--danger)' : 'var(--success)' }}>{item.daysRemaining < 0 ? `${Math.abs(item.daysRemaining)}d overdue` : `${item.daysRemaining}d remaining`}</td>
                   <td style={{ padding: '14px 18px' }}><span style={{ padding: '6px 10px', borderRadius: 8, background: '#fff5f5', color: '#bf1650', border: '1px solid #fde2e2' }}>{item.status}</span></td>
@@ -83,7 +136,7 @@ function RenewalDashboard({ renewals = [], searchQuery = '', onExport, onAdd }) 
               ))}
               {list.length === 0 && (
                 <tr>
-                  <td colSpan={6} style={{ padding: 24, color: 'var(--muted)' }}>No renewals match your search</td>
+                  <td colSpan={6} style={{ padding: 24, color: 'var(--muted)', textAlign: 'center' }}>No renewals match your search</td>
                 </tr>
               )}
             </tbody>
@@ -96,30 +149,29 @@ function RenewalDashboard({ renewals = [], searchQuery = '', onExport, onAdd }) 
           <div className="panel-header">
             <div>
               <h2>Contract activity</h2>
-              <p>Renewal pipeline versus obligations</p>
+              <p>Renewal pipeline timeline</p>
             </div>
             <select>
               <option>Last 6 months</option>
-              <option>Last 3 months</option>
             </select>
           </div>
           <div className="chart-area">
             <div className="chart-bars" aria-label="Bar chart showing contract activity">
-              {[72, 84, 65, 92, 88, 97].map((value, index) => (
+              {last6Months.map((month, index) => (
                 <div className="bar-column" key={index}>
-                  <div className="bar-fill" style={{ height: `${value}%` }} />
-                  <span>{['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'][index]}</span>
+                  <div className="bar-fill" style={{ height: `${(month.count / maxMonthlyCount) * 100}%`, minHeight: month.count > 0 ? '10%' : '0%' }} />
+                  <span>{month.label}</span>
                 </div>
               ))}
             </div>
             <div className="chart-summary">
               <div>
                 <span className="summary-label">Renewal success</span>
-                <strong>86%</strong>
+                <strong>{complianceScore}%</strong>
               </div>
               <div>
                 <span className="summary-label">At risk</span>
-                <strong>9 contracts</strong>
+                <strong>{pendingCount} contracts</strong>
               </div>
             </div>
           </div>
@@ -133,13 +185,18 @@ function RenewalDashboard({ renewals = [], searchQuery = '', onExport, onAdd }) 
             </div>
           </div>
           <div className="ring-chart" aria-label="Donut chart summary">
-            <div className="ring-center">74%</div>
+            <div className="ring-center">{portfolioData.length > 0 ? portfolioData[0].percentage : 0}%</div>
           </div>
           <div className="portfolio-list">
-            <div className="portfolio-item"><span className="dot blue"></span>Vendor <span>38%</span></div>
-            <div className="portfolio-item"><span className="dot green"></span>Employment <span>22%</span></div>
-            <div className="portfolio-item"><span className="dot orange"></span>Lease <span>14%</span></div>
-            <div className="portfolio-item"><span className="dot purple"></span>Software <span>12%</span></div>
+            {portfolioData.map((dept, index) => (
+              <div className="portfolio-item" key={dept.name}>
+                <span className={`dot ${dotColors[index % dotColors.length]}`}></span>
+                {dept.name} <span>{dept.percentage}%</span>
+              </div>
+            ))}
+            {portfolioData.length === 0 && (
+              <div className="portfolio-item text-muted">No data available</div>
+            )}
           </div>
         </div>
       </section>
@@ -148,23 +205,17 @@ function RenewalDashboard({ renewals = [], searchQuery = '', onExport, onAdd }) 
         <div className="footer-panel panel-card">
           <div className="panel-header">
             <div>
-              <h2>Recent activity</h2>
+              <h2>Recent Database Additions</h2>
               <p>Latest workflow updates</p>
             </div>
-            <a href="#">View all</a>
           </div>
-          <div className="activity-item">
-            <strong>Sarah Chen</strong> created new contract <span>Mutual NDA - TechVenture Group</span>
-            <div className="activity-time">10 min ago</div>
-          </div>
-          <div className="activity-item">
-            <strong>David Park</strong> updated compliance status on <span>Office Lease - Metro Plaza</span>
-            <div className="activity-time">1 hour ago</div>
-          </div>
-          <div className="activity-item">
-            <strong>Emily Crawford</strong> signed contract <span>Vendor SLA - CloudHosting Services</span>
-            <div className="activity-time">3 hours ago</div>
-          </div>
+          {recentActivity.map(item => (
+            <div className="activity-item" key={item.id || item.contractId}>
+              <strong>{item.owner}</strong> added <span>{item.name}</span>
+              <div className="activity-time">Status: {item.status}</div>
+            </div>
+          ))}
+          {recentActivity.length === 0 && <div className="activity-item">No recent activity</div>}
         </div>
 
         <div className="footer-panel panel-card">
@@ -173,22 +224,19 @@ function RenewalDashboard({ renewals = [], searchQuery = '', onExport, onAdd }) 
               <h2>Upcoming deadlines</h2>
               <p>Items requiring attention this week</p>
             </div>
-            <a href="#">View all</a>
           </div>
-          <div className="deadline-item">
-            <div>
-              <strong>Q2 Compliance Report Submission</strong>
-              <div className="deadline-meta">Sarah Chen · Due 2024-06-30</div>
+          {upcomingDeadlines.map(item => (
+            <div className="deadline-item" key={item.id || item.contractId}>
+              <div>
+                <strong>{item.name}</strong>
+                <div className="deadline-meta">{item.owner} · Due {item.renewalDate}</div>
+              </div>
+              <span className={`status ${item.daysRemaining < 0 ? 'overdue' : 'in-progress'}`}>
+                {item.daysRemaining < 0 ? 'Overdue' : 'Upcoming'}
+              </span>
             </div>
-            <span className="status in-progress">In Progress</span>
-          </div>
-          <div className="deadline-item">
-            <div>
-              <strong>Annual Insurance Certificate Renewal</strong>
-              <div className="deadline-meta">Lisa Torres · Due 2024-05-15</div>
-            </div>
-            <span className="status overdue">Overdue</span>
-          </div>
+          ))}
+          {upcomingDeadlines.length === 0 && <div className="deadline-item">No upcoming deadlines</div>}
         </div>
       </section>
     </div>
