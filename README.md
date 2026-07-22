@@ -6,7 +6,6 @@ A modern **User Dashboard** developed using **React.js** and **FastAPI** for man
 
 # Structure
 
-
 user-dashboard/
 │
 ├── backend/
