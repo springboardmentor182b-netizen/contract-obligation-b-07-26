@@ -6,6 +6,8 @@ from typing import Any
 from fastapi import Depends, FastAPI, HTTPException, Query, status
 from fastapi.middleware.cors import CORSMiddleware
 
+from .dashboard.router import router as dashboard_router
+
 from .auth.security import create_token, get_current_user, hash_password, require_roles, verify_password
 from .schemas import (
     APIRecord,
@@ -44,6 +46,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(dashboard_router)
 
 
 def public_user(user: dict[str, Any]) -> dict[str, Any]:
@@ -269,24 +273,6 @@ def compliance_summary(_: dict[str, Any] = Depends(get_current_user)) -> dict[st
             overdue += 1
 
     return {"total_obligations": len(obligations), "by_compliance_level": by_level, "overdue_obligations": overdue}
-
-
-@app.get("/api/dashboard")
-def dashboard(_: dict[str, Any] = Depends(get_current_user)) -> dict[str, Any]:
-    contracts = store.list("contracts")
-    obligations = store.list("obligations")
-    renewals = store.list("renewals")
-    notifications = store.list("notifications")
-    activities = sorted(store.list("activities"), key=lambda item: item["created_at"], reverse=True)[:10]
-
-    return {
-        "active_contracts": sum(1 for item in contracts if item["status"] == ContractStatus.active.value),
-        "upcoming_renewals": sum(1 for item in renewals if item["status"] == RenewalStatus.upcoming.value),
-        "pending_obligations": sum(1 for item in obligations if item["status"] in {ObligationStatus.pending.value, ObligationStatus.in_progress.value}),
-        "unread_notifications": sum(1 for item in notifications if not item.get("read", False)),
-        "compliance": compliance_summary(),
-        "recent_activities": activities,
-    }
 
 
 @app.get("/api/notifications", response_model=list[APIRecord])

@@ -1,5 +1,7 @@
 import React from 'react'
+import { Link } from 'react-router-dom'
 
-export default function Navbar() {
-  return React.createElement('nav', { className: 'navbar' }, React.createElement('strong', null, 'ContractIQ'))
+export default function Navbar({ profile }) {
+  const initials = profile?.full_name?.split(' ').map((name) => name[0]).join('').slice(0, 2).toUpperCase() || '-'
+  return React.createElement('header', { className: 'navbar' }, React.createElement('div', { className: 'breadcrumb' }, React.createElement(Link, { to: '/dashboard' }, 'ContractIQ'), React.createElement('span', { className: 'breadcrumb-arrow' }, '>'), React.createElement('strong', null, 'Dashboard')), React.createElement('div', { className: 'navbar-actions' }, React.createElement('button', { className: 'primary-button', type: 'button' }, '+  New Contract'), React.createElement('label', { className: 'search-box' }, React.createElement('span', { className: 'search-symbol', 'aria-hidden': true }, 'o'), React.createElement('input', { type: 'search', placeholder: 'Search...', 'aria-label': 'Search' })), React.createElement('button', { className: 'notification-button', type: 'button', 'aria-label': 'Notifications' }, 'o', React.createElement('span', { className: 'notification-dot' })), React.createElement('div', { className: 'profile-summary' }, React.createElement('span', { className: 'avatar' }, initials), React.createElement('span', { className: 'profile-copy' }, React.createElement('strong', null, profile?.full_name || '-'), React.createElement('small', null, profile?.role || '')), React.createElement('span', { className: 'header-chevron' }, 'v'))))
 }

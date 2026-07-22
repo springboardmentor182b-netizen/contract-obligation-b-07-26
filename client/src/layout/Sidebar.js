@@ -1,9 +1,17 @@
 import React from 'react'
+import { NavLink } from 'react-router-dom'
 
-export default function Sidebar({ items = [] }) {
-  return React.createElement(
-    'aside',
-    { className: 'sidebar' },
-    items.map((item) => React.createElement('a', { key: item.href, href: item.href }, item.label)),
-  )
+const navigationItems = [
+  ['Dashboard', 'grid', '/dashboard', null], ['Contracts', 'file', '/contracts', 'total_contracts'], ['Repository', 'folder', '/repository', null], ['Obligations', 'check', '/obligations', 'pending_obligations'], ['Renewals', 'renew', '/renewals', 'upcoming_renewals'], ['Compliance', 'shield', '/compliance', null], ['Reports', 'chart', '/reports', null], ['Notifications', 'bell', '/notifications', null], ['Audit Logs', 'clipboard', '/audit-logs', null], ['Users', 'users', '/users', null], ['Settings', 'settings', '/settings', null],
+]
+
+function Icon({ name }) {
+  const paths = { grid: 'M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z', file: 'M6 2h8l4 4v16H6zM14 2v5h5M9 12h6M9 16h6', folder: 'M3 6h7l2 2h9v12H3z', check: 'M5 4h14v17H5zM8 12l2.5 2.5L16 9', renew: 'M20 7V3l-3 3a8 8 0 1 0 2 10M4 17v4l3-3', shield: 'M12 2l7 3v5c0 5-3 9-7 11-4-2-7-6-7-11V5z', chart: 'M5 20V10M12 20V4M19 20v-7', bell: 'M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 22h4', clipboard: 'M9 4h6M9 2h6v4H9zM5 5h14v17H5zM9 12h6M9 16h6', users: 'M16 20v-1a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v1M9.5 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8M17 11a3 3 0 1 0 0-6M21 20v-1a4 4 0 0 0-3-3.87', settings: 'M12 15.5A3.5 3.5 0 1 0 12 8a3.5 3.5 0 0 0 0 7.5M19.4 15a1.7 1.7 0 0 0 .34 1.88l.06.06-2.1 2.1-.06-.06a1.7 1.7 0 0 0-1.88-.34 1.7 1.7 0 0 0-1.03 1.56v.08h-3v-.08a1.7 1.7 0 0 0-1.03-1.56 1.7 1.7 0 0 0-1.88.34l-.06.06-2.1-2.1.06-.06A1.7 1.7 0 0 0 7 15a1.7 1.7 0 0 0-1.56-1.03h-.08v-3h.08A1.7 1.7 0 0 0 7 9.94a1.7 1.7 0 0 0-.34-1.88l-.06-.06 2.1-2.1.06.06a1.7 1.7 0 0 0 1.88.34 1.7 1.7 0 0 0 1.03-1.56v-.08h3v.08a1.7 1.7 0 0 0 1.03 1.56 1.7 1.7 0 0 0 1.88-.34l.06-.06 2.1 2.1-.06.06A1.7 1.7 0 0 0 19.4 9.94a1.7 1.7 0 0 0 1.56 1.03h.08v3h-.08A1.7 1.7 0 0 0 19.4 15z' }
+  return React.createElement('svg', { viewBox: '0 0 24 24', 'aria-hidden': true }, React.createElement('path', { d: paths[name], fill: 'none', stroke: 'currentColor', strokeWidth: 1.8, strokeLinecap: 'round', strokeLinejoin: 'round' }))
+}
+
+export default function Sidebar({ profile, stats = [] }) {
+  const counts = Object.fromEntries(stats.map((stat) => [stat.key, stat.value]))
+  const initials = profile?.full_name?.split(' ').map((part) => part[0]).join('').slice(0, 2).toUpperCase() || '-'
+  return React.createElement('aside', { className: 'sidebar' }, React.createElement('div', { className: 'brand' }, React.createElement('span', { className: 'brand-mark' }, React.createElement(Icon, { name: 'file' })), React.createElement('span', null, 'ContractIQ')), React.createElement('nav', { className: 'sidebar-nav', 'aria-label': 'Main navigation' }, navigationItems.map(([label, icon, path, countKey]) => React.createElement(NavLink, { key: label, to: path, className: ({ isActive }) => `sidebar-link${isActive ? ' active' : ''}` }, React.createElement('span', { className: 'nav-icon' }, React.createElement(Icon, { name: icon })), React.createElement('span', { className: 'nav-label' }, label), countKey && counts[countKey] ? React.createElement('span', { className: 'nav-count' }, counts[countKey]) : null))), React.createElement('div', { className: 'sidebar-profile' }, React.createElement('span', { className: 'avatar sidebar-avatar' }, initials), React.createElement('span', { className: 'sidebar-profile-copy' }, React.createElement('strong', null, profile?.full_name || '-'), React.createElement('small', null, profile?.role || '')), React.createElement('span', { className: 'profile-chevron' }, 'v'), React.createElement('button', { type: 'button', className: 'collapse-button' }, 'x  Collapse')))
 }
