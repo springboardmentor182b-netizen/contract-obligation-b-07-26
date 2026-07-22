@@ -1,0 +1,55 @@
+.header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:25px;
+}
+
+.header-left h1{
+    font-size:38px;
+    font-weight:700;
+    color:#1E293B;
+    margin:0;
+}
+
+.header-left p{
+    color:#64748B;
+    margin-top:8px;
+    font-size:16px;
+}
+
+.header-right{
+    display:flex;
+    gap:15px;
+}
+
+.export-btn{
+    background:#0000FF;
+    color:white;
+    border:none;
+    padding:12px 26px;
+    border-radius:10px;
+    cursor:pointer;
+    font-size:15px;
+    font-weight:600;
+    transition:.3s;
+}
+
+.export-btn:hover{
+    background:#00BFFF;
+}
+.add-btn{
+    background:#0000FF;
+    color:white;
+    border:none;
+    padding:12px 26px;
+    border-radius:10px;
+    cursor:pointer;
+    font-size:15px;
+    font-weight:600;
+    transition:.3s;
+}
+
+.add-btn:hover{
+    background:#00BFFF;
+}
