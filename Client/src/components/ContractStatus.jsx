@@ -48,13 +48,15 @@ export default function ContractStatus() {
       <div className="status-content">
 
         <div className="status-chart">
-          <ResponsiveContainer width="100%" height={260}>
+          <ResponsiveContainer width="100%" height={180}>
             <PieChart>
               <Pie
                 data={data}
                 dataKey="value"
-                innerRadius={60}
-                outerRadius={90}
+                cx="40%"
+                cy="38%"
+                innerRadius={45}
+                outerRadius={70}
                 paddingAngle={3}
               >
                 {data.map((item, index) => (

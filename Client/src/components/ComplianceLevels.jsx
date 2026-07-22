@@ -49,7 +49,7 @@ function ComplianceLevels() {
 
         <div className="pie-chart">
 
-          <ResponsiveContainer width="100%" height={300}>
+          <ResponsiveContainer width="100%" height={180}>
             <PieChart>
 
               <Pie
@@ -58,7 +58,7 @@ function ComplianceLevels() {
                 cx="50%"
                 cy="50%"
                 innerRadius={0}
-                outerRadius={95}
+                outerRadius={70}
                 paddingAngle={2}
               >
                 {data.map((entry, index) => (

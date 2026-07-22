@@ -25,7 +25,10 @@ function ContractsByDepartment() {
     fetchDepartments();
   },[]);
   return (
-    <div className="compliance-card">
+    <div 
+      className="compliance-card"
+      style={{paddingTop:"12px", paddingBottom:"12px"}}
+    >
 
       <div className="chart-header">
         <div>
@@ -36,7 +39,7 @@ function ContractsByDepartment() {
       </div>
 
       <div className="chart-container">
-        <ResponsiveContainer width="100%" height={320}>
+        <ResponsiveContainer width="100%" height={220}>
           <BarChart data={data}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} horizontal={false} />
 
