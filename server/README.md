@@ -234,4 +234,82 @@ Swagger UI
 http://127.0.0.1:8000/docs
 ```
 
+# Compliance Dashboard - Server
 
+## Overview
+
+This project provides the backend REST APIs for the Compliance Monitoring Dashboard.
+
+## Tech Stack
+
+- FastAPI
+- SQLAlchemy
+- PostgreSQL
+- Pydantic
+- Uvicorn
+
+## Modules
+
+- Compliance
+- Audit
+- Reports
+- History
+- Risk
+- Missed Obligations
+
+## Installation
+
+Create Virtual Environment
+
+```bash
+python -m venv venv
+```
+
+Activate
+
+Windows
+
+```bash
+venv\Scripts\activate
+```
+
+Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+## Run Server
+
+```bash
+uvicorn app.main:app --reload
+```
+
+Server URL
+
+```
+http://127.0.0.1:8000
+```
+
+Swagger Documentation
+
+```
+http://127.0.0.1:8000/docs
+```
+
+## Database
+
+Database
+
+```
+PostgreSQL
+```
+
+Tables
+
+- compliance
+- audit
+- report
+- history
+- risk
+- missed_obligation
