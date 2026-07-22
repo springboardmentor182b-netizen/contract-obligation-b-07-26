@@ -2,6 +2,12 @@ import { Routes, Route } from "react-router-dom";
 
 import DashboardLayout from "../layouts/DashboardLayout";
 
+// Authentication Pages
+import Login from "../pages/Login";
+import Signup from "../pages/Signup";
+import ForgotPassword from "../pages/ForgotPassword";
+
+// Dashboard Pages
 import Dashboard from "../pages/Dashboard";
 import ContractRepository from "../pages/ContractRepository";
 import ContractManagement from "../pages/ContractManagement";
@@ -17,12 +23,14 @@ import Settings from "../pages/Settings";
 const AppRoutes = () => {
   return (
     <Routes>
+      {/* Authentication Routes */}
+      <Route path="/" element={<Login />} />
+      <Route path="/signup" element={<Signup />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
 
-      {/* Dashboard uses its own Sidebar and Navbar */}
-      <Route path="/" element={<Dashboard />} />
-
-      {/* All other pages use DashboardLayout */}
+      {/* Dashboard Routes */}
       <Route element={<DashboardLayout />}>
+        <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/repository" element={<ContractRepository />} />
         <Route path="/management" element={<ContractManagement />} />
         <Route path="/tracking" element={<ObligationTracking />} />
@@ -34,7 +42,6 @@ const AppRoutes = () => {
         <Route path="/users" element={<UserManagement />} />
         <Route path="/settings" element={<Settings />} />
       </Route>
-
     </Routes>
   );
 };
