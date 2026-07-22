@@ -1,37 +1,42 @@
-import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Cell } from "recharts";
-
-function colorFor(score) {
-  if (score >= 85) return "#22C55E";
-  if (score >= 60) return "#F59E0B";
-  return "#EF4444";
-}
+const COLOR_MAP = {
+  IT: "bg-emerald-500",
+  HR: "bg-emerald-500",
+  Legal: "bg-amber-500",
+  Operations: "bg-rose-500",
+  Marketing: "bg-amber-500",
+  Finance: "bg-emerald-500",
+};
 
 export default function DepartmentScores({ data }) {
-  return (
-    <div className="rounded-2xl border border-[#ECE7DE] bg-white p-6 shadow-sm">
-      <h3 className="text-base font-semibold text-[#1F2937]">
-        Department Compliance Scores
-      </h3>
+  const departments = data && data.length > 0 ? data : [
+    { department: "IT", score: 92 },
+    { department: "HR", score: 88 },
+    { department: "Legal", score: 75 },
+    { department: "Operations", score: 68 },
+    { department: "Marketing", score: 82 },
+  ];
 
-      <div className="mt-4 h-56">
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={data} layout="vertical" barSize={18}>
-            <XAxis type="number" domain={[0, 100]} tick={{ fontSize: 11, fill: "#98A2B3" }} axisLine={false} tickLine={false} />
-            <YAxis
-              type="category"
-              dataKey="department"
-              width={80}
-              tick={{ fontSize: 12, fill: "#374151" }}
-              axisLine={false}
-              tickLine={false}
-            />
-            <Bar dataKey="score" radius={[0, 6, 6, 0]}>
-              {data.map((entry) => (
-                <Cell key={entry.department} fill={colorFor(entry.score)} />
-              ))}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
+  return (
+    <div className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm">
+      <h3 className="text-base font-bold text-slate-900">Department Compliance Scores</h3>
+
+      <div className="mt-6 space-y-4">
+        {departments.map((item) => (
+          <div key={item.department} className="flex items-center gap-4">
+            <span className="w-20 text-xs font-semibold text-slate-600 text-right">
+              {item.department}
+            </span>
+            <div className="relative h-3.5 flex-1 overflow-hidden rounded-full bg-slate-100">
+              <div
+                className={`h-full rounded-full transition-all duration-500 ${
+                  COLOR_MAP[item.department] || "bg-emerald-500"
+                }`}
+                style={{ width: `${item.score}%` }}
+              />
+            </div>
+            <span className="w-8 text-xs font-bold text-slate-700">{item.score}%</span>
+          </div>
+        ))}
       </div>
     </div>
   );

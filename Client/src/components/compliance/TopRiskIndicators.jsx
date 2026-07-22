@@ -10,15 +10,24 @@ const DOT_COLOR = {
   Medium: "#8B5CF6",
 };
 
-export default function TopRiskIndicators({ items }) {
+export default function TopRiskIndicators({ items, onViewAll }) {
   return (
     <div className="rounded-2xl border border-[#ECE7DE] bg-white p-6 shadow-sm">
       <div className="flex items-center justify-between">
         <h3 className="text-base font-semibold text-[#1F2937]">Top Risk Indicators</h3>
-        <button className="text-sm font-medium text-[#D4AF37] hover:underline">
-          View all &rsaquo;
-        </button>
+        {onViewAll && (
+          <button
+            onClick={onViewAll}
+            className="text-sm font-medium text-[#D4AF37] hover:underline"
+          >
+            View all &rsaquo;
+          </button>
+        )}
       </div>
+
+      {items.length === 0 && (
+        <p className="mt-4 text-sm text-[#98A2B3]">No open high-priority risks right now.</p>
+      )}
 
       <ul className="mt-4 divide-y divide-[#ECE7DE]">
         {items.map((item) => (

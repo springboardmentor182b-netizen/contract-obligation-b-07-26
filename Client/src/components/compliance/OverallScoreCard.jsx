@@ -5,22 +5,22 @@ const STROKE = 14;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
 function tierFor(score) {
-  if (score >= 85) return { color: "#22C55E", label: "Excellent" };
-  if (score >= 65) return { color: "#F59E0B", label: "Good" };
-  return { color: "#EF4444", label: "Needs Attention" };
+  if (score >= 85) return { color: "#10B981", bg: "bg-emerald-50 text-emerald-600", label: "Excellent Health" };
+  if (score >= 65) return { color: "#F59E0B", bg: "bg-amber-50 text-amber-600", label: "Moderate Risk" };
+  return { color: "#EF4444", bg: "bg-rose-50 text-rose-600", label: "Needs Attention" };
 }
 
-export default function OverallScoreCard({ score, deltaLabel }) {
+export default function OverallScoreCard({ score, totalContracts }) {
   const progress = (score / 100) * CIRCUMFERENCE;
   const tier = tierFor(score);
 
   return (
-    <div className="rounded-2xl border border-[#ECE7DE] bg-white p-6 shadow-sm">
-      <p className="text-xs font-semibold uppercase tracking-wide text-[#98A2B3]">
+    <div className="rounded-2xl border border-slate-200/80 bg-white p-6 shadow-sm flex flex-col justify-between">
+      <p className="text-xs font-bold uppercase tracking-wider text-slate-400">
         Overall Compliance Score
       </p>
 
-      <div className="mt-6 flex flex-col items-center">
+      <div className="mt-4 flex flex-col items-center">
         <div className="relative" style={{ width: SIZE, height: SIZE }}>
           <svg width={SIZE} height={SIZE} viewBox={`0 0 ${SIZE} ${SIZE}`}>
             <circle
@@ -44,21 +44,18 @@ export default function OverallScoreCard({ score, deltaLabel }) {
             />
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-4xl font-bold text-[#1F2937]">{score}</span>
-            <span className="text-xs text-[#98A2B3]">%</span>
+            <span className="text-4xl font-extrabold text-slate-900">{score}</span>
+            <span className="text-xs font-semibold text-slate-400">%</span>
           </div>
         </div>
 
-        <span
-          className="mt-4 rounded-full px-4 py-1.5 text-sm font-medium"
-          style={{ color: tier.color, backgroundColor: `${tier.color}1A` }}
-        >
+        <span className={`mt-4 rounded-full px-4 py-1 text-xs font-bold ${tier.bg}`}>
           {tier.label}
         </span>
 
-        {deltaLabel && (
-          <p className="mt-3 text-xs text-[#6B7280]">{deltaLabel}</p>
-        )}
+        <p className="mt-3 text-xs font-medium text-slate-500">
+          Evaluated from <span className="font-bold text-slate-700">{totalContracts}</span> active contract{totalContracts === 1 ? "" : "s"}
+        </p>
       </div>
     </div>
   );

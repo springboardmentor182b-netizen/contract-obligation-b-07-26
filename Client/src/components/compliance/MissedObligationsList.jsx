@@ -7,15 +7,24 @@ function initials(name) {
     .toUpperCase();
 }
 
-export default function MissedObligationsList({ items }) {
+export default function MissedObligationsList({ items, onViewAll }) {
   return (
     <div className="rounded-2xl border border-[#ECE7DE] bg-white p-6 shadow-sm">
       <div className="flex items-center justify-between">
         <h3 className="text-base font-semibold text-[#1F2937]">Missed Obligations</h3>
-        <button className="text-sm font-medium text-[#D4AF37] hover:underline">
-          All &rsaquo;
-        </button>
+        {onViewAll && (
+          <button
+            onClick={onViewAll}
+            className="text-sm font-medium text-[#D4AF37] hover:underline"
+          >
+            All &rsaquo;
+          </button>
+        )}
       </div>
+
+      {items.length === 0 && (
+        <p className="mt-4 text-sm text-[#98A2B3]">Nothing overdue {"\u2014"} great job.</p>
+      )}
 
       <ul className="mt-4 space-y-3">
         {items.map((item) => (

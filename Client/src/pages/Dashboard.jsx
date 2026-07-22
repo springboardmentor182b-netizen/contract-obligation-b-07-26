@@ -1,84 +1,80 @@
-import Sidebar from "../components/Sidebar";
-import Navbar from "../components/Navbar";
 import DashboardCard from "../components/DashboardCard";
 import RecentContracts from "../components/RecentContracts";
 import ComplianceLevels from "../components/ComplianceLevels";
-// import "../styles/dashboard.css";
+import DeadlineCard from "../components/DeadlineCard";
+import "../styles/dashboard.css";
 import ContractsByDepartment from "../components/ContractsByDepartment";
 import RecentActivity from "../components/RecentActivity";
 import UpcomingRenewals from "../components/UpcomingRenewals";
 
 function Dashboard() {
   return (
-    <div className="dashboard">
-      <Sidebar />
+    <>
+      <div className="dashboard-header">
+        <h1>Dashboard Overview</h1>
+        <p>
+          Welcome back, Jennifer. Here is your compliance snapshot for today.
+        </p>
+      </div>
 
-      <main className="main-content">
-        <Navbar />
+      <div className="cards">
+        <DashboardCard
+          title="Total Contracts"
+          value="214"
+          percent="+12%"
+        />
 
-        <div className="dashboard-header">
-          <h1>Dashboard Overview</h1>
-          <p>
-            Welcome back, Jennifer. Here is your compliance snapshot for today.
-          </p>
-        </div>
+        <DashboardCard
+          title="Active Contracts"
+          value="179"
+          percent="+8%"
+        />
 
-        <div className="cards">
-          <DashboardCard
-            title="Total Contracts"
-            value="214"
-            percent="+12%"
-          />
+        <DashboardCard
+          title="Under Review"
+          value="31"
+          percent="+5%"
+        />
 
-          <DashboardCard
-            title="Active Contracts"
-            value="179"
-            percent="+8%"
-          />
+        <DashboardCard
+          title="Upcoming Renewals"
+          value="18"
+          percent="-2%"
+        />
 
-          <DashboardCard
-            title="Under Review"
-            value="31"
-            percent="+5%"
-          />
+        <DashboardCard
+          title="Pending Obligations"
+          value="43"
+          percent="+10%"
+        />
 
-          <DashboardCard
-            title="Upcoming Renewals"
-            value="18"
-            percent="-2%"
-          />
+        <DashboardCard
+          title="Compliance Rate"
+          value="91.4%"
+          percent="+2%"
+        />
+      </div>
 
-          <DashboardCard
-            title="Pending Obligations"
-            value="43"
-            percent="+10%"
-          />
-
-          <DashboardCard
-            title="Compliance Rate"
-            value="91.4%"
-            percent="+2%"
-          />
-        </div>
-
-        <div className="dashboard-grid">
-          <div className="left-column">
-            <div className="card-placeholder">
-              <h2>Contract Growth</h2>
-              <p>Graph will be added here.</p>
-            </div>
-
-            <ComplianceLevels />
-            {/* <ContractsByDepartment /> */}
-            <RecentContracts />
-            <RecentActivity />
-            <UpcomingRenewals />
+      <div className="dashboard-grid">
+        <div className="left-column">
+          <div className="card-placeholder">
+            <h2>Contract Growth</h2>
+            <p>Graph will be added here.</p>
           </div>
 
-          <div className="right-column"></div>
+          <ComplianceLevels />
+          {/* <ContractsByDepartment /> */}
+          <RecentContracts />
+          <RecentActivity />
+          <UpcomingRenewals />
         </div>
-      </main>
-    </div>
+
+        <div className="right-column">
+          <DeadlineCard />
+          <ContractsByDepartment />
+        </div>
+      </div>
+    </>
   );
 }
 

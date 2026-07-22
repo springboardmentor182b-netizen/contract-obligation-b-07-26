@@ -1,6 +1,15 @@
 import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 
+const COLOR_BY_LABEL = {
+  Compliant: "#22C55E",
+  Pending: "#F59E0B",
+  Delayed: "#FB923C",
+  "Non-Compliant": "#EF4444",
+  "High Risk": "#8B5CF6",
+};
+
 export default function StatusBreakdownCard({ data }) {
+  data = data.map((d) => ({ ...d, color: COLOR_BY_LABEL[d.label] ?? "#98A2B3" }));
   return (
     <div className="rounded-2xl border border-[#ECE7DE] bg-white p-6 shadow-sm">
       <p className="text-xs font-semibold uppercase tracking-wide text-[#98A2B3]">
