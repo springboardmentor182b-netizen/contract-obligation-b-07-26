@@ -1,95 +1,110 @@
+# User Dashboard (React + FastAPI)
 
-Compliance Dashboard — React + FastAPI
+A modern **User Dashboard** developed using **React.js** and **FastAPI** for managing user information, contracts, activities, notifications, and dashboard analytics. The application provides users with a centralized platform to monitor important metrics, upcoming tasks, and account activities through an intuitive and responsive interface.
 
-Feature-branch code for the Compliance Dashboard page of the Contract Obligation Tracking & Compliance Management platform (Infosys Springboard internship group project).
+---
 
-This reproduces the Compliance Dashboard exactly as designed in the Figma file: same KPI cards, department compliance chart, risk trend chart, audit summary, audit table, risk indicators panel, sidebar navigation, top navigation, search bar, notification badge, user profile, and role badge.
-## Structure
+# Structure
 
-```text
-compliance-dashboard/
-├── backend/                          # FastAPI service
-│   ├── main.py                       # App entrypoint + CORS
-│   ├── requirements.txt
-│   └── app/
-│       ├── models.py                 # Pydantic models
-│       ├── data.py                   # Dashboard seed data
-│       └── routers/
-│           └── dashboard.py          # Dashboard API routes
+```
+user-dashboard/
 │
-└── frontend/                         # React (Vite)
-    ├── index.html
-    ├── vite.config.js                # Proxy /api → localhost:8000
-    └── src/
-        ├── App.jsx
-        ├── api.js
-        ├── index.css
-        ├── pages/
-        │   └── ComplianceDashboard.jsx
-        ├── components/
-        │   ├── layout/
-        │   │   ├── Sidebar.jsx
-        │   │   ├── Topbar.jsx
-        │   │   └── DashboardLayout.jsx
-        │   ├── cards/
-        │   │   ├── MetricCard.jsx
-        │   │   ├── SummaryCard.jsx
-        │   │   └── RiskCard.jsx
-        │   ├── charts/
-        │   │   ├── DepartmentChart.jsx
-        │   │   └── RiskTrendChart.jsx
-        │   ├── tables/
-        │   │   └── AuditTable.jsx
-        │   └── common/
-        │       ├── Avatar.jsx
-        │       ├── Badge.jsx
-        │       └── SearchBar.jsx
-        └── assets/
-## Running Locally
-
-### Backend
-
-```bash
-cd backend
-
-python -m venv venv
-
-# Windows
-venv\Scripts\activate
-
-# Linux/macOS
-source venv/bin/activate
-
-pip install -r requirements.txt
-
-uvicorn main:app --reload --port 8000
+├── backend/
+│   ├── app/
+│   │   ├── api/
+│   │   ├── models/
+│   │   ├── schemas/
+│   │   ├── services/
+│   │   ├── database.py
+│   │   └── main.py
+│   │
+│   ├── requirements.txt
+│   └── README.md
+│
+├── frontend/
+│   ├── public/
+│   ├── src/
+│   │   ├── assets/
+│   │   ├── components/
+│   │   ├── layouts/
+│   │   ├── pages/
+│   │   ├── services/
+│   │   ├── hooks/
+│   │   ├── utils/
+│   │   ├── App.jsx
+│   │   └── main.jsx
+│   │
+│   ├── package.json
+│   └── vite.config.js
+│
+└── README.md
 ```
 
-FastAPI Swagger documentation is available at:
+---
 
-```text
+# Backend
+
+## Requirements
+
+- Python 3.10+
+- FastAPI
+- SQLAlchemy
+- Pydantic
+- Uvicorn
+
+### Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### Run Backend
+
+```bash
+uvicorn app.main:app --reload
+```
+
+Backend Server
+
+```
+http://localhost:8000
+```
+
+Swagger Documentation
+
+```
 http://localhost:8000/docs
 ```
 
 ---
 
-### Frontend
+# Frontend
+
+## Requirements
+
+- Node.js
+- React.js
+- Vite
+- Axios
+- React Router
+
+### Install Dependencies
 
 ```bash
-cd frontend
-
 npm install
+```
 
+### Run Frontend
+
+```bash
 npm run dev
 ```
 
-The application runs at:
+Frontend Server
 
-```text
+```
 http://localhost:5173
 ```
-
-The Vite development server automatically proxies all `/api/*` requests to the FastAPI backend running on **http://localhost:8000**, so no additional `.env` configuration is required during development.
 
 ---
 
@@ -97,200 +112,187 @@ The Vite development server automatically proxies all `/api/*` requests to the F
 
 ## Sidebar
 
-The sidebar includes:
+The sidebar contains:
 
-- ContractIQ Logo
-- User Profile
 - Dashboard
-- Compliance (Active)
-- Contract Repository
+- Profile
+- Contracts
+- Compliance
 - Obligation Tracker
-- Reports & Export
-- Notification Center
+- Reports
+- Notifications
+- Settings
+- Logout
 
 ---
 
 ## Top Navigation
 
-The top navigation bar contains:
+The top navigation includes:
 
-- Search Contracts & Obligations
-- Notification Bell
-- User Avatar
-- Username
-- Role Badge
+- Dashboard Title
+- Search Bar
+- Notifications
+- User Profile
+- Settings
 
 ---
 
-## KPI Cards
+## Dashboard Cards
 
-The dashboard displays four key metrics:
+The dashboard displays the following KPI cards:
 
-- Overall Compliance
-- Missed Deadlines
-- Risk Flags
-- Audits Completed
+- Active Contracts
+- Pending Obligations
+- Upcoming Renewals
+- Compliance Score
+- Expiring Contracts
 
-Each card contains:
+Each card contains
 
 - Icon
-- Current Value
-- Trend Indicator
+- Count
+- Status
 - Description
 
 ---
 
-## Department Compliance Chart
+## Contract Activity Chart
 
-A horizontal bar chart displays compliance scores for:
+Displays monthly contract statistics.
 
-- Legal
-- Finance
-- HR
-- IT
-- Operations
-- Procurement
+Shows
 
----
-
-## Risk Trend Chart
-
-A line chart visualizes compliance risk trends across the first half of 2024:
-
-- January
-- February
-- March
-- April
-- May
-- June
+- Created Contracts
+- Renewed Contracts
+- Terminated Contracts
 
 ---
 
-## Audit Summary
+## Portfolio Distribution
 
-The dashboard displays:
+Displays contract distribution by category.
 
-- Total Audits: **22**
-- Completed: **18**
-- In Progress: **3**
-- Failed: **1**
+Categories
+
+- Vendor
+- Employment
+- Lease
+- Software
+- NDA
+- Others
 
 ---
 
-## Audit Table
+## Recent Activities
 
-The audit table contains the following columns:
+Displays user activities including
 
-- Audit
-- Department
-- Auditor
-- Status
-- Score
+- Contract Created
+- Contract Updated
+- Approval Submitted
+- Profile Updated
+- Notification Received
 
-Supported status badges:
+---
 
-- Completed
+## Upcoming Deadlines
+
+Shows
+
+- Contract Renewals
+- Compliance Reports
+- Insurance Renewal
+- Audit Completion
+- License Renewal
+
+Status badges
+
+- Pending
 - In Progress
-- Terminated
+- Completed
+- Overdue
 
 ---
 
-## Risk Indicators
+# User Profile
 
-Displays:
+Displays
 
-- Expired Contracts with Active Obligations
-- Contracts Without Designated Owner
-- Obligations Past Due Date
-- Missing Compliance Documentation
-- Unreviewed Renewal Notices
+- User Name
+- Email
+- Role
+- Department
+- Profile Picture
 
-Each indicator displays:
+---
 
-- Severity Badge
-- Number of Affected Items
+# Search
+
+Users can search for
+
+- Contracts
+- Obligations
+- Reports
+- Notifications
 
 ---
 
 # API Endpoints
 
 | Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/dashboard/metrics` | Retrieve KPI metrics |
-| GET | `/api/dashboard/departments` | Retrieve department compliance scores |
-| GET | `/api/dashboard/risk-trend` | Retrieve monthly risk trend |
-| GET | `/api/dashboard/audits` | Retrieve audit table data |
-| GET | `/api/dashboard/risks` | Retrieve risk indicators |
+|---------|----------|-------------|
+| GET | /api/dashboard | Dashboard Summary |
+| GET | /api/contracts | Fetch Contracts |
+| GET | /api/activities | Recent Activities |
+| GET | /api/deadlines | Upcoming Deadlines |
+| GET | /api/profile | User Profile |
+| GET | /api/notifications | Notifications |
 
 ---
 
 # Sample API Responses
 
-### GET `/api/dashboard/metrics`
+### GET /api/dashboard
 
 ```json
 {
-  "overallCompliance": 94.2,
-  "missedDeadlines": 3,
-  "riskFlags": 5,
-  "auditsCompleted": "18/22"
+    "activeContracts": 247,
+    "pendingObligations": 41,
+    "renewals": 23,
+    "complianceScore": 94.2
 }
 ```
 
-### GET `/api/dashboard/departments`
+### GET /api/profile
+
+```json
+{
+    "name": "Sarah Chen",
+    "role": "Legal Manager",
+    "department": "Legal"
+}
+```
+
+### GET /api/activities
 
 ```json
 [
-  {
-    "department": "Legal",
-    "score": 98
-  },
-  {
-    "department": "Finance",
-    "score": 91
-  },
-  {
-    "department": "HR",
-    "score": 87
-  },
-  {
-    "department": "IT",
-    "score": 95
-  },
-  {
-    "department": "Operations",
-    "score": 80
-  },
-  {
-    "department": "Procurement",
-    "score": 89
-  }
+    {
+        "title": "Created New Contract",
+        "time": "10 minutes ago"
+    }
 ]
 ```
 
-### GET `/api/dashboard/audits`
+### GET /api/deadlines
 
 ```json
 [
-  {
-    "audit": "Q2 Vendor Contracts Audit",
-    "department": "Procurement",
-    "auditor": "David Park",
-    "status": "Completed",
-    "score": 97
-  }
-]
-```
-
-### GET `/api/dashboard/risks`
-
-```json
-[
-  {
-    "title": "Expired Contracts with Active Obligations",
-    "level": "High",
-    "count": 2
-  }
+    {
+        "title": "Compliance Report",
+        "status": "Pending"
+    }
 ]
 ```
 
@@ -300,44 +302,66 @@ Each indicator displays:
 
 ## Frontend
 
-- React
+- React.js
 - Vite
 - Axios
 - React Router
-- Recharts
-- React Icons
+- CSS / Tailwind CSS
+- Chart.js / Recharts
 
 ## Backend
 
 - FastAPI
+- Python
+- SQLAlchemy
 - Pydantic
 - Uvicorn
-- Python 3.11+
+
+## Database
+
+- MySQL / PostgreSQL / SQLite
+
+---
+
+# Features
+
+✅ Responsive Dashboard
+
+✅ Modern UI
+
+✅ Sidebar Navigation
+
+✅ Search Functionality
+
+✅ User Profile
+
+✅ Dashboard Analytics
+
+✅ Contract Overview
+
+✅ Activity Timeline
+
+✅ Upcoming Deadlines
+
+✅ Notifications
+
+✅ REST API Integration
+
+---
+
+# Future Enhancements
+
+- JWT Authentication
+- Role-Based Access Control
+- Dark Mode
+- Email Notifications
+- PDF Report Export
+- Excel Export
+- Real-Time Dashboard
+- Audit Logs
 
 ---
 
 # Notes
 
-This implementation recreates the **Compliance Dashboard** from the approved Figma design.
-
-### Features Included
-
-- Responsive dashboard layout
-- Sidebar navigation
-- Top navigation bar
-- KPI metric cards
-- Department compliance chart
-- Risk trend line chart
-- Audit summary cards
-- Audit table with status badges
-- Risk indicators panel
-- FastAPI backend with mock data
-- Modular and reusable React components
-
-The current implementation uses mock data stored in `backend/app/data.py`. During backend integration, these mock values can be replaced with live database data without requiring changes to the frontend components.
-# contract-obligation-b-07-26
-## 🎨 Figma Design
-
-View the UI Design here:
-
-https://www.figma.com/design/NyML0FgGMeOIo1pqKsUR4N/Contract-Obligation-Tracking-Assistant?node-id=0-1&t=qm7Vdw4owmwsovpw-1
+This project is built using **React.js** for the frontend and **FastAPI** for the backend. The dashboard provides users with a centralized platform to monitor contracts, compliance, notifications, and daily activities. The architecture is modular, scalable, and easy to extend for enterprise-level applications.
