@@ -1,53 +1,23 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy import text
 
-from database import engine
+from app.database import engine
+from app.contracts import models
+from app.contracts.router import router as contracts_router
 
-app = FastAPI()
+# Create database tables automatically
+models.Base.metadata.create_all(bind=engine)
 
+app = FastAPI(title="ContractIQ API")
+
+# Allow React to communicate with FastAPI
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-    "http://localhost:3000",
-    "http://localhost:3001",
-],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-@app.get("/")
-def home():
-    return {"message": "FastAPI is working!"}
-
-
-@app.get("/dashboard")
-def dashboard():
-    with engine.connect() as connection:
-        result = connection.execute(text("""
-            SELECT
-                compliance_score,
-                high_risk,
-                pending_review,
-                compliant
-            FROM dashboard
-            LIMIT 1
-        """))
-
-        row = result.fetchone()
-
-        if row is None:
-            return {
-                "compliance_score": 0,
-                "high_risk": 0,
-                "pending_reviews": 0,
-                "compliant": 0
-            }
-
-        return {
-            "compliance_score": row[0],
-            "high_risk": row[1],
-            "pending_reviews": row[2],
-            "compliant": row[3]
-        }
+# Include the modular routes
+app.include_router(contracts_router)
