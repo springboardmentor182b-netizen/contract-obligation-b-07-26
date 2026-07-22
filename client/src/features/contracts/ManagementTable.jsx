@@ -27,13 +27,15 @@ export default function ManagementTable() {
 
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this contract?")) {
-      await fetch(`http://127.0.0.1:8000/contracts/${id}`, { method: 'DELETE' });
+      // Updated to use API_BASE_URL
+      await fetch(`${API_BASE_URL}/contracts/${id}`, { method: 'DELETE' });
       setTableData(tableData.filter(row => row.id !== id));
     }
   };
 
   const handleSave = async (updatedContract) => {
-    await fetch(`http://127.0.0.1:8000/contracts/${updatedContract.id}`, {
+    // Updated to use API_BASE_URL
+    await fetch(`${API_BASE_URL}/contracts/${updatedContract.id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
