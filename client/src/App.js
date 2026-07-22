@@ -10,8 +10,8 @@ export default function App() {
     React.createElement(
       Routes,
       null,
+      React.createElement(Route, { path: '/', element: React.createElement(Navigate, { to: '/dashboard', replace: true }) }),
       React.createElement(Route, { path: '/dashboard', element: React.createElement(Home) }),
-      React.createElement(Route, { path: '*', element: React.createElement(Navigate, { to: '/dashboard', replace: true }) }),
     ),
   )
 }
