@@ -1,0 +1,381 @@
+/* ==========================================
+   REPORT CARD
+========================================== */
+
+.report-card{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    background:#FFFFFF;
+
+    border:1px solid #E5E7EB;
+
+    border-radius:18px;
+
+    padding:22px 24px;
+
+    box-shadow:0 4px 12px rgba(0,0,0,.05);
+
+    transition:.3s;
+
+}
+
+.report-card:hover{
+
+    transform:translateY(-4px);
+
+    box-shadow:0 12px 28px rgba(0,0,0,.08);
+
+}
+
+/* ==========================================
+   LEFT
+========================================== */
+
+.report-left{
+
+    display:flex;
+
+    align-items:flex-start;
+
+    gap:18px;
+
+    flex:1;
+
+}
+
+/* ==========================================
+   ICON
+========================================== */
+
+.report-icon{
+
+    width:58px;
+
+    height:58px;
+
+    border-radius:14px;
+
+    background:#EFF6FF;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+}
+
+.report-icon svg{
+
+    width:28px;
+
+    height:28px;
+
+    color:#2563EB;
+
+}
+
+/* ==========================================
+   INFO
+========================================== */
+
+.report-info{
+
+    flex:1;
+
+}
+
+.report-title-row{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:14px;
+
+    flex-wrap:wrap;
+
+}
+
+.report-title-row h3{
+
+    margin:0;
+
+    color:#0F172A;
+
+    font-size:20px;
+
+    font-weight:700;
+
+}
+
+.department{
+
+    margin-top:8px;
+
+    margin-bottom:8px;
+
+    color:#334155;
+
+    font-size:15px;
+
+    font-weight:500;
+
+}
+
+.report-meta{
+
+    color:#64748B;
+
+    font-size:14px;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    flex-wrap:wrap;
+
+}
+
+.report-meta span{
+
+    color:#CBD5E1;
+
+}
+
+/* ==========================================
+   STATUS
+========================================== */
+
+.report-status{
+
+    padding:6px 14px;
+
+    border-radius:30px;
+
+    font-size:13px;
+
+    font-weight:600;
+
+}
+
+.report-status.ready{
+
+    background:#DCFCE7;
+
+    color:#15803D;
+
+}
+
+.report-status.processing{
+
+    background:#FEF3C7;
+
+    color:#B45309;
+
+}
+
+.report-status.draft{
+
+    background:#DBEAFE;
+
+    color:#2563EB;
+
+}
+
+.report-status.pending{
+background:#DBEAFE;
+
+    color:#2563EB;
+
+}
+.report-status.generated{
+
+    background:#DCFCE7;
+
+    color:#15803D;
+
+}
+
+/* ==========================================
+   ACTIONS
+========================================== */
+
+.report-actions{
+
+    display:flex;
+
+    gap:12px;
+
+    margin-left:20px;
+
+}
+
+.report-actions button{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:8px;
+
+    border:none;
+
+    border-radius:10px;
+
+    padding:10px 16px;
+
+    cursor:pointer;
+
+    font-size:14px;
+
+    font-weight:600;
+
+    transition:.3s;
+
+}
+
+.action-icon{
+
+    width:18px;
+
+    height:18px;
+
+}
+
+/* Preview */
+
+.preview-btn{
+
+    background:#EFF6FF;
+
+    color:#2563EB;
+
+}
+
+.preview-btn:hover{
+
+    background:#DBEAFE;
+
+}
+
+/* PDF */
+
+.pdf-btn{
+
+    background:#FEF2F2;
+
+    color:#DC2626;
+
+}
+
+.pdf-btn:hover{
+
+    background:#FEE2E2;
+
+}
+
+/* Excel */
+
+.excel-btn{
+
+    background:#DCFCE7;
+
+    color:#15803D;
+
+}
+
+.excel-btn:hover{
+
+    background:#BBF7D0;
+
+}
+
+/* ==========================================
+   RESPONSIVE
+========================================== */
+
+@media(max-width:992px){
+
+.report-card{
+
+    flex-direction:column;
+
+    align-items:flex-start;
+
+    gap:20px;
+
+}
+
+.report-actions{
+
+    width:100%;
+
+    margin-left:0;
+
+}
+
+.report-actions button{
+
+    flex:1;
+
+    justify-content:center;
+
+}
+
+}
+
+@media(max-width:768px){
+
+.report-left{
+
+    flex-direction:column;
+
+}
+
+.report-title-row{
+
+    flex-direction:column;
+
+    align-items:flex-start;
+
+}
+
+.report-title-row h3{
+
+    font-size:18px;
+
+}
+
+.report-actions{
+
+    flex-direction:column;
+
+    width:100%;
+
+}
+
+.report-actions button{
+
+    width:100%;
+
+}
+
+.report-meta{
+
+    flex-direction:column;
+
+    align-items:flex-start;
+
+    gap:6px;
+
+}
+
+}
