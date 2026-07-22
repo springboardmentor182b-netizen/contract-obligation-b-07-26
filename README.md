@@ -4,8 +4,9 @@ A modern **User Dashboard** developed using **React.js** and **FastAPI** for man
 
 
 
-# Structure
+## Structure
 
+```text
 user-dashboard/
 │
 ├── backend/
@@ -14,9 +15,8 @@ user-dashboard/
 │   │   ├── models/
 │   │   ├── schemas/
 │   │   ├── services/
-│   │   ├── database.py
-│   │   └── main.py
-│   │
+│   │   └── database.py
+│   ├── main.py
 │   ├── requirements.txt
 │   └── README.md
 │
@@ -25,18 +25,21 @@ user-dashboard/
 │   ├── src/
 │   │   ├── assets/
 │   │   ├── components/
-│   │   ├── layouts/
+│   │   │   ├── common/
+│   │   │   ├── dashboard/
+│   │   │   └── profile/
+│   │   ├── hooks/
 │   │   ├── pages/
 │   │   ├── services/
-│   │   ├── hooks/
 │   │   ├── utils/
 │   │   ├── App.jsx
 │   │   └── main.jsx
-│   │
 │   ├── package.json
-│   └── vite.config.js
+│   ├── vite.config.js
+│   └── README.md
 │
 └── README.md
+```
 
 
 # Backend
