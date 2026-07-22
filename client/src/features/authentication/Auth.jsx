@@ -8,7 +8,7 @@ import { login } from './services/login'
 import { signup } from './services/signup'
 import { canSubmitLogin, canSubmitPasswordReset, canSubmitRegistration } from './utils/authValidation'
 
-export function Auth() {
+export function Auth({ onLogin }) {
   const [mode, setMode] = useState('login')
   const [formData, setFormData] = useState(emptyCredentials)
   const [registrationData, setRegistrationData] = useState(emptyRegistration)
@@ -66,8 +66,9 @@ export function Auth() {
         window.localStorage.setItem('contractiq_role', formData.role)
       }
 
+      onLogin({ token: result.access_token, role: formData.role })
       setStatus('success')
-      setMessage(`Login successful as ${formData.role}. Token saved for the current frontend session.`)
+      setMessage('Login successful')
     } catch (error) {
       setStatus('error')
       setMessage(error.message)
