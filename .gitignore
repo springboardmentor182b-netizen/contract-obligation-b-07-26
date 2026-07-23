@@ -1,0 +1,22 @@
+node_modules/
+build/
+.env
+__pycache__/
+*.pyc
+.pytest_cache/
+*.db
+.DS_Store
+# Python virtual environment
+server/venv/
+
+# Node dependencies
+client/node_modules/
+
+# Environment variables
+.env
+server/.env
+client/.env
+
+# Python cache
+__pycache__/
+*.pyc
