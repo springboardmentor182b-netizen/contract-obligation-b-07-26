@@ -1,8 +1,8 @@
-import { Auth } from './features/authentication/Auth'
-import './App.css'
+import RenewalManagement from "./pages/RenewalManagement";
+import "./App.css";
 
 function App() {
-  return <Auth />
+  return <RenewalManagement />;
 }
 
-export default App
+export default App;

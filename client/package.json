@@ -2,15 +2,21 @@
   "name": "client",
   "private": true,
   "version": "0.0.0",
-    "scripts": {
+  "scripts": {
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
   "dependencies": {
+    "@heroicons/react": "^2.2.0",
+    "jspdf": "^4.2.1",
+    "jspdf-autotable": "^5.0.8",
     "react": "^19.2.7",
-    "react-dom": "^19.2.7"
+    "react-dom": "^19.2.7",
+    "react-loader-spinner": "^8.0.2",
+    "react-toastify": "^11.1.0",
+    "recharts": "^3.10.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
@@ -24,4 +30,3 @@
     "vite": "^8.1.1"
   }
 }
-
