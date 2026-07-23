@@ -104,7 +104,7 @@ useEffect(() => {
                     title="Total"
                     value={kpis.total}
                     badge="+5"
-                    icon={<DocumentTextIcon className="kpi-icon" />}
+                    icon={null}
                 />
 
                 <KPICard

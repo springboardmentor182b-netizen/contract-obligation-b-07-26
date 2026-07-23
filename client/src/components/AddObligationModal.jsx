@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "./AddObligationModal.css";
-import { addObligation } from "../api/obligationApi";
+import { createObligation as addObligation } from "../api/api";
 import { toast } from "react-toastify";
 function AddObligationModal({ isOpen, onClose }) {
 
