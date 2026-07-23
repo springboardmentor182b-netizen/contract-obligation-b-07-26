@@ -17,11 +17,7 @@ from src.services.dashboard_service import get_calendar_events
 from src.services.dashboard_service import get_weekly_chart
 
 router = APIRouter(
-
-    prefix="/dashboard",
-
     tags=["Dashboard"]
-
 )
 
 @router.get("/kpis")

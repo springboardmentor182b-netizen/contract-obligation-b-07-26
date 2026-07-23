@@ -148,4 +148,27 @@ export function login(email, password) {
 export function getCurrentUser() {
   return get(`${BASE}/auth/me`);
 }
+
+// ── Obligations ─────────────────────────────────────────────────────────────
+
+/** Fetch all obligations */
+export function getObligations() {
+  return get(`${BASE}/obligations/`);
+}
+
+/** Create a new obligation */
+export function createObligation(data) {
+  return post(`${BASE}/obligations/`, data);
+}
+
+/** Update an obligation */
+export function updateObligation(id, data) {
+  return put(`${BASE}/obligations/${id}`, data);
+}
+
+/** Delete an obligation */
+export function deleteObligation(id) {
+  return del(`${BASE}/obligations/${id}`);
+}
+
 export { get, post, put, del };

@@ -3,9 +3,7 @@ import { ForgotPasswordForm } from './components/ForgotPasswordForm'
 import { LoginForm } from './components/LoginForm'
 import { RegisterForm } from './components/RegisterForm'
 import { API_BASE_URL, emptyCredentials, emptyPasswordReset, emptyRegistration } from './constants'
-import { forgotPassword } from './services/forgotPassword'
-import { login } from './services/login'
-import { signup } from './services/signup'
+import { login, post } from '../../../api';
 import { canSubmitLogin, canSubmitPasswordReset, canSubmitRegistration } from './utils/authValidation'
 
 export function Auth() {
@@ -59,10 +57,10 @@ export function Auth() {
     setMessage('')
 
     try {
-      const result = await login(API_BASE_URL, formData)
+      const result = await login(formData.email, formData.password)
 
+      window.localStorage.setItem('access_token', result.access_token)
       if (rememberMe) {
-        window.localStorage.setItem('access_token', result.access_token)
         window.localStorage.setItem('contractiq_role', formData.role)
       }
 
@@ -87,8 +85,11 @@ export function Auth() {
     setMessage('')
 
     try {
-      await signup(API_BASE_URL, {
-        ...registrationData,
+      await post('/users/', {
+        email: registrationData.email,
+        password: registrationData.password,
+        full_name: registrationData.name,
+        role: registrationData.role,
         department: registrationData.department || null,
       })
 
@@ -119,7 +120,7 @@ export function Auth() {
     setMessage('')
 
     try {
-      await forgotPassword(API_BASE_URL, passwordResetData)
+      await post('/auth/forgot-password', passwordResetData)
       setFormData({
         ...emptyCredentials,
         email: passwordResetData.email,

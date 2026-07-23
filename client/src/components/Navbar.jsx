@@ -6,7 +6,7 @@ import {
   FiUpload,
   FiChevronRight,
 } from "react-icons/fi";
-import { get } from "../api";
+import { getCurrentUser } from "../api";
 import "./Navbar.css";
 
 const Navbar = ({ onNewContract }) => {
@@ -15,10 +15,11 @@ const Navbar = ({ onNewContract }) => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const data = await get("/auth/me");
+        const data = await getCurrentUser();
         setUser(data);
       } catch (err) {
         console.error("Failed to fetch user:", err);
+        setUser({ full_name: "User", role: "" });
       }
     };
     fetchUser();
@@ -69,6 +70,7 @@ const Navbar = ({ onNewContract }) => {
                   .map((n) => n[0])
                   .join("")
                   .toUpperCase()
+                  .substring(0, 2)
               : "U"}
           </div>
 
