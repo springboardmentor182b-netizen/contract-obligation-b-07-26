@@ -1,8 +1,13 @@
-import { Auth } from './features/authentication/Auth'
-import './App.css'
+import React from 'react';
+import ContractRepository from './pages/ContractRepository';
+import './App.css';
 
 function App() {
-  return <Auth />
+  return (
+    <div className="app-container">
+      <ContractRepository />
+    </div>
+  );
 }
 
-export default App
+export default App;

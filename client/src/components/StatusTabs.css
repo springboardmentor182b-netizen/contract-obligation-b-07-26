@@ -1,0 +1,86 @@
+.status-flow {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 12px;
+  overflow-x: auto;
+  padding: 4px 0;
+}
+
+.status-flow::-webkit-scrollbar {
+  display: none;
+}
+
+.status-node {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 6px 12px 6px 6px;
+  border-radius: var(--radius-full);
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.status-node:hover {
+  box-shadow: var(--shadow-md);
+  border-color: #d1d5db;
+}
+
+.status-count {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.status-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-main);
+  padding-right: 4px;
+}
+
+.status-arrow {
+  color: #d1d5db;
+  display: flex;
+  align-items: center;
+  font-size: 1rem;
+}
+
+.status-count-draft {
+  background-color: var(--status-draft-bg);
+  color: var(--status-draft-text);
+}
+
+.status-count-review {
+  background-color: var(--status-review-bg);
+  color: var(--status-review-text);
+}
+
+.status-count-approved {
+  background-color: var(--status-approved-bg);
+  color: var(--status-approved-text);
+}
+
+.status-count-active {
+  background-color: var(--status-active-bg);
+  color: var(--status-active-text);
+}
+
+.status-count-expired {
+  background-color: var(--status-expired-bg);
+  color: var(--status-expired-text);
+}
+
+.status-count-terminated {
+  background-color: var(--status-terminated-bg);
+  color: var(--status-terminated-text);
+}

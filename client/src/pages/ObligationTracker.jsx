@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
-import BASE_URL from "../api/api";
+import { getObligations, get } from "../api";
 import "./ObligationTracker.css";
-import { getObligations } from "../api/api";
 import Header from "../components/Header/Header";
 import KPICard from "../components/KPI/KPICard";
 import SearchFilters from "../components/SearchFilters/SearchFilters";
@@ -60,9 +59,7 @@ useEffect(() => {
 
     useEffect(() => {
 
-        fetch(`${BASE_URL}/dashboard/kpis`)
-
-            .then((response) => response.json())
+        get('/dashboard/kpis')
 
             .then((data) => {
 

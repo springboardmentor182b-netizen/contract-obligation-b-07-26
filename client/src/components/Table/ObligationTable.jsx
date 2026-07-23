@@ -4,7 +4,7 @@ import {
     getObligations,
     deleteObligation,
     updateObligation
-} from "../../api/api";
+} from "../../api";
 import EditObligationModal from "../EditObligationModal";
 import Loader from "../Loader/Loader";
 

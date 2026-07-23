@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import "./AddObligationModal.css";
-import { addObligation } from "../api/obligationApi";
+import { createObligation } from "../api";
 import { toast } from "react-toastify";
 function AddObligationModal({ isOpen, onClose }) {
 
@@ -29,7 +29,7 @@ function AddObligationModal({ isOpen, onClose }) {
 
     try {
 
-        await addObligation({
+        await createObligation({
 
             title: formData.obligationName,
 
