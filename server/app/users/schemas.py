@@ -1,50 +1,42 @@
-"""
-Pydantic schemas for the Users module — kept in sync with
-client/src/services/usersApi.js.
-"""
-from datetime import datetime
-from typing import List, Optional
-from uuid import UUID
-
-from pydantic import BaseModel, EmailStr, ConfigDict, Field
+from pydantic import BaseModel
+from typing import Optional, List
 
 
 class UserResponse(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-
-    id: UUID
+    id: int
     name: str
-    email: EmailStr
-    department: Optional[str] = None
+    email: str
     role: str
+    department: str
     status: str
-    createdAt: datetime = Field(validation_alias="created_at")
-    lastLoginAt: Optional[datetime] = Field(default=None, validation_alias="last_login_at")
+    last_login: str
+    avatar: Optional[str] = None
 
 
 class UserListResponse(BaseModel):
-    items: List[UserResponse]
+    users: List[UserResponse]
     total: int
+    page: int
+    per_page: int
+    total_pages: int
 
 
-class UserCreate(BaseModel):
+class UserStats(BaseModel):
+    total_users: int
+    active_users: int
+    new_registrations: int
+    blocked_users: int
+    active_percentage: float
+    blocked_percentage: float
+    new_vs_last_month: int
+
+
+class RoleDistributionItem(BaseModel):
     name: str
-    email: EmailStr
-    password: str = Field(min_length=8)
-    role: str
-    department: Optional[str] = None
+    value: int
+    color: str
 
 
-class UserUpdate(BaseModel):
-    name: Optional[str] = None
-    email: Optional[EmailStr] = None
-    department: Optional[str] = None
-    role: Optional[str] = None
-
-
-class RoleUpdateRequest(BaseModel):
-    role: str
-
-
-class StatusUpdateRequest(BaseModel):
-    status: str  # 'active' | 'inactive'
+class RegistrationTrendItem(BaseModel):
+    month: str
+    users: int

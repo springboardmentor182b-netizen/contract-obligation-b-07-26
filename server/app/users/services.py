@@ -1,127 +1,176 @@
-"""
-Business logic for the Users module.
-
-ASSUMPTION: app/security.py exposes `hash_password(plain: str) -> str`
-(e.g. via passlib's bcrypt) — same file assumed to hold `get_current_user`
-in the reports module's router.py. Adjust the import below if it lives
-elsewhere.
-"""
-import uuid
-from typing import Optional
-from uuid import UUID
-
-from sqlalchemy.orm import Session
-
-from app.security import hash_password
-from app.users.models import User, UserRole, UserStatus
-from app.users import schemas
+import math
+from sqlalchemy import text
+from app.database import engine
 
 
-class DuplicateEmailError(Exception):
-    pass
+def get_users(
+    search=None,
+    role=None,
+    status=None,
+    department=None,
+    sort_by="name",
+    sort_order="asc",
+    page=1,
+    per_page=10,
+):
+    query = """
+        SELECT
+            id,
+            full_name,
+            email,
+            role,
+            department,
+            status,
+            last_login
+        FROM users
+    """
 
-
-class UserNotFoundError(Exception):
-    pass
-
-
-def list_users(
-    db: Session,
-    page: int,
-    page_size: int,
-    search: Optional[str],
-    role: Optional[str],
-    status: Optional[str],
-) -> schemas.UserListResponse:
-    query = db.query(User)
+    conditions = []
+    params = {}
 
     if search:
-        like = f"%{search}%"
-        query = query.filter((User.name.ilike(like)) | (User.email.ilike(like)))
-    if role:
-        query = query.filter(User.role == role)
-    if status:
-        query = query.filter(User.status == status)
+        conditions.append(
+            "(LOWER(full_name) LIKE :search OR LOWER(email) LIKE :search)"
+        )
+        params["search"] = f"%{search.lower()}%"
 
-    total = query.count()
-    users = (
-        query.order_by(User.created_at.desc())
-        .offset((page - 1) * page_size)
-        .limit(page_size)
-        .all()
-    )
+    if role and role.lower() != "all":
+        conditions.append("role = :role")
+        params["role"] = role
 
-    return schemas.UserListResponse(
-        items=[schemas.UserResponse.model_validate(u) for u in users],
-        total=total,
-    )
+    if status and status.lower() != "all":
+        conditions.append("status = :status")
+        params["status"] = status
 
+    if department and department.lower() != "all":
+        conditions.append("department = :department")
+        params["department"] = department
 
-def get_user(db: Session, user_id: UUID) -> User:
-    user = db.query(User).filter(User.id == user_id).first()
-    if not user:
-        raise UserNotFoundError(f"User {user_id} not found")
-    return user
+    if conditions:
+        query += " WHERE " + " AND ".join(conditions)
 
+    sort_columns = {
+        "name": "full_name",
+        "email": "email",
+        "role": "role",
+        "department": "department",
+        "status": "status",
+    }
 
-def create_user(db: Session, payload: schemas.UserCreate) -> User:
-    existing = db.query(User).filter(User.email == payload.email).first()
-    if existing:
-        raise DuplicateEmailError(f"A user with email {payload.email} already exists")
+    column = sort_columns.get(sort_by, "full_name")
+    direction = "DESC" if sort_order.lower() == "desc" else "ASC"
 
-    user = User(
-        id=uuid.uuid4(),
-        name=payload.name,
-        email=payload.email,
-        hashed_password=hash_password(payload.password),
-        role=UserRole(payload.role),
-        department=payload.department,
-        status=UserStatus.active,
-    )
-    db.add(user)
-    db.commit()
-    db.refresh(user)
-    return user
+    query += f" ORDER BY {column} {direction}"
 
+    with engine.connect() as conn:
+        rows = conn.execute(text(query), params).fetchall()
 
-def update_user(db: Session, user_id: UUID, payload: schemas.UserUpdate) -> User:
-    user = get_user(db, user_id)
+    users = []
 
-    if payload.email and payload.email != user.email:
-        existing = db.query(User).filter(User.email == payload.email).first()
-        if existing:
-            raise DuplicateEmailError(f"A user with email {payload.email} already exists")
-        user.email = payload.email
+    for row in rows:
+        users.append(
+            {
+                "id": row.id,
+                "name": row.full_name,
+                "email": row.email,
+                "role": row.role,
+                "department": row.department,
+                "status": row.status,
+                "last_login": row.last_login,
+            }
+        )
 
-    if payload.name is not None:
-        user.name = payload.name
-    if payload.department is not None:
-        user.department = payload.department
-    if payload.role is not None:
-        user.role = UserRole(payload.role)
+    total = len(users)
 
-    db.commit()
-    db.refresh(user)
-    return user
+    start = (page - 1) * per_page
+    end = start + per_page
+
+    return {
+        "users": users[start:end],
+        "total": total,
+        "page": page,
+        "per_page": per_page,
+        "total_pages": math.ceil(total / per_page) if total else 1,
+    }
 
 
-def update_role(db: Session, user_id: UUID, role: str) -> User:
-    user = get_user(db, user_id)
-    user.role = UserRole(role)
-    db.commit()
-    db.refresh(user)
-    return user
+def get_user_stats():
+    with engine.connect() as conn:
+        total = conn.execute(
+            text("SELECT COUNT(*) FROM users")
+        ).scalar()
+
+        active = conn.execute(
+            text("SELECT COUNT(*) FROM users WHERE status='Active'")
+        ).scalar()
+
+        blocked = conn.execute(
+            text("SELECT COUNT(*) FROM users WHERE status='Blocked'")
+        ).scalar()
+
+    return {
+        "total_users": total,
+        "active_users": active,
+        "blocked_users": blocked,
+        "new_registrations": total,
+        "active_percentage": round((active / total) * 100, 1) if total else 0,
+        "blocked_percentage": round((blocked / total) * 100, 1) if total else 0,
+        "new_vs_last_month": 0,
+    }
 
 
-def update_status(db: Session, user_id: UUID, status: str) -> User:
-    user = get_user(db, user_id)
-    user.status = UserStatus(status)
-    db.commit()
-    db.refresh(user)
-    return user
+def get_role_distribution():
+    with engine.connect() as conn:
+        rows = conn.execute(
+            text(
+                """
+                SELECT role, COUNT(*) AS total
+                FROM users
+                GROUP BY role
+                ORDER BY COUNT(*) DESC
+                """
+            )
+        ).fetchall()
+
+    colors = {
+        "Admin": "#2563EB",
+        "Manager": "#8B5CF6",
+        "Editor": "#22C55E",
+        "Viewer": "#F59E0B",
+    }
+
+    return [
+        {
+            "name": row.role,
+            "value": row.total,
+            "color": colors.get(row.role, "#CBD5E1"),
+        }
+        for row in rows
+    ]
 
 
-def delete_user(db: Session, user_id: UUID) -> None:
-    user = get_user(db, user_id)
-    db.delete(user)
-    db.commit()
+def get_registration_trend():
+    with engine.connect() as conn:
+        rows = conn.execute(
+            text(
+                """
+                SELECT
+                    TO_CHAR(created_at, 'Mon') AS month,
+                    COUNT(*) AS users
+                FROM users
+                GROUP BY
+                    EXTRACT(MONTH FROM created_at),
+                    TO_CHAR(created_at, 'Mon')
+                ORDER BY
+                    EXTRACT(MONTH FROM created_at)
+                """
+            )
+        ).fetchall()
+
+    return [
+        {
+            "month": row.month,
+            "users": row.users,
+        }
+        for row in rows
+    ]
