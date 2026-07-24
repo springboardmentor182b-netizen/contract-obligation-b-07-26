@@ -1,15 +1,20 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 from sqlalchemy import text
 
+from app.database import Base, engine
+from app.models.user import User
 from app.dashboard.router import router as dashboard_router
 from app.users.router import router as users_router
-from app.database import engine
+
+# Create all database tables
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="ContractIQ API",
     version="1.0.0",
-    description="Backend API for the ContractIQ Contract Obligation Tracking Assistant"
+    description="Backend API for the ContractIQ Contract Obligation Tracking Assistant",
 )
 
 origins = [
@@ -29,41 +34,113 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Register routers
 app.include_router(dashboard_router)
 app.include_router(users_router)
 
 
+class ContractCreate(BaseModel):
+    title: str
+    contract_type: str
+    department: str
+    status: str
+    start_date: str
+    end_date: str
+
+
 @app.get("/")
 def home():
-    return {"message": "ContractIQ Backend Running"}
+    return {
+        "message": "ContractIQ Backend Running"
+    }
 
 
 @app.get("/dashboard")
 def dashboard():
-    with engine.connect() as connection:
-        result = connection.execute(text("""
-            SELECT
-                compliance_score,
-                high_risk,
-                pending_review,
-                compliant
-            FROM dashboard
-            LIMIT 1
-        """))
+    with engine.connect() as conn:
 
-        row = result.fetchone()
+        total_contracts = conn.execute(
+            text("SELECT COUNT(*) FROM contracts")
+        ).scalar()
 
-        if row is None:
-            return {
-                "compliance_score": 0,
-                "high_risk": 0,
-                "pending_reviews": 0,
-                "compliant": 0,
-            }
+        active_contracts = conn.execute(
+            text("SELECT COUNT(*) FROM contracts WHERE status = 'Active'")
+        ).scalar()
+
+        pending_obligations = conn.execute(
+            text("SELECT COUNT(*) FROM obligations WHERE status = 'Pending'")
+        ).scalar()
+
+        upcoming_renewals = conn.execute(
+            text("SELECT COUNT(*) FROM renewals WHERE status = 'Upcoming'")
+        ).scalar()
+
+        unread_notifications = conn.execute(
+            text("SELECT COUNT(*) FROM notifications WHERE status = 'Unread'")
+        ).scalar()
 
         return {
-            "compliance_score": row[0],
-            "high_risk": row[1],
-            "pending_reviews": row[2],
-            "compliant": row[3],
+            "total_contracts": total_contracts,
+            "active_contracts": active_contracts,
+            "pending_obligations": pending_obligations,
+            "upcoming_renewals": upcoming_renewals,
+            "unread_notifications": unread_notifications
         }
+
+
+@app.get("/contracts")
+def get_contracts():
+    with engine.connect() as conn:
+        result = conn.execute(
+            text("""
+                SELECT *
+                FROM contracts
+                ORDER BY id
+            """)
+        )
+
+        contracts = []
+
+        for row in result:
+            contracts.append(dict(row._mapping))
+
+        return contracts
+
+
+@app.post("/contracts")
+def create_contract(contract: ContractCreate):
+    with engine.begin() as conn:
+        conn.execute(
+            text("""
+                INSERT INTO contracts
+                (
+                    title,
+                    contract_type,
+                    department,
+                    status,
+                    start_date,
+                    end_date
+                )
+                VALUES
+                (
+                    :title,
+                    :contract_type,
+                    :department,
+                    :status,
+                    :start_date,
+                    :end_date
+                )
+            """),
+            {
+                "title": contract.title,
+                "contract_type": contract.contract_type,
+                "department": contract.department,
+                "status": contract.status,
+                "start_date": contract.start_date,
+                "end_date": contract.end_date,
+            }
+        )
+
+    return {
+        "message": "Contract created successfully"
+    }
