@@ -2,9 +2,15 @@
 node_modules/
 Client/node_modules/
 
+# Python virtual environment
+server/venv/
+
 # Python cache
 __pycache__/
+server/__pycache__/
+server/src/**/__pycache__/
 *.py[cod]
+*.pyc
 
 # Environment files
 .env

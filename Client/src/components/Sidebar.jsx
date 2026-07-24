@@ -1,5 +1,6 @@
 import {
   FaTachometerAlt,
+  FaBuilding,
   FaFolderOpen,
   FaTasks,
   FaSyncAlt,
@@ -20,20 +21,26 @@ function Sidebar() {
       <div>
         <div className="logo-section">
           <FaFileContract className="logo-icon" />
-          <div>
+          <div className="logo-text">
             <h2>ContractIQ</h2>
-            <p>Compliance Platform</p>
+            <p>COMPLIANCE PLATFORM</p>
           </div>
         </div>
 
         <div className="company-card">
-          <h3>Nexora Group</h3>
-          <span>234 Contracts</span>
+          <div className="company-icon">
+            <FaBuilding/>
+          </div>
+          <div className="company-info">
+            <h3>Nexora Group</h3>
+            <p>Enterprise · 214 Contracts</p>
+          </div>
         </div>
         <h4 className="menu-heading">MAIN MENU</h4>
         <ul className="menu">
           <li className="active"><FaTachometerAlt /> Dashboard</li>
           <li><FaFolderOpen /> Contract Repository</li>
+          
           <li><FaTasks /> Obligation Tracking</li>
           <li><FaSyncAlt /> Renewal Management</li>
           <li><FaShieldAlt /> Compliance Monitoring</li>
