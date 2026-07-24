@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import UserManagement from "./pages/UserManagement";
 import ComplianceMonitoring from "./ComplianceMonitoring";
@@ -20,6 +21,14 @@ function App() {
       </Routes>
     </BrowserRouter>
   );
+=======
+import React from 'react';
+import { RouterProvider } from 'react-router-dom';
+import router from './routes';
+
+function App() {
+  return <RouterProvider router={router} />;
+>>>>>>> origin/main-group-B
 }
 
 export default App;

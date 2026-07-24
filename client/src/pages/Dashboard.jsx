@@ -1,5 +1,5 @@
 import React from 'react';
 
 export default function Settings() {
-  return <h1>App Settings</h1>;
+  return <h1>Dashboard</h1>;
 }
