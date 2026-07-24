@@ -1,5 +1,3 @@
-import React from "react";
-
 const departments = [
   { name: "Legal", total: 52, compliance: 94 },
   { name: "Procurement", total: 68, compliance: 88 },
@@ -14,20 +12,35 @@ function levelClass(pct) {
 }
 
 function ContractsByDepartment() {
+  const[data, setData] = useState([]);
+
+  useEffect(() => {
+    async function fetchDepartments(){
+      try{
+        const response = await getContractsByDepartment();
+        setData(response);
+      } catch (error){
+        console.error("Error fetching contracts by department:",error);
+      }
+    }
+    fetchDepartments();
+  },[]);
   return (
-    <div className="department-card">
+    <div
+      style={{
+        background: "#fff",
+        padding: "20px",
+        borderRadius: "12px",
+      }}
+    >
       <h2>Contracts by Department</h2>
-      {departments.map((d, i) => (
-        <div className="level" key={i}>
-          <div className="level-text">
-            <span>{d.name} ({d.total} contracts)</span>
-            <span>{d.compliance}%</span>
-          </div>
-          <div className="progress">
-            <div className={levelClass(d.compliance)} style={{ width: `${d.compliance}%` }}></div>
-          </div>
-        </div>
-      ))}
+
+      <BarChart width={500} height={300} data={data}>
+        <XAxis dataKey="department" />
+        <YAxis />
+        <Tooltip />
+        <Bar dataKey="contracts" fill="#4F46E5" />
+      </BarChart>
     </div>
   );
 }

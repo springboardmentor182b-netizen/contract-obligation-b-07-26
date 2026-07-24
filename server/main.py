@@ -1,18 +1,27 @@
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field, field_validator
+from typing import List
 from src.database.core import get_connection
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
 from typing import List
 
-app = FastAPI(title="ContractIQ API")
+app = FastAPI(
+    title="Contract Obligation API", 
+    version="1.0.0"
+)
 
+# Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=["*"],  # Allow all origins for development
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 
 class Obligation(BaseModel):
@@ -58,11 +67,6 @@ class Obligation(BaseModel):
 #         description="Review legal clauses",
 #     )
 # ]
-
-
-@app.get("/")
-def home():
-    return {"message": "ContractIQ API Running"}
 
 
 @app.get("/obligations")

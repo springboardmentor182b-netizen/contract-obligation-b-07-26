@@ -1,72 +1,60 @@
 import React from "react";
 import {
-  ShieldCheck,
-  LayoutGrid,
-  FileText,
-  AlertTriangle,
-  Users,
-  Settings,
-  Bell,
-  LogOut,
-  UserCheck,
-} from "lucide-react";
-import { Link, useLocation } from "react-router-dom";
+  FaTachometerAlt,
+  FaFolderOpen,
+  FaTasks,
+  FaSyncAlt,
+  FaShieldAlt,
+  FaChartBar,
+  FaClipboardList,
+  FaBell,
+  FaUsers,
+  FaCog,
+  FaSignOutAlt,
+  FaFileContract,
+  FaUserCircle,
+} from "react-icons/fa";
 
-const NAV_ITEMS = [
-  { label: "Overview", path: "/", icon: LayoutGrid },
-  { label: "Contract Repository", path: "/contracts", icon: FileText },
-  { label: "Obligation Tracking", path: "/obligations", icon: AlertTriangle },
-  { label: "Compliance Monitoring", path: "/compliance-monitoring", icon: ShieldCheck },
-  { label: "Vendors", path: "/vendors", icon: Users },
-  { label: "Settings", path: "/settings", icon: Settings },
-];
-
-export default function Sidebar() {
-  const location = useLocation();
-
+function Sidebar() {
   return (
     <aside className="hidden lg:flex lg:w-64 shrink-0 flex-col border-r border-border bg-surface min-h-screen justify-between p-4">
       <div>
-        {/* Header / Logo */}
-        <div className="flex items-center gap-3 px-3 py-4 border-b border-border mb-4">
-          <ShieldCheck className="h-7 w-7 text-brand" strokeWidth={2} />
+        <div className="logo-section">
+          <FaFileContract className="logo-icon" />
           <div>
-            <h2 className="font-display text-base font-bold tracking-tight text-ink">
-              ContractIQ
-            </h2>
-            <p className="text-xs text-ink-faint">Compliance Platform</p>
+            <h2>ContractIQ</h2>
+            <p>Compliance Platform</p>
           </div>
         </div>
 
-        {/* Company Card */}
-        <div className="mx-2 mb-6 p-3 rounded-lg bg-bg border border-border">
-          <h3 className="text-sm font-semibold text-ink">Nexora Group</h3>
-          <span className="text-xs text-ink-soft">234 Active Contracts</span>
+        <div className="company-card">
+          <h3>Nexora Group</h3>
+          <span>234 Contracts</span>
         </div>
+        <h4 className="menu-heading">MAIN MENU</h4>
+        <ul className="menu">
+          <li className="active"><FaTachometerAlt /> Dashboard</li>
+          <li><FaFolderOpen /> Contract Repository</li>
+          <li><FaTasks /> Obligation Tracking</li>
+          <li><FaSyncAlt /> Renewal Management</li>
+          <li><FaShieldAlt /> Compliance Monitoring</li>
+          <li><FaChartBar /> Reports & Export</li>
+          <li><FaClipboardList /> Audit Logs</li>
+        </ul>
 
-        {/* Navigation Menu */}
-        <nav className="space-y-1">
-          <span className="px-3 text-[10px] font-bold uppercase tracking-wider text-ink-faint">
-            Main Menu
-          </span>
-          {NAV_ITEMS.map(({ label, path, icon: Icon }) => {
-            const isActive = location.pathname === path;
-            return (
-              <Link
-                key={label}
-                to={path}
-                className={`focus-ring flex items-center gap-3 rounded-md px-3 py-2.5 text-sm transition-colors ${
-                  isActive
-                    ? "bg-brand text-white font-medium"
-                    : "text-ink-soft hover:bg-bg hover:text-ink"
-                }`}
-              >
-                <Icon className="h-4 w-4" strokeWidth={2} />
-                <span>{label}</span>
-              </Link>
-            );
-          })}
-        </nav>
+        <h4 className="menu-heading">ACCOUNT</h4>
+
+        <ul className="menu">
+          <li>
+            <div className="menu-left">
+              <FaBell /> 
+              <span>  Notifications</span>
+            </div>
+            <span className="notification-badge">5</span>
+          </li>
+          <li><FaUsers /> User Management</li>
+          <li><FaCog /> Settings</li>
+        </ul>
       </div>
 
       {/* Footer / Profile */}
