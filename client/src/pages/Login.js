@@ -72,23 +72,6 @@ const Login = () => {
               <span className="feature-icon">🔐</span>
               <span>JWT-secured authentication</span>
             </li>
-            <li>
-              <span className="feature-icon">👥</span>
-              <span>Role-based access control</span>
-            </li>
-          </ul>
-
-          <div className="figma-access-roles">
-            <p className="access-label">ACCESS ROLES</p>
-            <div className="role-tags">
-              <span className="role-tag">Administrator</span>
-              <span className="role-tag">Legal Manager</span>
-              <span className="role-tag">Compliance Officer</span>
-              <span className="role-tag">Contract Manager</span>
-              <span className="role-tag">Department Head</span>
-              <span className="role-tag">Employee</span>
-            </div>
-          </div>
 
           <div className="figma-footer-info">
             <p>🔒 Secure by JWT · Authentication · RBAC</p>
