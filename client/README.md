@@ -276,3 +276,51 @@ http://localhost:3000
 - Edit Obligation Modal
 - Loader
 
+# Compliance Dashboard - Client
+
+## Overview
+
+This is the React frontend for the Compliance Monitoring Dashboard.
+
+## Tech Stack
+
+- React.js
+- Axios
+- Heroicons
+- Recharts
+- CSS
+
+## Features
+
+- Compliance Overview
+- Audit Summary
+- Compliance Reports
+- Compliance History
+- Risk Indicators
+- Missed Obligations
+
+## API Integration
+
+The frontend consumes REST APIs from the FastAPI backend.
+
+Base URL
+
+http://127.0.0.1:8000
+
+## Installation
+
+```bash
+npm install
+```
+
+Run
+
+```bash
+npm start
+```
+
+Runs on
+
+```
+http://localhost:3000
+```
