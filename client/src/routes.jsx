@@ -5,6 +5,7 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
+import ObligationTracker from "./pages/ObligationTracker";
 import ForgotPassword from './pages/ForgotPassword';
 import Settings from './pages/Settings';
 import Contracts from './pages/ContractsManagement';
@@ -49,6 +50,7 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <Home /> },
       { path: 'dashboard', element: <Dashboard /> },
+      { path: "obligation-tracker", element: <ObligationTracker /> },
       { path: 'contracts/management', element: <Contracts /> },
       { path: 'contracts/repository', element: <Repository /> },
       { path: 'settings', element: <Settings /> },

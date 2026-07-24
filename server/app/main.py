@@ -1,23 +1,33 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.database import engine
-from app.contracts import models
-from app.contracts.router import router as contracts_router
+from app.routes.obligations import router as obligations_router
 
-# Create database tables automatically
-models.Base.metadata.create_all(bind=engine)
+app = FastAPI(
+    title="ContractIQ Obligation Tracker API",
+    version="1.0.0",
+)
 
-app = FastAPI(title="ContractIQ API")
-
-# Allow React to communicate with FastAPI
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "http://localhost:3000",
+        "http://localhost:3001",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Include the modular routes
-app.include_router(contracts_router)
+app.include_router(
+    obligations_router,
+    prefix="/api/obligations",
+    tags=["Obligations"],
+)
+
+
+@app.get("/health")
+def health_check():
+    return {"status": "ok"}
