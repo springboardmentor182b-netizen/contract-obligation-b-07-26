@@ -1,21 +1,47 @@
-from pydantic import BaseModel, Field, field_validator
-from src.database.core import get_connection
-from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel, Field, field_validator
 from typing import List
+from src.database.core import get_connection
+from src.dashboard.controller import router as dashboard_router
+from src.database.core import Base, engine
+from src.auth.controller import router as auth_router
+from src.auth.oauth_controller import router as oauth_router
+from src.users.controller import router as users_router
+from src.todos.controller import router as todos_router
+from src.auth.models import User
+from src.todos.models import Todo
 
-app = FastAPI(title="ContractIQ API")
+app = FastAPI(
+    title="Contract Obligation API", 
+    version="1.0.0"
+)
 
+# Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=["*"],  # Allow all origins for development
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+app.include_router(dashboard_router)
+app.include_router(auth_router)
+app.include_router(oauth_router)
+app.include_router(users_router)
+app.include_router(todos_router)
 
+@app.on_event("startup")
+def startup_event():
+    Base.metadata.create_all(bind=engine)
+
+@app.get("/")
+def home():
+    return {
+        "message": "Contract Obligation API is running",
+        "status":"active"
+    }
 
 class Obligation(BaseModel):
     id: str
@@ -60,11 +86,6 @@ class Obligation(BaseModel):
 #         description="Review legal clauses",
 #     )
 # ]
-
-
-@app.get("/")
-def home():
-    return {"message": "ContractIQ API Running"}
 
 
 @app.get("/obligations")

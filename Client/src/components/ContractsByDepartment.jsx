@@ -1,31 +1,48 @@
-const departments = [
-  { name: "Legal", total: 52, compliance: 94 },
-  { name: "Procurement", total: 68, compliance: 88 },
-  { name: "Human Resources", total: 34, compliance: 81 },
-  { name: "Finance", total: 60, compliance: 90 },
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  Tooltip,
+} from "recharts";
+
+const data = [
+  { department: "Legal", contracts: 72 },
+  { department: "Finance", contracts: 58 },
+  { department: "HR", contracts: 43 },
+  { department: "IT", contracts: 41 },
 ];
 
-function levelClass(pct) {
-  if (pct >= 90) return "excellent";
-  if (pct >= 75) return "good";
-  return "warning";
-}
-
 function ContractsByDepartment() {
+  const[data, setData] = useState([]);
+
+  useEffect(() => {
+    async function fetchDepartments(){
+      try{
+        const response = await getContractsByDepartment();
+        setData(response);
+      } catch (error){
+        console.error("Error fetching contracts by department:",error);
+      }
+    }
+    fetchDepartments();
+  },[]);
   return (
-    <div className="department-card">
+    <div
+      style={{
+        background: "#fff",
+        padding: "20px",
+        borderRadius: "12px",
+      }}
+    >
       <h2>Contracts by Department</h2>
-      {departments.map((d, i) => (
-        <div className="level" key={i}>
-          <div className="level-text">
-            <span>{d.name} ({d.total} contracts)</span>
-            <span>{d.compliance}%</span>
-          </div>
-          <div className="progress">
-            <div className={levelClass(d.compliance)} style={{ width: `${d.compliance}%` }}></div>
-          </div>
-        </div>
-      ))}
+
+      <BarChart width={500} height={300} data={data}>
+        <XAxis dataKey="department" />
+        <YAxis />
+        <Tooltip />
+        <Bar dataKey="contracts" fill="#4F46E5" />
+      </BarChart>
     </div>
   );
 }
