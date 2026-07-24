@@ -149,7 +149,7 @@ http://localhost:3000
 
 ## Overview
 
-This is the React frontend for the Compliance Monitoring Dashboard developed as part of the Infosys Springboard Virtual Internship.
+This is the React frontend for the Compliance Monitoring Dashboard.
 
 ## Tech Stack
 
