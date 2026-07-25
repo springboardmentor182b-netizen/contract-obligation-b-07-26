@@ -36,11 +36,12 @@ def authenticate_user(db: Session, email: str, password: str) -> User:
 
 
 def register_user(db: Session, payload: schemas.RegisterRequest) -> User:
-    # Delegates to the canonical user-creation logic (handles duplicate
-    # email checks + password hashing) instead of reimplementing it here.
+    # Self-registration always creates an Employee account, regardless of
+    # what role the client sends — Administrator/other elevated roles can
+    # only be granted afterward via User Management (Administrator-gated).
     return user_services.create_user(
         db,
-        UserCreate(name=payload.name, email=payload.email, password=payload.password, role=payload.role, department=payload.department),
+        UserCreate(name=payload.name, email=payload.email, password=payload.password, role="Employee", department=payload.department),
     )
 
 
