@@ -1,5 +1,4 @@
 import React from 'react'
-
 const cardStyles = [
   ['D', 'blue'], ['A', 'green'], ['R', 'amber'], ['O', 'red'], ['C', 'cyan'],
 ]

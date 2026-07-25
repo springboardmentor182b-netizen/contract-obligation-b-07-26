@@ -3,7 +3,6 @@ import React from 'react'
 function statusClass(value = '') {
   return value.toLowerCase().replaceAll(' ', '-')
 }
-
 export default function UpcomingDeadlines({ deadlines = [] }) {
   const rows = deadlines.length
     ? deadlines.map((deadline) => React.createElement('tr', { key: deadline.id },

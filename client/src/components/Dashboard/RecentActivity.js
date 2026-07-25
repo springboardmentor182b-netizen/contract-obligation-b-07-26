@@ -1,5 +1,4 @@
 import React from 'react'
-
 export default function RecentActivity({ activities = [] }) {
   return React.createElement('section', { className: 'dashboard-card activity-card' },
     React.createElement('div', { className: 'card-heading activity-title' }, React.createElement('h2', null, 'Recent Activity'), React.createElement('a', { href: '/audit-logs' }, 'View all  >')),

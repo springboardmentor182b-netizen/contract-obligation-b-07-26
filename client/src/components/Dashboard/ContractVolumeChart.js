@@ -1,6 +1,5 @@
 import React from 'react'
 import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
-
 export default function ContractVolumeChart({ data = [] }) {
   return React.createElement('section', { className: 'dashboard-card chart-card' },
     React.createElement('div', { className: 'card-heading' }, React.createElement('div', null, React.createElement('h2', null, 'Contract Volume'), React.createElement('p', null, 'Monthly contract lifecycle activity'))),

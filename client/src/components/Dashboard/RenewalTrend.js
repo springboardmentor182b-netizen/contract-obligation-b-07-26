@@ -1,6 +1,5 @@
 import React from 'react'
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
-
 export default function RenewalTrend({ data = [] }) {
   return React.createElement('section', { className: 'dashboard-card chart-card' },
     React.createElement('div', { className: 'card-heading' }, React.createElement('div', null, React.createElement('h2', null, 'Renewals Trend'), React.createElement('p', null, 'Monthly renewal activity'))),

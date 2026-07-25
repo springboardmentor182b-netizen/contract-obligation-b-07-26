@@ -6,6 +6,8 @@ from typing import Any
 from fastapi import Depends, FastAPI, HTTPException, Query, status
 from fastapi.middleware.cors import CORSMiddleware
 
+from .dashboard.router import router as dashboard_router
+
 from .auth.security import create_token, get_current_user, hash_password, require_roles, verify_password
 from .database import create_user, find_user_by_email, initialize_database, list_users as list_database_users, update_user_password
 from .schemas import (
@@ -31,12 +33,8 @@ from .schemas import (
     UserPublic,
 )
 from .storage import store
-from fastapi import FastAPI
-from app.config.database import Base, engine
-from app.routers.obligation_routers import router as obligation_router
-from app.routers.dashboard_routers import router as dashboard_router
-from app.models.obligation import Obligation
-Base.metadata.create_all(bind=engine)
+
+
 app = FastAPI(
     title="ContractIQ: Contract Obligation Tracking API",
     version="1.0.0",
@@ -50,12 +48,12 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-app.include_router(obligation_router)
-app.include_router(dashboard_router)
 
 @app.on_event("startup")
 def startup() -> None:
     initialize_database()
+
+app.include_router(dashboard_router)
 
 
 def public_user(user: dict[str, Any]) -> dict[str, Any]:
@@ -290,57 +288,6 @@ def compliance_summary(_: dict[str, Any] = Depends(get_current_user)) -> dict[st
             overdue += 1
 
     return {"total_obligations": len(obligations), "by_compliance_level": by_level, "overdue_obligations": overdue}
-
-
-def role_dashboard(role: str) -> dict[str, Any]:
-    dashboards = {
-        Role.administrator.value: {
-            "name": "Admin Dashboard",
-            "features": ["User Management", "Contract Statistics", "System Monitoring", "Activity Logs"],
-        },
-        Role.legal_manager.value: {
-            "name": "Legal Dashboard",
-            "features": ["Active Contracts", "Upcoming Renewals", "Pending Obligations", "Recent Activities"],
-        },
-        Role.compliance_officer.value: {
-            "name": "Compliance Dashboard",
-            "features": ["Compliance Reports", "Missed Deadlines", "Risk Indicators", "Audit Summary"],
-        },
-        Role.contract_manager.value: {
-            "name": "Contract Manager Dashboard",
-            "features": ["Contract Repository", "Approval Workflow", "Version Management", "Assignments"],
-        },
-        Role.department_head.value: {
-            "name": "Department Head Dashboard",
-            "features": ["Department Contracts", "Obligation Ownership", "Renewal Approvals", "Performance"],
-        },
-        Role.employee.value: {
-            "name": "Employee Dashboard",
-            "features": ["Assigned Obligations", "Notifications", "Contract Access", "Profile"],
-        },
-    }
-    return dashboards.get(role, dashboards[Role.employee.value])
-
-
-@app.get("/api/dashboard")
-def dashboard(current_user: dict[str, Any] = Depends(get_current_user)) -> dict[str, Any]:
-    contracts = store.list("contracts")
-    obligations = store.list("obligations")
-    renewals = store.list("renewals")
-    notifications = store.list("notifications")
-    activities = sorted(store.list("activities"), key=lambda item: item["created_at"], reverse=True)[:10]
-
-    return {
-        "active_contracts": sum(1 for item in contracts if item["status"] == ContractStatus.active.value),
-        "upcoming_renewals": sum(1 for item in renewals if item["status"] == RenewalStatus.upcoming.value),
-        "pending_obligations": sum(1 for item in obligations if item["status"] in {ObligationStatus.pending.value, ObligationStatus.in_progress.value}),
-        "unread_notifications": sum(1 for item in notifications if not item.get("read", False)),
-        "compliance": compliance_summary(),
-        "recent_activities": activities,
-        "user": public_user(current_user),
-        "role_dashboard": role_dashboard(current_user["role"]),
-    }
-
 
 @app.get("/api/notifications", response_model=list[APIRecord])
 def list_notifications(current_user: dict[str, Any] = Depends(get_current_user)) -> list[dict[str, Any]]:

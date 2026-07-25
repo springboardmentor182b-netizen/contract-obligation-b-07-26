@@ -2,7 +2,6 @@ import React from 'react'
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts'
 
 const colors = ['#13b981', '#3c7ded', '#f59b0b', '#f25b61', '#7a45e8']
-
 export default function ComplianceChart({ data = [] }) {
   const total = data.reduce((sum, item) => sum + item.value, 0)
   return React.createElement('section', { className: 'dashboard-card compliance-card' },
