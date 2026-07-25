@@ -1,5 +1,4 @@
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-
 export const api = {
   async signup(userData) {
     const response = await fetch(`${API_BASE_URL}/auth/signup`, {
@@ -77,11 +76,9 @@ export const api = {
   facebookLogin() {
     window.location.href = `${API_BASE_URL}/auth/facebook/login`;
   },
-
   githubLogin() {
     window.location.href = `${API_BASE_URL}/auth/github/login`;
   },
-
   appleLogin() {
     window.location.href = `${API_BASE_URL}/auth/apple/login`;
   },

@@ -2,7 +2,6 @@ import "./login.css";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { api } from "../utils/api";
-
 function Login() {
   const [formData, setFormData] = useState({
     email: "",
@@ -11,41 +10,35 @@ function Login() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-
   const handleChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
     });
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setLoading(true);
-
     try {
       const response = await api.login({
         email: formData.email,
         password: formData.password
       });
-      
       // Store the JWT token
       api.setToken(response.access_token);
-      
       alert("Login successful!");
-      navigate("/home");
+      alert("Login successful!");
+      navigate("/dashboard");
     } catch (err) {
       setError(err.message || "Login failed");
     } finally {
       setLoading(false);
     }
   };
-
   return (
     <div className="login-container">
       <h1>Login</h1>
-
       {error && <p className="error-message">{error}</p>}
 
       <form onSubmit={handleSubmit}>

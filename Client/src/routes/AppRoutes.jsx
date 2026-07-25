@@ -1,12 +1,9 @@
 import { Routes, Route } from "react-router-dom";
-
 import DashboardLayout from "../layouts/DashboardLayout";
-
 // Authentication Pages
 import Login from "../pages/Login";
 import Signup from "../pages/Signup";
 import ForgotPassword from "../pages/ForgotPassword";
-
 // Dashboard Pages
 import Dashboard from "../pages/Dashboard";
 import ContractRepository from "../pages/ContractRepository";
@@ -19,7 +16,6 @@ import AuditLogs from "../pages/AuditLogs";
 import Notifications from "../pages/Notifications";
 import UserManagement from "../pages/UserManagement";
 import Settings from "../pages/Settings";
-
 const AppRoutes = () => {
   return (
     <Routes>
@@ -27,7 +23,6 @@ const AppRoutes = () => {
       <Route path="/" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
-
       {/* Dashboard Routes */}
       <Route element={<DashboardLayout />}>
         <Route path="/dashboard" element={<Dashboard />} />
@@ -45,5 +40,4 @@ const AppRoutes = () => {
     </Routes>
   );
 };
-
 export default AppRoutes;
