@@ -4,6 +4,7 @@ import AppRoutes from './routes';
 import Sidebar from './components/layout/Sidebar';
 import Navbar from './components/layout/Navbar'; 
 import { AuthProvider } from './features/authentication/authContext';
+import { SearchProvider } from './context/SearchContext';
 
 function LayoutWrapper() {
   const location = useLocation();
@@ -28,9 +29,11 @@ function LayoutWrapper() {
 export default function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
-        <LayoutWrapper />
-      </BrowserRouter>
+      <SearchProvider>
+        <BrowserRouter>
+          <LayoutWrapper />
+        </BrowserRouter>
+      </SearchProvider>
     </AuthProvider>
   );
 }

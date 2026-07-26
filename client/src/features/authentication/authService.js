@@ -1,9 +1,4 @@
-/**
- * Auth business logic — composes authApi.js with localStorage token
- * persistence and access-token refresh scheduling. authContext.jsx is the
- * only thing that should import this; components should use useAuth()
- * instead of importing authService directly.
- */
+
 import * as authApi from '../../services/authApi';
 
 const ACCESS_TOKEN_KEY = 'ciq_access_token';
@@ -50,11 +45,7 @@ export async function logoutUser() {
   }
 }
 
-/**
- * Called on app load to restore a session from a previously-stored token.
- * Returns the user if the access token is still valid, refreshes it once
- * if expired, or returns null if there's no usable session.
- */
+
 export async function restoreSession() {
   const accessToken = getStoredAccessToken();
   if (!accessToken) return null;

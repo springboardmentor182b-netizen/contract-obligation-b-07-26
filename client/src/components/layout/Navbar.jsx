@@ -1,7 +1,10 @@
 import React from 'react';
 import { Search, Bell } from 'lucide-react';
+import { useSearch } from '../../context/SearchContext';
 
 export default function Navbar() {
+  const { globalSearch, setGlobalSearch } = useSearch();
+
   return (
     <div style={{
       height: '64px',
@@ -20,7 +23,9 @@ export default function Navbar() {
         <Search size={16} color="#9ca3af" style={{ marginRight: '8px' }} />
         <input 
           type="text" 
-          placeholder="Search..." 
+          placeholder="Search logs globally..." 
+          value={globalSearch}
+          onChange={(e) => setGlobalSearch(e.target.value)}
           style={{ border: 'none', backgroundColor: 'transparent', outline: 'none', width: '100%', fontSize: '14px' }} 
         />
       </div>
