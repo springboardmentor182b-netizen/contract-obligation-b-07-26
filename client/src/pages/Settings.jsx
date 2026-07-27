@@ -1,4 +1,25 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useAuth } from '../features/authentication/authContext';
+import { useSettings } from '../hooks/useSettings';
+import ProfileSection from '../features/settings/ProfileSection';
+import PasswordSection from '../features/settings/PasswordSection';
+import NotificationPreferences from '../features/settings/NotificationPreferences';
+import OrganizationSettings from '../features/settings/OrganizationSettings';
+
+const TABS = [
+  { key: 'profile', label: 'Profile' },
+  { key: 'security', label: 'Security' },
+  { key: 'notifications', label: 'Notifications' },
+  { key: 'organization', label: 'Organization', adminOnly: true },
+];
+
+function SettingsSkeleton() {
+  return (
+    <div className="max-w-lg space-y-3 animate-pulse">
+      <div className="h-40 bg-slate-100 rounded-xl" />
+    </div>
+  );
+}
 import Input from '../components/common/Input';
 import Button from '../components/common/Button';
 
