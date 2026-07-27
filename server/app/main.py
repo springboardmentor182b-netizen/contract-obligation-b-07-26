@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.routes.obligations import router as obligations_router
-
+from app.contracts.router import router as contracts_router
 app = FastAPI(
     title="ContractIQ Obligation Tracker API",
     version="1.0.0",
@@ -27,6 +27,11 @@ app.include_router(
     tags=["Obligations"],
 )
 
+app.include_router(
+    contracts_router,
+    prefix="/api",
+    tags=["Contracts"],
+)
 
 @app.get("/health")
 def health_check():
