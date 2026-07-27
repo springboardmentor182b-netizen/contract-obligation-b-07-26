@@ -26,8 +26,6 @@ const EMPTY_FORM = {
 };
 
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul"];
-const COMPLETED_DATA = [18, 24, 21, 31, 27, 36, 14];
-const PENDING_DATA = [12, 9, 14, 8, 11, 6, 17];
 
 async function apiRequest(url, options = {}) {
   const response = await fetch(url, {
@@ -285,7 +283,7 @@ export default function App() {
               title="Completion Progress"
               subtitle="Completed vs pending per month"
             />
-            <CompletionChart />
+           <CompletionChart obligations={obligations} />
           </div>
 
           <div className="panel">
@@ -454,8 +452,29 @@ function PanelHeader({ title, subtitle }) {
   );
 }
 
-function CompletionChart() {
-  const maximum = 36;
+function CompletionChart({ obligations }) {
+  const completedData = MONTHS.map(() => 0);
+  const pendingData = MONTHS.map(() => 0);
+
+  obligations.forEach((item) => {
+    if (!item.due_date) return;
+
+    const date = new Date(`${item.due_date}T00:00:00`);
+    const monthIndex = date.getMonth();
+
+    if (monthIndex < 0 || monthIndex >= MONTHS.length) return;
+
+    const status = String(item.status || "").toLowerCase();
+
+    if (status === "completed") {
+      completedData[monthIndex] += 1;
+    } else if (status === "pending" || status === "overdue") {
+      pendingData[monthIndex] += 1;
+    }
+  });
+
+  const maximum = Math.max(...completedData, ...pendingData, 1);
+  
 
   return (
     <div className="chart-area">
@@ -478,13 +497,13 @@ function CompletionChart() {
               <span
                 className="bar completed"
                 style={{
-                  height: `${(COMPLETED_DATA[index] / maximum) * 100}%`,
+                  height: `${(completedData[index] / maximum) * 100}%`,
                 }}
               />
               <span
                 className="bar pending"
                 style={{
-                  height: `${(PENDING_DATA[index] / maximum) * 100}%`,
+                 height: `${(pendingData[index] / maximum) * 100}%`,
                 }}
               />
             </div>
