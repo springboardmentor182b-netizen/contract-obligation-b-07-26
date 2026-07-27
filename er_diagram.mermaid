@@ -1,0 +1,444 @@
+erDiagram
+
+    %% ============================================================
+    %% CONTRACT MANAGEMENT SYSTEM — ER DIAGRAM
+    %% ============================================================
+
+    %% ── USERS & AUTH ──────────────────────────────────────────
+
+    users {
+        UUID        id               PK
+        VARCHAR     employee_id      UK
+        VARCHAR     first_name
+        VARCHAR     last_name
+        VARCHAR     email            UK
+        VARCHAR     phone
+        TEXT        password_hash
+        ENUM        role
+        UUID        department_id    FK
+        BOOLEAN     is_active
+        BOOLEAN     is_email_verified
+        TEXT        avatar_url
+        TIMESTAMPTZ last_login_at
+        TIMESTAMPTZ password_changed_at
+        INT         failed_login_count
+        TIMESTAMPTZ locked_until
+        UUID        created_by       FK
+        TIMESTAMPTZ created_at
+        TIMESTAMPTZ updated_at
+        TIMESTAMPTZ deleted_at
+    }
+
+    departments {
+        UUID    id          PK
+        VARCHAR name        UK
+        VARCHAR code        UK
+        TEXT    description
+        UUID    head_id     FK
+        UUID    parent_id   FK
+        BOOLEAN is_active
+        TIMESTAMPTZ created_at
+        TIMESTAMPTZ updated_at
+    }
+
+    user_sessions {
+        UUID        id                  PK
+        UUID        user_id             FK
+        TEXT        token_hash          UK
+        TEXT        refresh_token_hash  UK
+        INET        ip_address
+        TEXT        user_agent
+        BOOLEAN     is_active
+        TIMESTAMPTZ expires_at
+        TIMESTAMPTZ created_at
+        TIMESTAMPTZ revoked_at
+    }
+
+    password_reset_tokens {
+        UUID        id          PK
+        UUID        user_id     FK
+        TEXT        token_hash  UK
+        TIMESTAMPTZ expires_at
+        TIMESTAMPTZ used_at
+        TIMESTAMPTZ created_at
+    }
+
+    permissions {
+        UUID    id          PK
+        VARCHAR resource
+        VARCHAR action
+        TEXT    description
+    }
+
+    role_permissions {
+        ENUM        role            PK
+        UUID        permission_id   PK,FK
+        TIMESTAMPTZ granted_at
+        UUID        granted_by      FK
+    }
+
+    %% ── CONTRACTS ─────────────────────────────────────────────
+
+    contracts {
+        UUID        id                  PK
+        VARCHAR     contract_number     UK
+        VARCHAR     title
+        TEXT        description
+        ENUM        category
+        ENUM        status
+        VARCHAR     counterparty_name
+        VARCHAR     counterparty_email
+        VARCHAR     counterparty_phone
+        TEXT        counterparty_address
+        UUID        department_id       FK
+        UUID        owner_id            FK
+        UUID        assigned_manager_id FK
+        NUMERIC     value
+        CHAR        currency
+        DATE        start_date
+        DATE        end_date
+        DATE        signed_date
+        DATE        effective_date
+        BOOLEAN     auto_renew
+        INT         renewal_notice_days
+        BOOLEAN     is_confidential
+        TEXT_ARRAY  tags
+        JSONB       metadata
+        UUID        created_by          FK
+        TIMESTAMPTZ created_at
+        TIMESTAMPTZ updated_at
+        TIMESTAMPTZ deleted_at
+    }
+
+    contract_versions {
+        UUID        id              PK
+        UUID        contract_id     FK
+        INT         version_number
+        VARCHAR     file_name
+        TEXT        file_path
+        BIGINT      file_size
+        VARCHAR     file_mime_type
+        VARCHAR     checksum
+        TEXT        change_summary
+        BOOLEAN     is_current
+        UUID        uploaded_by     FK
+        TIMESTAMPTZ created_at
+    }
+
+    approval_workflows {
+        UUID        id              PK
+        VARCHAR     name
+        TEXT        description
+        ENUM        category
+        INT         steps_count
+        BOOLEAN     is_active
+        TIMESTAMPTZ created_at
+        TIMESTAMPTZ updated_at
+    }
+
+    approval_workflow_steps {
+        UUID    id          PK
+        UUID    workflow_id FK
+        INT     step_order
+        VARCHAR step_name
+        ENUM    approver_role
+        UUID    approver_id FK
+        BOOLEAN is_mandatory
+    }
+
+    contract_approvals {
+        UUID        id          PK
+        UUID        contract_id FK
+        UUID        workflow_id FK
+        UUID        step_id     FK
+        UUID        approver_id FK
+        ENUM        action
+        TEXT        comments
+        TIMESTAMPTZ acted_at
+        TIMESTAMPTZ created_at
+    }
+
+    contract_comments {
+        UUID        id          PK
+        UUID        contract_id FK
+        UUID        parent_id   FK
+        UUID        author_id   FK
+        TEXT        body
+        BOOLEAN     is_internal
+        TIMESTAMPTZ created_at
+        TIMESTAMPTZ updated_at
+        TIMESTAMPTZ deleted_at
+    }
+
+    tags {
+        UUID    id      PK
+        VARCHAR name    UK
+        VARCHAR color
+    }
+
+    contract_tag_map {
+        UUID contract_id PK,FK
+        UUID tag_id      PK,FK
+    }
+
+    document_archives {
+        UUID        id              PK
+        UUID        contract_id     FK
+        UUID        version_id      FK
+        UUID        archived_by     FK
+        TEXT        archive_reason
+        TEXT        storage_path
+        VARCHAR     checksum
+        TIMESTAMPTZ archived_at
+        TIMESTAMPTZ restore_at
+        UUID        restored_by     FK
+    }
+
+    %% ── OBLIGATIONS ───────────────────────────────────────────
+
+    obligations {
+        UUID        id                  PK
+        UUID        contract_id         FK
+        VARCHAR     title
+        TEXT        description
+        ENUM        obligation_type
+        ENUM        status
+        UUID        responsible_user_id FK
+        UUID        responsible_dept_id FK
+        DATE        due_date
+        INT         reminder_days
+        TEXT        recurrence_rule
+        NUMERIC     amount
+        CHAR        currency
+        DATE        completion_date
+        TEXT        completion_notes
+        TEXT        evidence_url
+        SMALLINT    priority
+        ENUM        compliance_level
+        TEXT_ARRAY  tags
+        UUID        created_by          FK
+        TIMESTAMPTZ created_at
+        TIMESTAMPTZ updated_at
+        TIMESTAMPTZ deleted_at
+    }
+
+    obligation_progress {
+        UUID        id              PK
+        UUID        obligation_id   FK
+        SMALLINT    progress_pct
+        TEXT        note
+        UUID        recorded_by     FK
+        TIMESTAMPTZ recorded_at
+    }
+
+    %% ── RENEWALS ──────────────────────────────────────────────
+
+    renewals {
+        UUID        id                  PK
+        UUID        contract_id         FK
+        INT         renewal_number
+        ENUM        status
+        DATE        previous_end_date
+        DATE        new_start_date
+        DATE        new_end_date
+        NUMERIC     new_value
+        CHAR        currency
+        TIMESTAMPTZ reminder_sent_at
+        INT         reminder_days
+        UUID        approved_by         FK
+        TIMESTAMPTZ approved_at
+        TEXT        notes
+        TEXT        renewal_doc_path
+        UUID        created_by          FK
+        TIMESTAMPTZ created_at
+        TIMESTAMPTZ updated_at
+    }
+
+    renewal_approvals {
+        UUID        id          PK
+        UUID        renewal_id  FK
+        UUID        approver_id FK
+        ENUM        action
+        TEXT        comments
+        TIMESTAMPTZ acted_at
+    }
+
+    %% ── COMPLIANCE ────────────────────────────────────────────
+
+    compliance_records {
+        UUID        id                  PK
+        UUID        contract_id         FK
+        UUID        obligation_id       FK
+        ENUM        compliance_level
+        DATE        review_date
+        UUID        reviewed_by         FK
+        SMALLINT    risk_score
+        TEXT        findings
+        TEXT        recommendations
+        TEXT        evidence_url
+        DATE        next_review_date
+        BOOLEAN     is_resolved
+        TIMESTAMPTZ resolved_at
+        UUID        resolved_by         FK
+        TIMESTAMPTZ created_at
+        TIMESTAMPTZ updated_at
+    }
+
+    %% ── NOTIFICATIONS ─────────────────────────────────────────
+
+    notifications {
+        UUID        id              PK
+        UUID        user_id         FK
+        ENUM        type
+        ENUM        channel
+        ENUM        status
+        VARCHAR     subject
+        TEXT        body
+        VARCHAR     reference_type
+        UUID        reference_id
+        TIMESTAMPTZ scheduled_at
+        TIMESTAMPTZ sent_at
+        TIMESTAMPTZ delivered_at
+        TIMESTAMPTZ read_at
+        INT         retry_count
+        TEXT        error_message
+        JSONB       metadata
+        TIMESTAMPTZ created_at
+    }
+
+    notification_templates {
+        UUID        id          PK
+        VARCHAR     name        UK
+        ENUM        type
+        ENUM        channel
+        VARCHAR     subject
+        TEXT        body_html
+        TEXT        body_text
+        TEXT_ARRAY  variables
+        BOOLEAN     is_active
+        TIMESTAMPTZ created_at
+        TIMESTAMPTZ updated_at
+    }
+
+    %% ── REPORTS ───────────────────────────────────────────────
+
+    reports {
+        UUID        id              PK
+        ENUM        report_type
+        VARCHAR     title
+        TEXT        description
+        JSONB       parameters
+        ENUM        export_format
+        TEXT        file_path
+        BIGINT      file_size
+        UUID        generated_by    FK
+        TIMESTAMPTZ generated_at
+        TIMESTAMPTZ expires_at
+        INT         download_count
+        BOOLEAN     is_scheduled
+        VARCHAR     schedule_cron
+        TIMESTAMPTZ created_at
+    }
+
+    %% ── AUDIT & ACTIVITY ──────────────────────────────────────
+
+    audit_logs {
+        UUID        id              PK
+        UUID        user_id         FK
+        ENUM        action
+        VARCHAR     resource_type
+        UUID        resource_id
+        VARCHAR     resource_label
+        JSONB       old_values
+        JSONB       new_values
+        INET        ip_address
+        TEXT        user_agent
+        UUID        session_id      FK
+        VARCHAR     request_id
+        SMALLINT    status_code
+        INT         duration_ms
+        TIMESTAMPTZ created_at
+    }
+
+    activities {
+        UUID        id              PK
+        UUID        actor_id        FK
+        VARCHAR     verb
+        VARCHAR     object_type
+        UUID        object_id
+        VARCHAR     object_label
+        VARCHAR     target_type
+        UUID        target_id
+        VARCHAR     target_label
+        UUID        department_id   FK
+        JSONB       metadata
+        TIMESTAMPTZ created_at
+    }
+
+    system_settings {
+        VARCHAR     key         PK
+        TEXT        value
+        TEXT        description
+        TIMESTAMPTZ updated_at
+        UUID        updated_by  FK
+    }
+
+    %% ============================================================
+    %% RELATIONSHIPS
+    %% ============================================================
+
+    %% Users & Departments
+    users              }o--||  departments           : "belongs_to"
+    departments        ||--o{  users                 : "has_members"
+    departments        |o--o|  departments            : "parent_of"
+    departments        |o--||  users                 : "headed_by"
+
+    %% Auth
+    users              ||--o{  user_sessions          : "has"
+    users              ||--o{  password_reset_tokens  : "requests"
+    role_permissions   }o--||  permissions            : "grants"
+
+    %% Contracts
+    users              ||--o{  contracts              : "owns"
+    departments        ||--o{  contracts              : "holds"
+    contracts          ||--o{  contract_versions      : "has_versions"
+    contracts          ||--o{  contract_approvals     : "goes_through"
+    contracts          ||--o{  contract_comments      : "has_comments"
+    contracts          ||--o{  contract_tag_map       : "tagged_with"
+    contract_tag_map   }o--||  tags                   : "uses"
+    contracts          ||--o{  document_archives      : "archived_in"
+    contract_versions  ||--o{  document_archives      : "version_of"
+
+    %% Approval Workflows
+    approval_workflows  ||--o{  approval_workflow_steps : "has_steps"
+    approval_workflows  ||--o{  contract_approvals      : "used_in"
+    approval_workflow_steps ||--o{ contract_approvals   : "referenced_by"
+    users               ||--o{  contract_approvals      : "approves"
+
+    %% Obligations
+    contracts          ||--o{  obligations            : "has"
+    users              ||--o{  obligations            : "responsible_for"
+    departments        ||--o{  obligations            : "responsible_dept"
+    obligations        ||--o{  obligation_progress    : "tracked_by"
+    obligations        ||--o{  compliance_records     : "assessed_in"
+
+    %% Renewals
+    contracts          ||--o{  renewals               : "renewed_as"
+    renewals           ||--o{  renewal_approvals      : "approved_via"
+    users              ||--o{  renewal_approvals      : "approves"
+
+    %% Compliance
+    contracts          ||--o{  compliance_records     : "assessed_in"
+    users              ||--o{  compliance_records     : "reviewed_by"
+
+    %% Notifications
+    users              ||--o{  notifications          : "receives"
+
+    %% Reports
+    users              ||--o{  reports                : "generates"
+
+    %% Audit & Activity
+    users              ||--o{  audit_logs             : "generates"
+    user_sessions      ||--o{  audit_logs             : "linked_to"
+    users              ||--o{  activities             : "performs"
+    departments        ||--o{  activities             : "context_of"
