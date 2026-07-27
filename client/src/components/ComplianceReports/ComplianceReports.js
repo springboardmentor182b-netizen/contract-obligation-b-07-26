@@ -2,6 +2,8 @@ import "./ComplianceReports.css";
 
 import { useEffect, useState } from "react";
 
+import BASE_URL from "../../api/config";
+
 import {
     DocumentPlusIcon
 } from "@heroicons/react/24/outline";
@@ -62,9 +64,9 @@ function ComplianceReports() {
     const handlePDF = (id)=>{
 
         window.open(
-            `http://127.0.0.1:8000/reports/${id}/pdf`,
-            "_blank"
-        );
+    `${BASE_URL}/reports/${id}/pdf`,
+    "_blank"
+);
 
     };
 
@@ -73,9 +75,9 @@ function ComplianceReports() {
     const handleExcel = (id)=>{
 
         window.open(
-            `http://127.0.0.1:8000/reports/${id}/excel`,
-            "_blank"
-        );
+    `${BASE_URL}/reports/${id}/excel`,
+    "_blank"
+);
 
     };
 
