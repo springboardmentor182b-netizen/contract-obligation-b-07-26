@@ -72,3 +72,7 @@ dist/
 test-results/
 playwright-report/
 coverage/
+__pycache__/
+*.py[cod]
+server/data/
+server/venv/
