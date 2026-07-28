@@ -1,6 +1,10 @@
 import { useEffect, useState, useCallback } from 'react';
 import * as settingsApi from '../services/settingsApi';
 
+/**
+ * @param {boolean} isAdmin - whether to also load organization settings.
+ *   Pass useAuth().hasRole(['Administrator']) from the page.
+ */
 export function useSettings(isAdmin = false) {
   const [profile, setProfile] = useState(null);
   const [notifications, setNotifications] = useState(null);
