@@ -25,3 +25,22 @@ export default App;
 export default function App() {
   return React.createElement(Home)
 }
+import "./App.css";
+
+import ComplianceDashboard from "./pages/ComplianceDashboard";
+
+function App() {
+
+return (
+
+<div>
+
+<ComplianceDashboard/>
+
+</div>
+
+);
+
+}
+
+export default App;
