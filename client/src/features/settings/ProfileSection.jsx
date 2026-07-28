@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Loader2 } from 'lucide-react';
 
+/**
+ * @param {object} profile - { name, email, department, role }
+ * @param {(payload) => Promise<void>} onSave
+ * @param {boolean} saving
+ */
 export default function ProfileSection({ profile, onSave, saving }) {
   const [form, setForm] = useState({ name: '', email: '', department: '' });
   const [error, setError] = useState(null);

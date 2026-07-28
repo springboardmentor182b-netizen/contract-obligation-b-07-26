@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import { Loader2 } from 'lucide-react';
 
+/**
+ * @param {(current, next) => Promise<void>} onSave
+ * @param {boolean} saving
+ */
 export default function PasswordSection({ onSave, saving }) {
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
