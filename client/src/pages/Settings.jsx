@@ -26,11 +26,20 @@ export default function Settings() {
   const isAdmin = hasRole(['Administrator']);
 
   const {
-    profile, notifications, organization, loading, error, refetch,
-    saveProfile, savingProfile,
-    savePassword, savingPassword,
-    saveNotifications, savingNotifications,
-    saveOrganization, savingOrganization,
+    profile,
+    notifications,
+    organization,
+    loading,
+    error,
+    refetch,
+    saveProfile,
+    savingProfile,
+    savePassword,
+    savingPassword,
+    saveNotifications,
+    savingNotifications,
+    saveOrganization,
+    savingOrganization,
   } = useSettings(isAdmin);
 
   const [activeTab, setActiveTab] = useState('profile');
@@ -50,7 +59,9 @@ export default function Settings() {
               key={tab.key}
               onClick={() => setActiveTab(tab.key)}
               className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px transition ${
-                activeTab === tab.key ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-800'
+                activeTab === tab.key
+                  ? 'border-blue-600 text-blue-600'
+                  : 'border-transparent text-slate-500 hover:text-slate-800'
               }`}
             >
               {tab.label}
@@ -63,7 +74,10 @@ export default function Settings() {
         {!loading && error && (
           <div className="max-w-lg text-center py-10">
             <p className="text-sm text-slate-600 mb-3">{error}</p>
-            <button onClick={refetch} className="text-sm font-medium text-white bg-slate-900 rounded-lg px-4 py-2 hover:bg-slate-800">
+            <button
+              onClick={refetch}
+              className="text-sm font-medium text-white bg-slate-900 rounded-lg px-4 py-2 hover:bg-slate-800"
+            >
               Try again
             </button>
           </div>
