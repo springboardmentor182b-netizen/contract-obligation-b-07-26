@@ -52,7 +52,7 @@ const TopBar = () => {
             </h4>
 
             <p className="text-xs text-gray-500">
-              Chief Compliance Officer
+              CCO &middot; Nexora Group
             </p>
 
           </div>

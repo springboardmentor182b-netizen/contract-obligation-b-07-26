@@ -1,14 +1,15 @@
-import {
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-} from "recharts";
-import { useEffect,useState } from "react";
-import { getContractsByDepartment } from "../api/dashboardApi";
+const departments = [
+  { name: "Legal", total: 52, compliance: 94 },
+  { name: "Procurement", total: 68, compliance: 88 },
+  { name: "Human Resources", total: 34, compliance: 81 },
+  { name: "Finance", total: 60, compliance: 90 },
+];
+
+function levelClass(pct) {
+  if (pct >= 90) return "excellent";
+  if (pct >= 75) return "good";
+  return "warning";
+}
 
 function ContractsByDepartment() {
   const[data, setData] = useState([]);
@@ -25,47 +26,21 @@ function ContractsByDepartment() {
     fetchDepartments();
   },[]);
   return (
-    <div 
-      className="compliance-card"
-      style={{paddingTop:"12px", paddingBottom:"12px"}}
+    <div
+      style={{
+        background: "#fff",
+        padding: "20px",
+        borderRadius: "12px",
+      }}
     >
+      <h2>Contracts by Department</h2>
 
-      <div className="chart-header">
-        <div>
-          <h2>Contracts by Department</h2>
-          <p>Active contracts by business unit</p>
-        </div>
-
-      </div>
-
-      <div className="chart-container">
-        <ResponsiveContainer width="100%" height={220}>
-          <BarChart data={data}>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} horizontal={false} />
-
-            <XAxis
-            dataKey="department"
-            axisLine={false}
-            tickLine={false} 
-            />
-
-            <YAxis
-             domain={[0, 60]} 
-             axisLine={false}
-             tickLine={false}
-             tickMargin={10}/>
-
-            <Tooltip />
-
-            <Bar
-              dataKey="compliance"
-              fill="#F59E0B"
-              radius={[8, 8, 0, 0]}
-            />
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
-
+      <BarChart width={500} height={300} data={data}>
+        <XAxis dataKey="department" />
+        <YAxis />
+        <Tooltip />
+        <Bar dataKey="contracts" fill="#4F46E5" />
+      </BarChart>
     </div>
   );
 }

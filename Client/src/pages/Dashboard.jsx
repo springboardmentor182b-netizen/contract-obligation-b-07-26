@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
 import Navbar from "../components/Navbar";
 import DashboardCard from "../components/DashboardCard";
-import ContractGrowth from "../components/ContractGrowth";
-import ContractStatus from "../components/ContractStatus";
+import RecentContracts from "../components/RecentContracts";
+import ComplianceLevels from "../components/ComplianceLevels";
+// import "../styles/dashboard.css";
 import ContractsByDepartment from "../components/ContractsByDepartment";
 import ComplianceLevels from "../components/ComplianceLevels";
 import RecentContracts from "../components/RecentContracts";
@@ -47,98 +47,67 @@ function Dashboard() {
         <Navbar />
 
         <div className="dashboard-header">
-          <div>
-            <h1>Dashboard Overview</h1>
-            <p>
-              Welcome back, Jennifer. Here is your compliance snapshot for
-              today.
-            </p>
-          </div>
-
-          <div className="header-actions">
-            <button className="action-btn">
-              <FiUpload />
-            </button>
-
-            <button className="action-btn">
-              <FiPlus />
-            </button>
-
-            <button className="action-btn">
-              <FiClipboard />
-            </button>
-
-            <button className="action-btn download">
-              <FiDownload />
-            </button>
-          </div>
+          <h1>Dashboard Overview</h1>
+          <p>
+            Welcome back, Jennifer. Here is your compliance snapshot for today.
+          </p>
         </div>
 
         <div className="cards">
           <DashboardCard
             title="Total Contracts"
-            value={summary ? summary.total_contracts : "..."}
+            value="214"
             percent="+12%"
           />
 
           <DashboardCard
             title="Active Contracts"
-            value={summary ? summary.active_contracts : "..."}
+            value="179"
             percent="+8%"
           />
 
           <DashboardCard
             title="Under Review"
-            value={summary ? summary.under_review : "..."}
+            value="31"
             percent="+5%"
           />
 
           <DashboardCard
             title="Upcoming Renewals"
-            value={summary ? summary.expiring_soon : "..."}
+            value="18"
             percent="-2%"
           />
 
           <DashboardCard
             title="Pending Obligations"
-            value={summary ? summary.pending_obligations : "..."}
+            value="43"
             percent="+10%"
           />
 
           <DashboardCard
             title="Compliance Rate"
-            value={summary ? `${summary.compliance_rate}%` : "..."}
+            value="91.4%"
             percent="+2%"
           />
         </div>
 
         <div className="dashboard-grid">
           <div className="left-column">
-            <ContractGrowth />
-
-            <ContractStatus />
-
-            <ContractsByDepartment />
+            <div className="card-placeholder">
+              <h2>Contract Growth</h2>
+              <p>Graph will be added here.</p>
+            </div>
 
             <ComplianceLevels />
-
+            {/* <ContractsByDepartment /> */}
             <RecentContracts />
-
             <RecentActivity />
-
             <UpcomingRenewals />
-
-            <ComplianceSummary />
-
-            <Footer />
           </div>
 
-          <div className="right-column"></div>
-        </div>
-
-        <div className="help-button">
-          ?
-          <span className="help-tooltip">Help & Resources</span>
+        <div className="right-column">
+          <DeadlineCard />
+          <ContractsByDepartment />
         </div>
       </main>
     </div>
