@@ -20,68 +20,42 @@ function SettingsSkeleton() {
     </div>
   );
 }
+import Input from '../components/common/Input';
+import Button from '../components/common/Button';
 
 export default function Settings() {
-  const { hasRole } = useAuth();
-  const isAdmin = hasRole(['Administrator']);
-
-  const {
-    profile, notifications, organization, loading, error, refetch,
-    saveProfile, savingProfile,
-    savePassword, savingPassword,
-    saveNotifications, savingNotifications,
-    saveOrganization, savingOrganization,
-  } = useSettings(isAdmin);
-
-  const [activeTab, setActiveTab] = useState('profile');
-  const visibleTabs = TABS.filter((t) => !t.adminOnly || isAdmin);
-
   return (
-    <div className="flex-1 flex flex-col overflow-y-auto bg-slate-50">
-      <main className="p-8 space-y-6">
-        <div>
-          <h1 className="text-2xl font-semibold text-slate-900">Settings</h1>
-          <p className="text-sm text-slate-400 mt-1">Manage your profile, security, and notification preferences</p>
-        </div>
+    <div style={{ padding: '24px', backgroundColor: '#fafafa', minHeight: '100vh', fontFamily: 'sans-serif' }}>
+      
+      {/* Page Header */}
+      <div style={{ marginBottom: '24px' }}>
+        <h1 style={{ margin: 0, fontSize: '24px', color: '#111827' }}>Account Settings</h1>
+        <p style={{ margin: '4px 0 0 0', color: '#6b7280', fontSize: '14px' }}>
+          Manage your account preferences and personal information.
+        </p>
+      </div>
 
-        <div className="flex gap-1 border-b border-slate-200">
-          {visibleTabs.map((tab) => (
-            <button
-              key={tab.key}
-              onClick={() => setActiveTab(tab.key)}
-              className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px transition ${
-                activeTab === tab.key ? 'border-blue-600 text-blue-600' : 'border-transparent text-slate-500 hover:text-slate-800'
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-
-        {loading && <SettingsSkeleton />}
-
-        {!loading && error && (
-          <div className="max-w-lg text-center py-10">
-            <p className="text-sm text-slate-600 mb-3">{error}</p>
-            <button onClick={refetch} className="text-sm font-medium text-white bg-slate-900 rounded-lg px-4 py-2 hover:bg-slate-800">
-              Try again
-            </button>
+      {/* Settings Form Container */}
+      <div style={{ backgroundColor: 'white', padding: '32px', borderRadius: '8px', border: '1px solid #e5e7eb', maxWidth: '600px' }}>
+        <h3 style={{ margin: '0 0 20px 0', fontSize: '18px', color: '#111827', borderBottom: '1px solid #e5e7eb', paddingBottom: '12px' }}>
+          Profile Information
+        </h3>
+        
+        <form onSubmit={(e) => e.preventDefault()}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+            <Input label="First Name" name="firstName" placeholder="Alexandra" />
+            <Input label="Last Name" name="lastName" placeholder="Thornton" />
           </div>
-        )}
+          
+          <Input label="Email Address" type="email" name="email" placeholder="admin@contractiq.com" />
+          <Input label="Job Title" name="jobTitle" placeholder="System Administrator" />
+          
+          <div style={{ marginTop: '32px', display: 'flex', justifyContent: 'flex-end' }}>
+            <Button type="submit">Save Changes</Button>
+          </div>
+        </form>
+      </div>
 
-        {!loading && !error && (
-          <>
-            {activeTab === 'profile' && <ProfileSection profile={profile} onSave={saveProfile} saving={savingProfile} />}
-            {activeTab === 'security' && <PasswordSection onSave={savePassword} saving={savingPassword} />}
-            {activeTab === 'notifications' && (
-              <NotificationPreferences preferences={notifications} onSave={saveNotifications} saving={savingNotifications} />
-            )}
-            {activeTab === 'organization' && isAdmin && (
-              <OrganizationSettings organization={organization} onSave={saveOrganization} saving={savingOrganization} />
-            )}
-          </>
-        )}
-      </main>
     </div>
   );
 }
