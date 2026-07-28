@@ -1,5 +1,11 @@
+"""
+Pydantic schemas for the Settings module — kept in sync with
+client/src/services/settingsApi.js.
+"""
 from pydantic import BaseModel, EmailStr, Field, ConfigDict
 
+
+# ---- Profile (thin wrapper around app.users.schemas.UserResponse) ----
 
 class ProfileResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -17,10 +23,14 @@ class ProfileUpdate(BaseModel):
     department: str | None = None
 
 
+# ---- Password ----
+
 class PasswordChangeRequest(BaseModel):
     currentPassword: str
     newPassword: str = Field(min_length=8)
 
+
+# ---- Notification preferences ----
 
 class NotificationPreferencesResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -43,6 +53,8 @@ class NotificationPreferencesUpdate(BaseModel):
     complianceAlerts: bool | None = None
     approvalAlerts: bool | None = None
 
+
+# ---- Organization settings (Administrator only) ----
 
 class OrganizationSettingsResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)

@@ -1,3 +1,15 @@
+"""
+Router for the Settings module.
+
+Profile read/update deliberately delegates to app.users.services (the
+canonical User CRUD logic) rather than duplicating it — this router just
+narrows "update any user" down to "update yourself".
+
+ASSUMPTIONS: same as reports/users routers — app/database.get_db and
+app/security.get_current_user exist. The admin-only organization endpoints
+reuse the `require_admin` dependency already defined in users/router.py
+rather than redefining it here.
+"""
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
@@ -11,6 +23,8 @@ from app.settings import schemas, services
 router = APIRouter(prefix="/settings", tags=["settings"])
 
 
+# ---- Profile ----
+
 @router.get("/profile", response_model=schemas.ProfileResponse)
 def read_profile(current_user=Depends(get_current_user)):
     return current_user
@@ -23,14 +37,17 @@ def update_profile(
     current_user=Depends(get_current_user),
 ):
     try:
-        return user_services.update_user(
+        updated = user_services.update_user(
             db,
             current_user.id,
             UserUpdate(name=payload.name, email=payload.email, department=payload.department),
         )
+        return updated
     except user_services.DuplicateEmailError as e:
         raise HTTPException(status_code=409, detail=str(e))
 
+
+# ---- Password ----
 
 @router.post("/password", status_code=204)
 def change_password(
@@ -43,6 +60,8 @@ def change_password(
     except services.IncorrectPasswordError:
         raise HTTPException(status_code=400, detail="Current password is incorrect")
 
+
+# ---- Notification preferences ----
 
 @router.get("/notifications", response_model=schemas.NotificationPreferencesResponse)
 def read_notifications(db: Session = Depends(get_db), current_user=Depends(get_current_user)):
@@ -57,6 +76,8 @@ def update_notifications(
 ):
     return services.update_preferences(db, current_user.id, payload)
 
+
+# ---- Organization settings (Administrators only) ----
 
 @router.get("/organization", response_model=schemas.OrganizationSettingsResponse)
 def read_organization(db: Session = Depends(get_db), _admin=Depends(require_admin)):

@@ -3,8 +3,11 @@ SQLAlchemy models for the Settings module.
 
 Deliberately does NOT define its own User model or profile fields — profile
 editing (name/email/department) reuses app.users.models.User and
-app.users.services directly. This module only owns notification
-preferences and org-wide settings.
+app.users.services directly, since that's already the canonical source of
+truth for user data. This module only owns things that don't belong
+anywhere else: notification preferences and org-wide settings.
+
+ASSUMPTION: app/database.py exposes `Base` (same as reports/users modules).
 """
 import uuid
 from datetime import datetime
@@ -16,6 +19,8 @@ from app.database import Base
 
 
 class NotificationPreference(Base):
+    """One row per user. Created lazily on first read (see services.py)."""
+
     __tablename__ = "notification_preferences"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
@@ -34,7 +39,10 @@ class NotificationPreference(Base):
 
 
 class OrganizationSettings(Base):
-    """Singleton table — get_or_create in services.py enforces only one row."""
+    """
+    Singleton table — there should only ever be one row. get_or_create in
+    services.py enforces this by always fetching/creating id=SINGLETON_ID.
+    """
 
     __tablename__ = "organization_settings"
 
