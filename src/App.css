@@ -1,0 +1,41 @@
+/* Color tokens extracted from the ContractIQ screenshot.
+   Drop this into your global stylesheet (e.g. globals.css / index.css).
+   No component code needs to change — App.jsx already references
+   these same semantic classes (bg-card, text-primary, border-border, etc). */
+
+:root {
+  /* Main content area background (light gray behind the cards) */
+  --background: 210 40% 98%;      /* #F1F5F9 */
+  --foreground: 222 47% 11%;      /* #0F172A — near-black navy text */
+
+  /* Cards / table / inputs */
+  --card: 0 0% 100%;              /* #FFFFFF */
+  --card-foreground: 222 47% 11%; /* #0F172A */
+
+  /* Borders and dividers */
+  --border: 214 32% 91%;          /* #E2E8F0 */
+
+  /* Muted surfaces (table header row, hover states) + muted text */
+  --muted: 210 40% 96%;           /* #F8FAFC */
+  --muted-foreground: 215 16% 47%; /* #64748B */
+
+  /* Primary blue — "New Contract" button, active sidebar item, links */
+  --primary: 221 83% 53%;         /* #2563EB */
+  --primary-foreground: 0 0% 100%; /* #FFFFFF */
+}
+
+/* Dark navy sidebar shell — not part of the ContractRepository/
+   ContractDetail components themselves, but included here since it's
+   visible in the screenshot in case you're wiring up the app shell too. */
+.sidebar {
+  background-color: #0B1220;       /* near-black navy */
+  color: #E2E8F0;
+}
+.sidebar-active {
+  background-color: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+}
+.role-badge {
+  background-color: #D97706;       /* amber — "Contract Manager" pill */
+  color: #FFFFFF;
+}
