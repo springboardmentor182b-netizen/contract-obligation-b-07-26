@@ -77,3 +77,108 @@
     font-size:18px;
 
 }
+.kpi-card{
+
+    width:100%;
+
+    min-height:120px;
+
+    padding:18px;
+
+    border-radius:16px;
+
+    background:#ffffff;
+
+    border:1px solid #E5E7EB;
+
+    box-shadow:0 3px 10px rgba(0,0,0,.05);
+
+    box-sizing:border-box;
+
+    transition:0.3s;
+
+    cursor:pointer;
+
+}
+
+.kpi-card:hover{
+
+    transform:translateY(-5px);
+
+    box-shadow:0 10px 20px rgba(0,0,0,.08);
+
+}
+
+.top{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:18px;
+
+}
+
+.icon{
+
+    width:32px;
+
+    height:32px;
+
+    border-radius:30px;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+}
+
+.icon svg{
+
+    width:24px;
+
+    height:24px;
+
+    color:white;
+
+}
+
+.badge{
+
+    padding:6px 12px;
+
+    border-radius:30px;
+
+    font-size:14px;
+
+    font-weight:400;
+
+}
+
+.kpi-card h2{
+
+    margin:0;
+
+    font-size:30px;
+
+    font-weight:700;
+
+    color:#111827;
+
+}
+
+.kpi-card p{
+
+    margin-top:6px;
+
+    color:#64748B;
+
+    font-size:16px;
+
+    font-weight:500;
+
+}

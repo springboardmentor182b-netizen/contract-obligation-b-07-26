@@ -31,3 +31,22 @@ export default function App() {
     ),
   )
 }
+import "./App.css";
+
+import ComplianceDashboard from "./pages/ComplianceDashboard";
+
+function App() {
+
+return (
+
+<div>
+
+<ComplianceDashboard/>
+
+</div>
+
+);
+
+}
+
+export default App;
