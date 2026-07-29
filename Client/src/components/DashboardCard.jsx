@@ -56,7 +56,7 @@ function DashboardCard({ title, value, percent }) {
 
   return (
     <div className="dashboard-card">
-
+      {/* Percentage */}
       <span
         className="card-percent"
         style={{ color: item.percentColor }}
@@ -64,6 +64,7 @@ function DashboardCard({ title, value, percent }) {
         {percent}
       </span>
 
+      {/* Icon */}
       <div
         className="card-icon"
         style={{
@@ -74,10 +75,11 @@ function DashboardCard({ title, value, percent }) {
         {item.icon}
       </div>
 
-      <h2>{value}</h2>
-
-      <p>{title}</p>
-
+      {/* Number & Title */}
+      <div className="card-info">
+        <h2 className="card-value">{value}</h2>
+        <p className="card-title">{title}</p>
+      </div>
     </div>
   );
 }

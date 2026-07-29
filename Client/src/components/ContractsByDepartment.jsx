@@ -1,30 +1,40 @@
-const departments = [
-  { name: "Legal", total: 52, compliance: 94 },
-  { name: "Procurement", total: 68, compliance: 88 },
-  { name: "Human Resources", total: 34, compliance: 81 },
-  { name: "Finance", total: 60, compliance: 90 },
-];
-
-function levelClass(pct) {
-  if (pct >= 90) return "excellent";
-  if (pct >= 75) return "good";
-  return "warning";
-}
+import { useEffect, useState } from "react";
+import { getContractsByDepartment } from "../api/dashboardApi";
+import {
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+} from "recharts";
 
 function ContractsByDepartment() {
-  const[data, setData] = useState([]);
+  console.log("ContractsByDepartment rendered");
+
+  const [data, setData] = useState([]);
 
   useEffect(() => {
-    async function fetchDepartments(){
-      try{
+    console.log("useEffect started");
+
+    async function fetchDepartments() {
+      console.log("Fetching department data...");
+
+      try {
         const response = await getContractsByDepartment();
+
+        console.log("API Response:", response);
+
         setData(response);
-      } catch (error){
-        console.error("Error fetching contracts by department:",error);
+      } catch (error) {
+        console.error(error);
       }
     }
+
     fetchDepartments();
-  },[]);
+  }, []);
+
   return (
     <div
       style={{
@@ -35,12 +45,15 @@ function ContractsByDepartment() {
     >
       <h2>Contracts by Department</h2>
 
-      <BarChart width={500} height={300} data={data}>
-        <XAxis dataKey="department" />
-        <YAxis />
-        <Tooltip />
-        <Bar dataKey="contracts" fill="#4F46E5" />
-      </BarChart>
+      <ResponsiveContainer width="100%" height={300}>
+        <BarChart data={data}>
+          <CartesianGrid strokeDasharray="3 3" />
+          <XAxis dataKey="department" />
+          <YAxis />
+          <Tooltip />
+          <Bar dataKey="contracts" fill="#4F46E5" />
+        </BarChart>
+      </ResponsiveContainer>
     </div>
   );
 }

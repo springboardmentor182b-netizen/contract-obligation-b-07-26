@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field, field_validator
 from typing import List
 from src.database.core import get_connection
+from src.dashboard.controller import router as dashboard_router
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
@@ -12,6 +13,8 @@ app = FastAPI(
     title="Contract Obligation API", 
     version="1.0.0"
 )
+
+app.include_router(dashboard_router)
 
 # Configure CORS
 app.add_middleware(
