@@ -1,0 +1,97 @@
+.status-card{
+
+    width:100%;
+
+}
+
+.status-card h3{
+
+    font-size:24px;
+
+    margin-bottom:30px;
+
+    color:#0F172A;
+
+}
+
+.status-body{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    gap:35px;
+
+}
+
+.status-chart{
+
+    width:48%;
+
+    height:260px;
+
+}
+
+.status-legend{
+
+    width:52%;
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:18px;
+
+}
+
+.legend-row{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+}
+
+.legend-left{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    color:#374151;
+
+    font-size:16px;
+
+}
+
+.legend-dot{
+
+    width:12px;
+
+    height:12px;
+
+    border-radius:50%;
+
+}
+
+.legend-right{
+
+    display:flex;
+
+    gap:25px;
+
+    color:#64748B;
+
+    font-weight:600;
+
+    min-width:80px;
+
+    justify-content:flex-end;
+
+}
