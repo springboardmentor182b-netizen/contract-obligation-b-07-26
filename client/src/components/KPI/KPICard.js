@@ -1,4 +1,3 @@
-import { DocumentTextIcon, ClockIcon, ClipboardDocumentCheckIcon, CheckCircleIcon, ExclamationCircleIcon, ExclamationTriangleIcon, ShieldCheckIcon } from "@heroicons/react/24/outline";
 import "./KPICard.css";
 import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
 function KPICard({ title, value, badge, icon }) {

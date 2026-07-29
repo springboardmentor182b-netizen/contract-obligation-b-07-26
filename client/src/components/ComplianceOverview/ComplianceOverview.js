@@ -13,7 +13,7 @@ function ComplianceOverview() {
 	useEffect(() => {
 		loadCompliance();
 	}, []);
-	const loadCompliance = async () => {
+	async function loadCompliance() {
 		try {
 			const data = await getCompliance();
 			setComplianceData(data);
@@ -23,8 +23,8 @@ function ComplianceOverview() {
 		} finally {
 			setLoading(false);
 		}
-	};
-	// ===========================
+	}
+	// ==========================
 	// Calculations
 	// ===========================
 	const totalRecords = complianceData.length;

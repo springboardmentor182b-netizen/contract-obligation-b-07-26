@@ -18,7 +18,7 @@ function ComplianceDashboard() {
 	useEffect(() => {
 		loadKPIs();
 	}, []);
-	const loadKPIs = async () => {
+	async function loadKPIs() {
 		try {
 			const data = await getDashboardKPIs();
 			setKpis(data);
@@ -27,7 +27,7 @@ function ComplianceDashboard() {
 		} finally {
 			setLoading(false);
 		}
-	};
+	}
 	if (loading) {
 		return /* @__PURE__ */ _jsx("h2", { children: "Loading Dashboard..." });
 	}

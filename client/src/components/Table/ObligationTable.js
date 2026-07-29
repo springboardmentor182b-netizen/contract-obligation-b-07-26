@@ -12,7 +12,7 @@ function ObligationTable({ search, status, priority }) {
 	useEffect(() => {
 		loadData();
 	}, []);
-	const loadData = () => {
+	function loadData() {
 		setLoading(true);
 		getObligations().then((data) => {
 			setObligations(data);

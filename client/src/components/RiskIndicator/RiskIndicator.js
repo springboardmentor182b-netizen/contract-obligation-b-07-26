@@ -15,7 +15,7 @@ function RiskIndicator() {
 	useEffect(() => {
 		loadRisks();
 	}, []);
-	const loadRisks = async () => {
+	async function loadRisks() {
 		try {
 			const data = await getRisks();
 			setRisks(data);
@@ -25,8 +25,8 @@ function RiskIndicator() {
 		} finally {
 			setLoading(false);
 		}
-	};
-	// ===============================
+	}
+	// ==========================
 	// KPI Calculations
 	// ===============================
 	const openRisks = risks.filter((risk) => risk.status !== "Resolved").length;

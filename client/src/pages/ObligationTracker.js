@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import BASE_URL, { getObligations } from "../api/api";
 import "./ObligationTracker.css";
 import Header from "../components/Header/Header";

@@ -10,7 +10,7 @@ function ComplianceHistory() {
 	useEffect(() => {
 		loadHistory();
 	}, []);
-	const loadHistory = async () => {
+	async function loadHistory() {
 		try {
 			const data = await getHistory();
 			setHistoryData(data);
@@ -20,7 +20,7 @@ function ComplianceHistory() {
 		} finally {
 			setLoading(false);
 		}
-	};
+	}
 	if (loading) {
 		return /* @__PURE__ */ _jsx("h2", { children: "Loading..." });
 	}

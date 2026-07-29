@@ -13,7 +13,7 @@ function AuditSummary() {
 	useEffect(() => {
 		loadAudits();
 	}, []);
-	const loadAudits = async () => {
+	async function loadAudits() {
 		try {
 			const data = await getAudits();
 			setAuditData(data);
@@ -23,7 +23,7 @@ function AuditSummary() {
 		} finally {
 			setLoading(false);
 		}
-	};
+	}
 	// ==========================
 	// KPI Calculations
 	// ==========================

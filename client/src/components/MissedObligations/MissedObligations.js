@@ -13,7 +13,7 @@ function MissedObligations() {
 	useEffect(() => {
 		loadObligations();
 	}, []);
-	const loadObligations = async () => {
+	async function loadObligations() {
 		try {
 			const data = await getMissedObligations();
 			setObligations(data);
@@ -23,8 +23,8 @@ function MissedObligations() {
 		} finally {
 			setLoading(false);
 		}
-	};
-	// ===========================
+	}
+	// ==========================
 	// KPI Calculations
 	// ===========================
 	const totalMissed = obligations.length;
