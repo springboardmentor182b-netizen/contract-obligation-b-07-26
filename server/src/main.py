@@ -32,6 +32,11 @@ from .schemas import (
 )
 from .storage import store
 from fastapi import FastAPI
+from app.config.database import Base, engine
+from app.routers.obligation_routers import router as obligation_router
+from app.routers.dashboard_routers import router as dashboard_router
+from app.models.obligation import Obligation
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="ContractIQ: Contract Obligation Tracking API",
@@ -46,7 +51,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
+app.include_router(obligation_router)
+app.include_router(dashboard_router)
 @app.on_event("startup")
 def startup() -> None:
     initialize_database()
@@ -400,7 +406,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config.database import Base, engine
 
-# Import Models
+Import Models
 from app.models import compliance
 from app.models import audit
 from app.models import report
@@ -409,7 +415,7 @@ from app.models import risk
 from app.models import missed_obligation
 
 
-# Import Routes
+Import Routes
 from app.routes import compliance
 from app.routes import audit
 from app.routes import report
