@@ -1,5 +1,7 @@
-from fastapi import APIRouter, HTTPException, Response, status
+from fastapi import APIRouter, Depends, HTTPException, Response, status
+from sqlalchemy.orm import Session
 
+from app.database import get_db
 from app.schemas.obligation import (
     ObligationCreate,
     ObligationResponse,
@@ -7,17 +9,21 @@ from app.schemas.obligation import (
 )
 from app.services.obligation_service import obligation_service
 
+
 router = APIRouter()
 
 
 @router.get("", response_model=list[ObligationResponse])
-def list_obligations():
-    return obligation_service.list_all()
+def list_obligations(db: Session = Depends(get_db)):
+    return obligation_service.list_all(db)
 
 
 @router.get("/{obligation_id}", response_model=ObligationResponse)
-def get_obligation(obligation_id: str):
-    obligation = obligation_service.get_by_id(obligation_id)
+def get_obligation(
+    obligation_id: int,
+    db: Session = Depends(get_db),
+):
+    obligation = obligation_service.get_by_id(db, obligation_id)
 
     if obligation is None:
         raise HTTPException(
@@ -33,16 +39,20 @@ def get_obligation(obligation_id: str):
     response_model=ObligationResponse,
     status_code=status.HTTP_201_CREATED,
 )
-def create_obligation(payload: ObligationCreate):
-    return obligation_service.create(payload)
+def create_obligation(
+    payload: ObligationCreate,
+    db: Session = Depends(get_db),
+):
+    return obligation_service.create(db, payload)
 
 
 @router.put("/{obligation_id}", response_model=ObligationResponse)
 def update_obligation(
-    obligation_id: str,
+    obligation_id: int,
     payload: ObligationUpdate,
+    db: Session = Depends(get_db),
 ):
-    obligation = obligation_service.update(obligation_id, payload)
+    obligation = obligation_service.update(db, obligation_id, payload)
 
     if obligation is None:
         raise HTTPException(
@@ -53,9 +63,15 @@ def update_obligation(
     return obligation
 
 
-@router.delete("/{obligation_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_obligation(obligation_id: str):
-    deleted = obligation_service.delete(obligation_id)
+@router.delete(
+    "/{obligation_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+def delete_obligation(
+    obligation_id: int,
+    db: Session = Depends(get_db),
+):
+    deleted = obligation_service.delete(db, obligation_id)
 
     if not deleted:
         raise HTTPException(

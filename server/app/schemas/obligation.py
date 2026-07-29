@@ -26,4 +26,7 @@ class ObligationUpdate(ObligationBase):
 
 
 class ObligationResponse(ObligationBase):
-    id: str
+    id: int
+
+    class Config:
+        from_attributes = True

@@ -1,132 +1,60 @@
-from app.schemas.obligation import (
-    ObligationCreate,
-    ObligationResponse,
-    ObligationUpdate,
-)
+from sqlalchemy.orm import Session
+
+from app.models.obligation import Obligation
+from app.schemas.obligation import ObligationCreate, ObligationUpdate
 
 
 class ObligationService:
-    def __init__(self):
-        self._items = [
-            {
-                "id": "OBL-001",
-                "obligation": "Quarterly Performance Report",
-                "contract": "Enterprise SaaS",
-                "priority": "High",
-                "status": "Pending",
-                "due_date": "2026-07-15",
-                "owner": "P. Nair",
-                "progress": 60,
-            },
-            {
-                "id": "OBL-002",
-                "obligation": "Security Audit Submission",
-                "contract": "Data Processing",
-                "priority": "High",
-                "status": "Overdue",
-                "due_date": "2026-06-30",
-                "owner": "S. Reinholt",
-                "progress": 25,
-            },
-            {
-                "id": "OBL-003",
-                "obligation": "Insurance Certificate Renewal",
-                "contract": "Vendor Contract",
-                "priority": "Medium",
-                "status": "Completed",
-                "due_date": "2026-07-01",
-                "owner": "D. Okafor",
-                "progress": 100,
-            },
-            {
-                "id": "OBL-004",
-                "obligation": "Monthly Usage Report",
-                "contract": "Software License",
-                "priority": "Low",
-                "status": "Pending",
-                "due_date": "2026-07-31",
-                "owner": "M. Delgado",
-                "progress": 40,
-            },
-            {
-                "id": "OBL-005",
-                "obligation": "SLA Compliance Review",
-                "contract": "IT Infrastructure",
-                "priority": "High",
-                "status": "Pending",
-                "due_date": "2026-08-05",
-                "owner": "J. Whitfield",
-                "progress": 15,
-            },
-            {
-                "id": "OBL-006",
-                "obligation": "Marketing Budget Reconciliation",
-                "contract": "Marketing Pship",
-                "priority": "Medium",
-                "status": "Completed",
-                "due_date": "2026-06-28",
-                "owner": "T. Essien",
-                "progress": 100,
-            },
-        ]
+    def list_all(self, db: Session):
+        return db.query(Obligation).order_by(Obligation.id).all()
 
-    def list_all(self):
-        return [ObligationResponse(**item) for item in self._items]
-
-    def get_by_id(self, obligation_id):
-        item = next(
-            (item for item in self._items if item["id"] == obligation_id),
-            None,
+    def get_by_id(self, db: Session, obligation_id: int):
+        return (
+            db.query(Obligation)
+            .filter(Obligation.id == obligation_id)
+            .first()
         )
 
-        if item is None:
-            return None
+    def create(self, db: Session, payload: ObligationCreate):
+        obligation = Obligation(**payload.model_dump())
 
-        return ObligationResponse(**item)
+        db.add(obligation)
+        db.commit()
+        db.refresh(obligation)
 
-    def create(self, payload: ObligationCreate):
-        numeric_ids = [
-            int(item["id"].split("-")[1])
-            for item in self._items
-        ]
-
-        next_number = max(numeric_ids, default=0) + 1
-
-        item = {
-            "id": f"OBL-{next_number:03d}",
-            **payload.model_dump(mode="json"),
-        }
-
-        self._items.append(item)
-        return ObligationResponse(**item)
+        return obligation
 
     def update(
         self,
-        obligation_id: str,
+        db: Session,
+        obligation_id: int,
         payload: ObligationUpdate,
     ):
-        for index, item in enumerate(self._items):
-            if item["id"] == obligation_id:
-                updated_item = {
-                    "id": obligation_id,
-                    **payload.model_dump(mode="json"),
-                }
+        obligation = self.get_by_id(db, obligation_id)
 
-                self._items[index] = updated_item
-                return ObligationResponse(**updated_item)
+        if obligation is None:
+            return None
 
-        return None
+        update_data = payload.model_dump(exclude_unset=True)
 
-    def delete(self, obligation_id):
-        original_length = len(self._items)
+        for field, value in update_data.items():
+            setattr(obligation, field, value)
 
-        self._items = [
-            item
-            for item in self._items
-            if item["id"] != obligation_id
-        ]
+        db.commit()
+        db.refresh(obligation)
 
-        return len(self._items) < original_length
+        return obligation
+
+    def delete(self, db: Session, obligation_id: int):
+        obligation = self.get_by_id(db, obligation_id)
+
+        if obligation is None:
+            return False
+
+        db.delete(obligation)
+        db.commit()
+
+        return True
 
 
 obligation_service = ObligationService()
