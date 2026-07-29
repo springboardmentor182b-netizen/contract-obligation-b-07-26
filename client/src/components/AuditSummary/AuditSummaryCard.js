@@ -1,94 +1,37 @@
 import "./AuditSummaryCard.css";
-
-function AuditSummaryCard({
-
-    title,
-
-    value,
-
-    subtitle,
-
-    badge,
-
-    icon,
-
-    iconBg,
-
-    badgeBg,
-
-    badgeColor,
-
-}) {
-
-    return (
-
-        <div className="audit-summary-card">
-
-            {/* Top Section */}
-
-            <div className="audit-card-top">
-
-                <div
-                    className="audit-card-icon"
-                    style={{
-                        background: iconBg
-                    }}
-                >
-
-                    {icon}
-
-                </div>
-
-                {
-
-                    badge && (
-
-                        <span
-                            className="audit-card-badge"
-                            style={{
-                                background: badgeBg,
-                                color: badgeColor,
-                            }}
-                        >
-
-                            {badge}
-
-                        </span>
-
-                    )
-
-                }
-
-            </div>
-
-            {/* Value */}
-
-            <h2 className="audit-card-value">
-
-                {value}
-
-            </h2>
-
-            {/* Title */}
-
-            <h4 className="audit-card-title">
-
-                {title}
-
-            </h4>
-
-            {/* Subtitle */}
-
-            <p className="audit-card-subtitle">
-
-                {subtitle}
-
-            </p>
-
-        </div>
-
-    );
-
+import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+function AuditSummaryCard({ title, value, subtitle, badge, icon, iconBg, badgeBg, badgeColor }) {
+	return /* @__PURE__ */ _jsxs("div", {
+		className: "audit-summary-card",
+		children: [
+			/* @__PURE__ */ _jsxs("div", {
+				className: "audit-card-top",
+				children: [/* @__PURE__ */ _jsx("div", {
+					className: "audit-card-icon",
+					style: { background: iconBg },
+					children: icon
+				}), badge && /* @__PURE__ */ _jsx("span", {
+					className: "audit-card-badge",
+					style: {
+						background: badgeBg,
+						color: badgeColor
+					},
+					children: badge
+				})]
+			}),
+			/* @__PURE__ */ _jsx("h2", {
+				className: "audit-card-value",
+				children: value
+			}),
+			/* @__PURE__ */ _jsx("h4", {
+				className: "audit-card-title",
+				children: title
+			}),
+			/* @__PURE__ */ _jsx("p", {
+				className: "audit-card-subtitle",
+				children: subtitle
+			})
+		]
+	});
 }
-
 export default AuditSummaryCard;

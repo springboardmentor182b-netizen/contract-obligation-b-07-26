@@ -1,6 +1,4 @@
-import CONFIG from "../config/config";
-
-const BASE_URL = CONFIG.BASE_URL;
+const BASE_URL = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
 
 export default BASE_URL;
 
@@ -23,6 +21,8 @@ export async function createObligation(data) {
     return response.json();
 }
 
+export const addObligation = createObligation;
+
 // Update
 export async function updateObligation(id, data) {
     const response = await fetch(`${BASE_URL}/obligations/${id}`, {
@@ -35,8 +35,6 @@ export async function updateObligation(id, data) {
 
     return response.json();
 }
-
-import BASE_URL from "./config";
 
 // ==========================
 // GET

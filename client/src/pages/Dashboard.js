@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import ObligationTracker from "./ObligationTracker";
 import { jsx as _jsx, jsxs as _jsxs, Fragment as _Fragment } from "react/jsx-runtime";
 const API_BASE_URL = "http://127.0.0.1:8000";
 const reportMetricConfig = [
@@ -123,8 +124,9 @@ export function Dashboard({ userRole }) {
 	const [reports, setReports] = useState([]);
 	const [reportsStatus, setReportsStatus] = useState("idle");
 	const isReportsView = activeView === "Reports";
-	const pageTitle = isReportsView ? "Reports Dashboard" : "Dashboard";
-	const breadcrumb = isReportsView ? "Reports" : "Dashboard";
+	const isObligationsView = activeView === "Obligations";
+	const pageTitle = isReportsView ? "Reports Dashboard" : isObligationsView ? "Obligations" : "Dashboard";
+	const breadcrumb = isReportsView ? "Reports" : isObligationsView ? "Obligations" : "Dashboard";
 	const profileName = currentUser?.name || currentUser?.email || "";
 	const profileInitials = getInitials(profileName);
 	const profileRole = currentUser?.role || userRole || "";
@@ -370,7 +372,7 @@ export function Dashboard({ userRole }) {
 							}, item.label))
 						})]
 					})
-				] }) : null]
+				] }) : isObligationsView ? /* @__PURE__ */ _jsx(ObligationTracker, {}) : null]
 			})]
 		})]
 	});
