@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
-import BASE_URL from "../api/api";
+import BASE_URL, { getObligations } from "../api/api";
 import "./ObligationTracker.css";
-import { getObligations } from "../api/api";
 import Header from "../components/Header/Header";
 import KPICard from "../components/KPI/KPICard";
 import SearchFilters from "../components/SearchFilters/SearchFilters";
