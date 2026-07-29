@@ -1,0 +1,42 @@
+{
+  "navigationItems": [
+    {
+      "id": "home",
+      "label": "Home",
+      "path": "/",
+      "icon": "home"
+    },
+    {
+      "id": "contracts",
+      "label": "Contracts",
+      "path": "/contracts",
+      "icon": "document"
+    },
+    {
+      "id": "obligations",
+      "label": "Obligations",
+      "path": "/obligations",
+      "icon": "checklist"
+    },
+    {
+      "id": "reports",
+      "label": "Reports",
+      "path": "/reports",
+      "icon": "chart"
+    },
+    {
+      "id": "settings",
+      "label": "Settings",
+      "path": "/settings",
+      "icon": "settings"
+    }
+  ],
+  "roleBasedAccess": {
+    "Administrator": ["home", "contracts", "obligations", "reports", "settings"],
+    "Legal Manager": ["home", "contracts", "obligations", "reports"],
+    "Compliance Officer": ["home", "contracts", "obligations", "reports"],
+    "Contract Manager": ["home", "contracts", "obligations"],
+    "Department Head": ["home", "contracts", "reports"],
+    "Employee": ["home", "contracts"]
+  }
+}
