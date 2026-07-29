@@ -23,6 +23,11 @@ function Toggle({ checked, onChange, label, description }) {
   );
 }
 
+/**
+ * @param {object} preferences - see settingsApi.getNotificationPreferences() shape
+ * @param {(payload) => Promise<void>} onSave
+ * @param {boolean} saving
+ */
 export default function NotificationPreferences({ preferences, onSave, saving }) {
   const [form, setForm] = useState(null);
   const [error, setError] = useState(null);
@@ -57,13 +62,44 @@ export default function NotificationPreferences({ preferences, onSave, saving })
       </div>
 
       <div>
-        <Toggle checked={form.emailEnabled} onChange={() => toggle('emailEnabled')} label="Email notifications" description="Receive updates via email" />
-        <Toggle checked={form.smsEnabled} onChange={() => toggle('smsEnabled')} label="SMS notifications" description="Receive urgent alerts via text message" />
-        <Toggle checked={form.inAppEnabled} onChange={() => toggle('inAppEnabled')} label="In-app notifications" description="Show notifications inside ContractIQ" />
-        <Toggle checked={form.renewalReminders} onChange={() => toggle('renewalReminders')} label="Renewal reminders" />
-        <Toggle checked={form.obligationAlerts} onChange={() => toggle('obligationAlerts')} label="Obligation due alerts" />
-        <Toggle checked={form.complianceAlerts} onChange={() => toggle('complianceAlerts')} label="Compliance alerts" />
-        <Toggle checked={form.approvalAlerts} onChange={() => toggle('approvalAlerts')} label="Contract approval alerts" />
+        <Toggle
+          checked={form.emailEnabled}
+          onChange={() => toggle('emailEnabled')}
+          label="Email notifications"
+          description="Receive updates via email"
+        />
+        <Toggle
+          checked={form.smsEnabled}
+          onChange={() => toggle('smsEnabled')}
+          label="SMS notifications"
+          description="Receive urgent alerts via text message"
+        />
+        <Toggle
+          checked={form.inAppEnabled}
+          onChange={() => toggle('inAppEnabled')}
+          label="In-app notifications"
+          description="Show notifications inside ContractIQ"
+        />
+        <Toggle
+          checked={form.renewalReminders}
+          onChange={() => toggle('renewalReminders')}
+          label="Renewal reminders"
+        />
+        <Toggle
+          checked={form.obligationAlerts}
+          onChange={() => toggle('obligationAlerts')}
+          label="Obligation due alerts"
+        />
+        <Toggle
+          checked={form.complianceAlerts}
+          onChange={() => toggle('complianceAlerts')}
+          label="Compliance alerts"
+        />
+        <Toggle
+          checked={form.approvalAlerts}
+          onChange={() => toggle('approvalAlerts')}
+          label="Contract approval alerts"
+        />
       </div>
 
       {error && <p className="text-xs text-red-600 mt-3">{error}</p>}

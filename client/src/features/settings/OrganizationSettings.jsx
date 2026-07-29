@@ -4,6 +4,11 @@ import { Loader2 } from 'lucide-react';
 const TIMEZONES = ['UTC', 'Asia/Kolkata', 'America/New_York', 'Europe/London', 'Asia/Singapore'];
 const CURRENCIES = ['USD', 'INR', 'EUR', 'GBP'];
 
+/**
+ * @param {object} organization - { name, timezone, defaultCurrency }
+ * @param {(payload) => Promise<void>} onSave
+ * @param {boolean} saving
+ */
 export default function OrganizationSettings({ organization, onSave, saving }) {
   const [form, setForm] = useState({ name: '', timezone: TIMEZONES[0], defaultCurrency: CURRENCIES[0] });
   const [error, setError] = useState(null);
@@ -50,7 +55,9 @@ export default function OrganizationSettings({ organization, onSave, saving }) {
           className="w-full mt-1 px-3 py-2 text-sm border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           {TIMEZONES.map((tz) => (
-            <option key={tz} value={tz}>{tz}</option>
+            <option key={tz} value={tz}>
+              {tz}
+            </option>
           ))}
         </select>
       </div>
@@ -63,7 +70,9 @@ export default function OrganizationSettings({ organization, onSave, saving }) {
           className="w-full mt-1 px-3 py-2 text-sm border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           {CURRENCIES.map((c) => (
-            <option key={c} value={c}>{c}</option>
+            <option key={c} value={c}>
+              {c}
+            </option>
           ))}
         </select>
       </div>
