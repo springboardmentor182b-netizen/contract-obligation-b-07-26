@@ -234,5 +234,86 @@ Swagger UI
 http://127.0.0.1:8000/docs
 ```
 
+# Compliance Dashboard - Server
 
+<<<<<<< HEAD
 This starter uses `server/data/contractiq.json` for local persistence so it can run with the packages already present in the project virtual environment. The module boundaries are intentionally close to a future PostgreSQL/SQLAlchemy migration.
+=======
+## Overview
+
+This project provides the backend REST APIs for the Compliance Monitoring Dashboard.
+
+## Tech Stack
+
+- FastAPI
+- SQLAlchemy
+- PostgreSQL
+- Pydantic
+- Uvicorn
+
+## Modules
+
+- Compliance
+- Audit
+- Reports
+- History
+- Risk
+- Missed Obligations
+
+## Installation
+
+Create Virtual Environment
+
+```bash
+python -m venv venv
+```
+
+Activate
+
+Windows
+
+```bash
+venv\Scripts\activate
+```
+
+Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+## Run Server
+
+```bash
+uvicorn app.main:app --reload
+```
+
+Server URL
+
+```
+http://127.0.0.1:8000
+```
+
+Swagger Documentation
+
+```
+http://127.0.0.1:8000/docs
+```
+
+## Database
+
+Database
+
+```
+PostgreSQL
+```
+
+Tables
+
+- compliance
+- audit
+- report
+- history
+- risk
+- missed_obligation
+>>>>>>> 2de895e060763dca44da81c5888f3a8f8a7256e3
