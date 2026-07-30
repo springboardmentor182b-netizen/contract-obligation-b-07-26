@@ -33,7 +33,10 @@ from .schemas import (
     UserPublic,
 )
 from .storage import store
-
+from .database import Base, engine
+from .routers.obligation_routers import router as obligation_router
+from .models.obligation import Obligation
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title="ContractIQ: Contract Obligation Tracking API",
@@ -54,6 +57,7 @@ def startup() -> None:
     initialize_database()
 
 app.include_router(dashboard_router)
+app.include_router(obligation_router)
 
 
 def public_user(user: dict[str, Any]) -> dict[str, Any]:
