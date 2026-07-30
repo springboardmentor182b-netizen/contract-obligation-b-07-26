@@ -109,9 +109,9 @@ function Dashboard() {
 
           <ContractGrowth/>
 
-          <ContractsByDepartment/>
-
           <ContractStatus/>
+
+          <ContractsByDepartment/>
 
           <ComplianceLevels />
 
@@ -121,7 +121,25 @@ function Dashboard() {
 
           <UpcomingRenewals />
 
-          <ComplianceSummary/>
+          <ComplianceSummary />
+          <div className="dashboard-footer">
+            <div className="footer-left">
+              ©️ 2024 ContractIQ - Nexora Group. All rights reserved.
+            </div>
+            <div className="footer-center">
+              v4.2.1
+            </div>
+            <div className="footer-right">
+              <a href="#">Privacy Policy</a>
+              <a href="#">Terms of Service</a>
+              <a href="#">Support</a>
+            </div>
+            <div className="help-button">
+              ?
+              <span className="help-tooltip">Need Help?</span>
+            </div>
+          </div>
+
         </div>
 
         <div className="right-column">

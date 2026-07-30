@@ -49,7 +49,7 @@ function ComplianceLevels() {
         </div>
       </div>
 
-      <div className="compliance-content">
+      <div className="compliance-content horizontal">
         <div className="pie-chart">
           <ResponsiveContainer width="100%" height={180}>
             <PieChart>

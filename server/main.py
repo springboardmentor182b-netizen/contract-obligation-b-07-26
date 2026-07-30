@@ -4,10 +4,6 @@ from pydantic import BaseModel, Field, field_validator
 from typing import List
 from src.database.core import get_connection
 from src.dashboard.controller import router as dashboard_router
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
-from typing import List
 
 app = FastAPI(
     title="Contract Obligation API", 
@@ -57,19 +53,6 @@ class Obligation(BaseModel):
             raise ValueError("Status must be Pending, In Progress or Completed")
         return value
 
-
-# obligations: List[Obligation] = [
-#     Obligation(
-#         id="OBL-001",
-#         obligation="Review Vendor Contract",
-#         contract="Vendor Agreement",
-#         owner="John Smith",
-#         priority="High",
-#         status="Pending",
-#         dueDate="2026-07-20",
-#         description="Review legal clauses",
-#     )
-# ]
 
 
 @app.get("/obligations")

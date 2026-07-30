@@ -11,20 +11,15 @@ import {
 } from "recharts";
 
 function ContractsByDepartment() {
-  console.log("ContractsByDepartment rendered");
 
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    console.log("useEffect started");
 
     async function fetchDepartments() {
-      console.log("Fetching department data...");
 
       try {
         const response = await getContractsByDepartment();
-
-        console.log("API Response:", response);
 
         setData(response);
       } catch (error) {
@@ -43,15 +38,21 @@ function ContractsByDepartment() {
         borderRadius: "12px",
       }}
     >
-      <h2>Contracts by Department</h2>
+      <div className="chart-title">
+      <h3>Contracts by Department</h3>
+      <span>Active contracts by business unit</span>
+      </div>
 
-      <ResponsiveContainer width="100%" height={300}>
+      <ResponsiveContainer width="100%" height={240}>
         <BarChart data={data}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="department" />
+          <CartesianGrid
+           vertical={false}
+           stroke="#F1F5F9"
+          />
+          <XAxis dataKey="department" tick={{fill:"#374151", fontSize:13}} />
           <YAxis />
           <Tooltip />
-          <Bar dataKey="contracts" fill="#4F46E5" />
+          <Bar dataKey="compliance" fill="#F59E0B" radius={[6,6,0,0]} barSize={97} />
         </BarChart>
       </ResponsiveContainer>
     </div>
