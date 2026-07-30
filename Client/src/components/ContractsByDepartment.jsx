@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+import { getContractsByDepartment } from "../api/dashboardApi";
 import {
   ResponsiveContainer,
   BarChart,
@@ -7,65 +9,52 @@ import {
   CartesianGrid,
   Tooltip,
 } from "recharts";
-import { useEffect,useState } from "react";
-import { getContractsByDepartment } from "../api/dashboardApi";
 
 function ContractsByDepartment() {
-  const[data, setData] = useState([]);
+
+  const [data, setData] = useState([]);
 
   useEffect(() => {
-    async function fetchDepartments(){
-      try{
+
+    async function fetchDepartments() {
+
+      try {
         const response = await getContractsByDepartment();
+
         setData(response);
-      } catch (error){
-        console.error("Error fetching contracts by department:",error);
+      } catch (error) {
+        console.error(error);
       }
     }
+
     fetchDepartments();
-  },[]);
+  }, []);
+
   return (
-    <div 
-      className="compliance-card"
-      style={{paddingTop:"12px", paddingBottom:"12px"}}
+    <div
+      style={{
+        background: "#fff",
+        padding: "20px",
+        borderRadius: "12px",
+      }}
     >
-
-      <div className="chart-header">
-        <div>
-          <h2>Contracts by Department</h2>
-          <p>Active contracts by business unit</p>
-        </div>
-
+      <div className="chart-title">
+      <h3>Contracts by Department</h3>
+      <span>Active contracts by business unit</span>
       </div>
 
-      <div className="chart-container">
-        <ResponsiveContainer width="100%" height={220}>
-          <BarChart data={data}>
-            <CartesianGrid strokeDasharray="3 3" vertical={false} horizontal={false} />
-
-            <XAxis
-            dataKey="department"
-            axisLine={false}
-            tickLine={false} 
-            />
-
-            <YAxis
-             domain={[0, 60]} 
-             axisLine={false}
-             tickLine={false}
-             tickMargin={10}/>
-
-            <Tooltip />
-
-            <Bar
-              dataKey="compliance"
-              fill="#F59E0B"
-              radius={[8, 8, 0, 0]}
-            />
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
-
+      <ResponsiveContainer width="100%" height={240}>
+        <BarChart data={data}>
+          <CartesianGrid
+           vertical={false}
+           stroke="#F1F5F9"
+          />
+          <XAxis dataKey="department" tick={{fill:"#374151", fontSize:13}} />
+          <YAxis />
+          <Tooltip />
+          <Bar dataKey="compliance" fill="#F59E0B" radius={[6,6,0,0]} barSize={97} />
+        </BarChart>
+      </ResponsiveContainer>
     </div>
   );
 }

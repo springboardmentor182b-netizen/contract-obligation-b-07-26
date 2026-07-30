@@ -13,6 +13,7 @@ import {getContractGrowth} from "../api/dashboardApi";
 
 export default function ContractGrowth() {
   const[data, setData]=useState([]);
+  const currentYear = new Date().getFullYear();
 
   useEffect(()=>{
     async function fetchGrowth(){
@@ -31,12 +32,12 @@ export default function ContractGrowth() {
       <div className="contract-growth-header">
         <div>
           <h2>Contract Growth</h2>
-          <p>Total vs. active — 2024</p>
+          <p>Total vs. active — {currentYear}</p>
         </div>
 
         <div className="year-filter">
           <FaCalendarAlt />
-          <span>2024</span>
+          <span>{currentYear}</span>
         </div>
       </div>
 
