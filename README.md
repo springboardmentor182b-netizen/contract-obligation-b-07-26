@@ -1,101 +1,73 @@
 # ContractIQ — Auth Module
 
-Contract Obligation Tracking & Compliance Management Platform.  
-This document covers **how to run** the authentication module (Login + Registration).
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
----
+## Available Scripts
 
-## Prerequisites
+In the project directory, you can run:
 
-| Tool | Version |
-|------|---------|
-| Python | 3.11+ |
-| PostgreSQL | 14+ |
-| Node.js | 18+ |
-| npm | 9+ |
+### `npm start`
 
----
+Runs the app in the development mode.\
+Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
-## 1 — Backend (FastAPI)
+The page will reload when you make changes.\
+You may also see any lint errors in the console.
 
-### 1.1 Create & activate a virtual environment
+### `npm test`
 
-```bash
-cd backend
-python -m venv venv
+Launches the test runner in the interactive watch mode.\
+See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-# Windows
-venv\Scripts\activate
+### `npm run build`
 
-# macOS / Linux
-source venv/bin/activate
-```
+Builds the app for production to the `build` folder.\
+It correctly bundles React in production mode and optimizes the build for the best performance.
 
-### 1.2 Install dependencies
+The build is minified and the filenames include the hashes.\
+Your app is ready to be deployed!
 
-```bash
-pip install -r requirements.txt
-```
+See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-### 1.3 Set up PostgreSQL
+### `npm run eject`
 
-Create the database (run in psql or pgAdmin):
+**Note: this is a one-way operation. Once you `eject`, you can't go back!**
 
-```sql
-CREATE DATABASE contractiq;
-```
+If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
 
-### 1.4 Configure environment variables
+Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
 
-Copy the example file and update the values:
+You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
 
-```bash
-cp .env.example .env
-```
+## Learn More
 
-Edit `backend/.env`:
+You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
-```env
-DATABASE_URL=postgresql://postgres:YOUR_PASSWORD@localhost:5432/contractiq
-SECRET_KEY=your-super-secret-key-min-32-characters-long
-ALGORITHM=HS256
-ACCESS_TOKEN_EXPIRE_MINUTES=30
-REFRESH_TOKEN_EXPIRE_DAYS=7
-```
+To learn React, check out the [React documentation](https://reactjs.org/).
 
-### 1.5 Run database migrations
+### Code Splitting
 
-```bash
-# Generate the initial migration
-alembic revision --autogenerate -m "create users table"
+This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
 
-# Apply it
-alembic upgrade head
-```
+### Analyzing the Bundle Size
 
-### 1.6 Start the API server
+This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
 
-```bash
-uvicorn app.main:app --reload --port 8000
-```
+### Making a Progressive Web App
 
-The API is now running at **http://localhost:8000**
+This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
 
-- Swagger UI → http://localhost:8000/api/docs  
-- ReDoc     → http://localhost:8000/api/redoc  
-- Health    → http://localhost:8000/
+### Advanced Configuration
 
----
+This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
 
-## 2 — Frontend (Angular)
+### Deployment
 
-### 2.1 Install dependencies
+This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
 
-```bash
-cd frontend
-npm install
-```
+### `npm run build` fails to minify
 
+<<<<<<< HEAD
 ### 2.2 Start the development server
 
 ```bash
@@ -213,3 +185,6 @@ frontend/src/app/
 ├── app.config.ts       # Angular providers
 └── app.routes.ts       # Top-level routes
 ```
+=======
+This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+>>>>>>> origin/main-group-B

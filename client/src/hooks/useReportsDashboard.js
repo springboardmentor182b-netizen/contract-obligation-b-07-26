@@ -1,11 +1,6 @@
 import { useEffect, useState, useCallback } from 'react';
 import { getReportsSummary, getMonthlyActivity, getReportLibrary } from '../services/reportsApi';
 
-/**
- * Loads everything the Reports Dashboard page needs and exposes a single
- * { data, loading, error, refetch } shape so the page component stays a
- * pure render function.
- */
 export function useReportsDashboard(year = new Date().getFullYear()) {
   const [summary, setSummary] = useState(null);
   const [activity, setActivity] = useState(null);
