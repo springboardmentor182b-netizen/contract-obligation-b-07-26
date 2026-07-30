@@ -289,6 +289,56 @@ def compliance_summary(_: dict[str, Any] = Depends(get_current_user)) -> dict[st
 
     return {"total_obligations": len(obligations), "by_compliance_level": by_level, "overdue_obligations": overdue}
 
+def role_dashboard(role: str) -> dict[str, Any]:
+    dashboards = {
+        Role.administrator.value: {
+            "name": "Admin Dashboard",
+            "features": ["User Management", "Contract Statistics", "System Monitoring", "Activity Logs"],
+        },
+        Role.legal_manager.value: {
+            "name": "Legal Dashboard",
+            "features": ["Active Contracts", "Upcoming Renewals", "Pending Obligations", "Recent Activities"],
+        },
+        Role.compliance_officer.value: {
+            "name": "Compliance Dashboard",
+            "features": ["Compliance Reports", "Missed Deadlines", "Risk Indicators", "Audit Summary"],
+        },
+        Role.contract_manager.value: {
+            "name": "Contract Manager Dashboard",
+            "features": ["Contract Repository", "Approval Workflow", "Version Management", "Assignments"],
+        },
+        Role.department_head.value: {
+            "name": "Department Head Dashboard",
+            "features": ["Department Contracts", "Obligation Ownership", "Renewal Approvals", "Performance"],
+        },
+        Role.employee.value: {
+            "name": "Employee Dashboard",
+            "features": ["Assigned Obligations", "Notifications", "Contract Access", "Profile"],
+        },
+    }
+    return dashboards.get(role, dashboards[Role.employee.value])
+
+
+@app.get("/api/dashboard")
+def dashboard(current_user: dict[str, Any] = Depends(get_current_user)) -> dict[str, Any]:
+    contracts = store.list("contracts")
+    obligations = store.list("obligations")
+    renewals = store.list("renewals")
+    notifications = store.list("notifications")
+    activities = sorted(store.list("activities"), key=lambda item: item["created_at"], reverse=True)[:10]
+
+    return {
+        "active_contracts": sum(1 for item in contracts if item["status"] == ContractStatus.active.value),
+        "upcoming_renewals": sum(1 for item in renewals if item["status"] == RenewalStatus.upcoming.value),
+        "pending_obligations": sum(1 for item in obligations if item["status"] in {ObligationStatus.pending.value, ObligationStatus.in_progress.value}),
+        "unread_notifications": sum(1 for item in notifications if not item.get("read", False)),
+        "compliance": compliance_summary(),
+        "recent_activities": activities,
+        "user": public_user(current_user),
+        "role_dashboard": role_dashboard(current_user["role"]),
+    }
+
+
 @app.get("/api/notifications", response_model=list[APIRecord])
 def list_notifications(current_user: dict[str, Any] = Depends(get_current_user)) -> list[dict[str, Any]]:
     notifications = store.list("notifications")
