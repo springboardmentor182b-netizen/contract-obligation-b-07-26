@@ -236,9 +236,6 @@ http://127.0.0.1:8000/docs
 
 # Compliance Dashboard - Server
 
-<<<<<<< HEAD
-This starter uses `server/data/contractiq.json` for local persistence so it can run with the packages already present in the project virtual environment. The module boundaries are intentionally close to a future PostgreSQL/SQLAlchemy migration.
-=======
 ## Overview
 
 This project provides the backend REST APIs for the Compliance Monitoring Dashboard.
@@ -316,4 +313,3 @@ Tables
 - history
 - risk
 - missed_obligation
->>>>>>> 2de895e060763dca44da81c5888f3a8f8a7256e3

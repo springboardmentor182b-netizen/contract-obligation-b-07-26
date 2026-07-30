@@ -71,11 +71,9 @@ def read_root():
 @app.get("/health")
 def health():
     return {
-<<<<<<< HEAD
         "status": "ok",
         "service": "contractiq-api"
     }
-=======
         "active_contracts": sum(1 for item in contracts if item["status"] == ContractStatus.active.value),
         "upcoming_renewals": sum(1 for item in renewals if item["status"] == RenewalStatus.upcoming.value),
         "pending_obligations": sum(1 for item in obligations if item["status"] in {ObligationStatus.pending.value, ObligationStatus.in_progress.value}),
@@ -210,4 +208,3 @@ def home():
     return {
         "message": "Compliance Monitoring API Running Successfully"
     }
->>>>>>> 2de895e060763dca44da81c5888f3a8f8a7256e3
