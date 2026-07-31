@@ -77,6 +77,18 @@ const Login = () => {
             </li>
           </ul>
 
+          <div className="access-roles-section">
+            <h3>ACCESS ROLES</h3>
+            <div className="role-badges">
+              <span className="role-badge">Administrator</span>
+              <span className="role-badge">Legal Manager</span>
+              <span className="role-badge">Compliance Officer</span>
+              <span className="role-badge">Contract Manager</span>
+              <span className="role-badge">Department Head</span>
+              <span className="role-badge employee">Employee</span>
+            </div>
+          </div>
+
           <div className="figma-footer-info">
             <p>🔒 Secure by JWT · Authentication · RBAC</p>
           </div>
