@@ -1,39 +1,22 @@
-import React from 'react';
-import { BrowserRouter, useLocation } from 'react-router-dom';
-import AppRoutes from './routes';
-import Sidebar from './components/layout/Sidebar';
-import Navbar from './components/layout/Navbar'; 
-import { AuthProvider } from './features/authentication/authContext';
-import { SearchProvider } from './context/SearchContext';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { AnalyticsProvider } from './components/context/AnalyticsContext';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
+import Home from './pages/Home';
 
-function LayoutWrapper() {
-  const location = useLocation();
-  const isAuthPage = ['/login', '/register', '/forgot-password', '/'].includes(location.pathname);
-
+function App() {
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#f8fafc', margin: 0, padding: 0 }}>
-      {!isAuthPage && <Sidebar />}
-      
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-        
-        {!isAuthPage && <Navbar />}
-
-        <main style={{ flex: 1, overflowY: 'auto' }}>
-          <AppRoutes />
-        </main>
-      </div>
-    </div>
+    <AnalyticsProvider>
+      <Router>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/" element={<Home />} />
+          <Route path="*" element={<Navigate to="/login" replace />} />
+        </Routes>
+      </Router>
+    </AnalyticsProvider>
   );
 }
 
-export default function App() {
-  return (
-    <AuthProvider>
-      <SearchProvider>
-        <BrowserRouter>
-          <LayoutWrapper />
-        </BrowserRouter>
-      </SearchProvider>
-    </AuthProvider>
-  );
-}
+export default App;
