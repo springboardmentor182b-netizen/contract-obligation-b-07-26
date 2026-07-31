@@ -1,0 +1,601 @@
+body {
+    font-family: "Inter", sans-serif;
+    background-color: #F7F9FC;
+}
+.sidebar{
+    background:#1E2B3F;
+
+    min-height:100vh;
+
+    padding:28px 20px;
+
+    display:flex;
+    flex-direction:column;
+}
+
+
+.sidebar small {
+    color: #4F8FFF;
+}
+
+.menu-heading {
+    color: #60728C !important;
+    font-size: 12px;
+}
+
+.sidebar-link {
+    color: #9FB0C7;
+    padding: 10px 12px;
+    margin: 2px 0;
+    border-radius: 8px;
+}
+
+.sidebar-link:hover {
+    color: white;
+}
+
+.active-menu {
+    background-color: #2563EB;
+    color: white;
+}
+
+.dashboard-card {
+    background-color: #FFFFFF;
+    border: 1px solid #DCE3EC;
+    border-radius: 14px;
+    box-shadow: 0 4px 10px rgba(15, 31, 56, 0.10);
+    transform: translateY(-4px);
+}
+
+.chart-card {
+    background-color: #FFFFFF;
+    border: 1px solid #DCE3EC;
+    border-radius: 14px;
+    box-shadow: 0 2px 6px rgba(15, 31, 56, 0.06);
+    min-height: 300px;
+    overflow: hidden;
+}
+
+.trend-chart {
+    height: 220px;
+}
+
+.chart-line {
+    height: 120px;
+    border-bottom: 3px solid #16A34A;
+    position: relative;
+    transform: skewY(-3deg);
+}
+
+.chart-point {
+    width: 8px;
+    height: 8px;
+    background-color: #16A34A;
+    border: 2px solid #FFFFFF;
+    border-radius: 50%;
+    position: absolute;
+    bottom: -5px;
+}
+
+.point-1 {
+    left: 0%;
+}
+
+.point-2 {
+    left: 16%;
+}
+
+.point-3 {
+    left: 33%;
+}
+
+.point-4 {
+    left: 50%;
+}
+
+.point-5 {
+    left: 66%;
+}
+
+.point-6 {
+    left: 83%;
+}
+
+.point-7 {
+    right: 0%;
+}
+
+.risk-circle {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    background: conic-gradient(
+        #16A34A 0deg 230deg,
+        #FFFFFF 230deg 234deg,
+        #F59E0B 234deg 315deg,
+        #FFFFFF 315deg 319deg,
+        #EF2B32 319deg 360deg
+    );
+    position: relative;
+}
+
+.risk-circle::after {
+    content: "";
+    width: 60px;
+    height: 60px;
+    background-color: #FFFFFF;
+    border-radius: 50%;
+    position: absolute;
+    top: 25px;
+    left: 25px;
+}
+
+.risk-circle::after {
+    content: "";
+    width: 60px;
+    height: 60px;
+    background-color: #FFFFFF;
+    border-radius: 50%;
+    position: absolute;
+    top: 25px;
+    left: 25px;
+}   /* Line 124 */
+
+
+/* Compliance Register CSS */
+/* इथे मी दिलेला complete CSS paste कर */
+
+
+/* Compliance Register Premium Look */
+.compliance-register {
+    background-color: #FFFFFF;
+    border: 1px solid #DCE3EC;
+    border-radius: 14px;
+    box-shadow: 0 4px 12px rgba(15, 31, 56, 0.10);
+    overflow: hidden;
+    min-height: 450px;
+    margin-top: 20px !important;
+}
+
+.compliance-register > .border-bottom {
+    padding: 18px 20px !important;
+    background-color: #FFFFFF;
+}
+
+.compliance-register h5 {
+    color: #0F1F38;
+    font-size: 17px;
+    font-weight: 700;
+}
+
+.compliance-table {
+    font-size: 14px;
+    margin-bottom: 0;
+}
+
+.compliance-table thead th {
+    background-color: #F7F9FC;
+    color: #5F708A;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    padding: 14px 16px;
+    border-bottom: 1px solid #DCE3EC;
+}
+
+.compliance-table tbody td {
+    color: #5F708A;
+    padding: 14px 16px;
+    vertical-align: middle;
+    border-bottom: 1px solid #EEF2F7;
+    background-color: #FFFFFF;
+}
+
+.compliance-table tbody tr:hover td {
+    background-color: #F9FBFD;
+}
+
+.compliance-table tbody td:nth-child(2) {
+    color: #0F1F38;
+    font-weight: 600;
+}
+
+.risk-low,
+.risk-medium,
+.risk-high,
+.status-compliant,
+.status-risk,
+.status-non-compliant {
+    display: inline-block;
+    padding: 5px 11px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.risk-low,
+.status-compliant {
+    color: #008A3E;
+    background-color: #ECFDF3;
+}
+
+.risk-medium,
+.status-risk {
+    color: #D97706;
+    background-color: #FFF8E7;
+}
+
+.risk-high,
+.status-non-compliant {
+    color: #DC2626;
+    background-color: #FEF0F0;
+}
+
+.score-green {
+    color: #16A34A;
+    font-weight: 600;
+}
+
+.score-orange {
+    color: #F59E0B;
+    font-weight: 600;
+}
+
+.score-red {
+    color: #EF2B32;
+    font-weight: 600;
+}
+
+.compliance-register .btn {
+    color: #0F1F38;
+    background-color: #FFFFFF;
+    border: 1px solid #DCE3EC;
+    border-radius: 10px;
+    font-weight: 600;
+    padding: 9px 18px;
+    box-shadow: 0 1px 3px rgba(15, 31, 56, 0.04);
+}
+
+
+/* ===========================================================
+                NOTIFICATION DASHBOARD CSS
+=========================================================== */
+
+.notification-title{
+    font-size:40px;
+    font-weight:700;
+    color:#0F1F38;
+    margin-bottom:8px;
+}
+
+.notification-subtitle{
+    color:#60728C;
+    font-size:18px;
+}
+
+.mark-read-btn{
+    background:#2563EB;
+    color:#fff;
+    border:none;
+    border-radius:12px;
+    padding:12px 22px;
+    font-weight:600;
+    box-shadow:0 6px 16px rgba(37,99,235,.25);
+}
+
+.mark-read-btn:hover{
+    background:#1D4ED8;
+    color:#fff;
+}
+
+/* ================= Cards ================= */
+
+.notification-card{
+    background:#FFFFFF;
+    border:1px solid #DCE3EC;
+    border-radius:16px;
+    padding:24px;
+    min-height:145px;
+    box-shadow:0 4px 12px rgba(15,31,56,.08);
+    transition:.3s;
+}
+
+.notification-card:hover{
+    transform:translateY(-4px);
+}
+
+.notification-card p{
+    color:#60728C;
+    font-size:13px;
+    font-weight:700;
+    margin-bottom:8px;
+}
+
+.notification-card h1{
+    font-size:54px;
+    font-weight:700;
+    color:#0F1F38;
+    margin-bottom:6px;
+}
+
+.notification-card small{
+    color:#60728C;
+}
+
+.card-icon{
+    width:60px;
+    height:60px;
+    background:#EEF4FF;
+    border-radius:16px;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.card-icon i{
+    font-size:28px;
+    color:#3366FF;
+}
+
+/* ================= Sections ================= */
+
+.activity-section,
+.preference-section{
+
+    background:#FFFFFF;
+    border:1px solid #DCE3EC;
+    border-radius:16px;
+    padding:22px;
+    box-shadow:0 4px 12px rgba(15,31,56,.08);
+}
+
+.section-header{
+
+    border-bottom:1px solid #EEF2F7;
+    padding-bottom:14px;
+    margin-bottom:18px;
+}
+
+.section-header h4{
+
+    font-weight:700;
+    color:#0F1F38;
+}
+
+.section-header p{
+
+    color:#60728C;
+    margin:0;
+}
+
+/* ================= Preference Card ================= */
+
+.preference-card{
+
+    border:1px solid #DCE3EC;
+    border-radius:14px;
+    padding:24px 15px;
+    background:#fff;
+    min-height:180px;
+
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+
+    transition:.3s;
+}
+
+.preference-card:hover{
+
+    transform:translateY(-3px);
+}
+.preference-icon{
+    width:54px;
+    height:54px;
+    background:#EEF4FF;
+    border-radius:16px;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    margin:0 auto 20px;
+}
+
+.preference-icon i{
+    font-size:24px;
+    color:#3366FF;
+}
+
+.preference-card h6{
+
+    font-weight:700;
+    color:#0F1F38;
+}
+
+.preference-card small{
+
+    color:#60728C;
+}
+
+/* ================= Toggle ================= */
+
+.toggle-switch{
+
+    width:48px;
+    height:26px;
+
+    border-radius:30px;
+
+    background:#2563EB;
+
+    position:relative;
+
+    cursor:pointer;
+}
+
+.toggle-switch::after{
+
+    content:"";
+
+    position:absolute;
+
+    top:3px;
+    right:3px;
+
+    width:20px;
+    height:20px;
+
+    border-radius:50%;
+
+    background:white;
+}
+
+.toggle-switch.off{
+
+    background:#D1D5DB;
+}
+
+.toggle-switch.off::after{
+
+    left:3px;
+    right:auto;
+}
+
+/* ================= Activity Chart ================= */
+
+.chart-placeholder{
+
+    height:300px;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:flex-end;
+
+    padding:20px;
+}
+
+.chart-grid{
+
+    width:100%;
+}
+
+.chart-bars{
+
+    height:220px;
+
+    display:flex;
+
+    justify-content:space-around;
+
+    align-items:flex-end;
+
+    gap:14px;
+}
+
+.bar{
+
+    width:42px;
+
+    background:#2563EB;
+
+    border-radius:10px 10px 0 0;
+}
+
+.bar-1{height:70px;}
+.bar-2{height:110px;}
+.bar-3{height:55px;}
+.bar-4{height:150px;}
+.bar-5{height:90px;}
+.bar-6{height:35px;}
+.bar-7{height:50px;}
+
+.chart-labels{
+
+    display:flex;
+
+    justify-content:space-around;
+
+    margin-top:14px;
+
+    color:#60728C;
+
+    font-size:14px;
+
+    font-weight:500;
+}
+
+/* ================= Notification Feed ================= */
+
+.notification-feed{
+    background:#FFFFFF;
+    border:1px solid #DCE3EC;
+    border-radius:16px;
+    padding:22px;
+    box-shadow:0 4px 12px rgba(15,31,56,.08);
+    margin-top:24px;
+}
+
+.feed-header{
+    border-bottom:1px solid #EEF2F7;
+    padding-bottom:16px;
+    margin-bottom:20px;
+}
+
+.feed-header h4{
+    font-size:20px;
+    font-weight:700;
+    color:#0F1F38;
+}
+
+.feed-filters button{
+    background:#fff;
+    border:1px solid #DCE3EC;
+    border-radius:10px;
+    padding:7px 16px;
+    margin-left:8px;
+    font-weight:600;
+    color:#60728C;
+}
+
+.feed-filters .active{
+    background:#2563EB;
+    color:#fff;
+    border-color:#2563EB;
+}
+
+.feed-item{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:18px 20px;
+    border-radius:12px;
+    margin-bottom:12px;
+}
+
+.feed-item.warning{
+    background:#FFF8E7;
+}
+
+.feed-item.critical{
+    background:#FFF1F1;
+}
+
+.feed-item.info{
+    background:#EEF5FF;
+}
+
+.feed-item h6{
+    margin-bottom:5px;
+    font-weight:700;
+}
+
+.feed-item small,
+.feed-item span{
+    color:#60728C;
+}
