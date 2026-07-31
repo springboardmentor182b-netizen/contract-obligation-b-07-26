@@ -5,9 +5,11 @@ from uuid import UUID
 
 from sqlalchemy import Boolean, Date, DateTime, ForeignKey, String, Text
 from sqlalchemy.dialects.postgresql import UUID as PostgreSQLUUID
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
-from ..database.session import Base
+
+class Base(DeclarativeBase):
+    """Base class for dashboard ORM entities."""
 
 
 class User(Base):

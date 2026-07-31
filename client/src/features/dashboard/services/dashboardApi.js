@@ -21,5 +21,5 @@ export function getDashboard() {
 }
 
 export function getProfile() {
-  return get('/api/users/profile')
+  return get('/api/auth/me')
 }

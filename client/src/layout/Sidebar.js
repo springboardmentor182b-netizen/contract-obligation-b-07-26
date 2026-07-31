@@ -17,7 +17,7 @@ export default function Sidebar({
   onToggle,
 }) {
   const counts = Object.fromEntries(stats.map((stat) => [stat.key, stat.value]))
-  const initials = profile?.full_name?.split(' ').map((part) => part[0]).join('').slice(0, 2).toUpperCase() || '-'
+  const initials = profile?.name?.split(' ').map((part) => part[0]).join('').slice(0, 2).toUpperCase() || '-'
   return React.createElement(
     'aside',
     {
@@ -45,7 +45,7 @@ export default function Sidebar({
     React.createElement('div', { className: 'sidebar-profile' },
       React.createElement('span', { className: 'avatar sidebar-avatar' }, initials),
       React.createElement('span', { className: 'sidebar-profile-copy' },
-        React.createElement('strong', null, profile?.full_name || '-'),
+        React.createElement('strong', null, profile?.name || '-'),
         React.createElement('small', null, profile?.role || ''),
       ),
       React.createElement('span', { className: 'profile-chevron' }, 'v'),

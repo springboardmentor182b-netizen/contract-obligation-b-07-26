@@ -8,7 +8,8 @@ export function canSubmitRegistration(registrationData) {
   return (
     registrationData.name.trim().length >= 2 &&
     registrationData.email.includes('@') &&
-    passwordPattern.test(registrationData.password)
+    passwordPattern.test(registrationData.password) &&
+    Boolean(registrationData.role)
   )
 }
 

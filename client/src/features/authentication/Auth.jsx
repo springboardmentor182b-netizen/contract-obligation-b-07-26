@@ -64,10 +64,14 @@ export function Auth() {
       if (rememberMe) {
         window.localStorage.setItem('contractiq_token', result.access_token)
         window.localStorage.setItem('contractiq_role', formData.role)
+      } else {
+        window.sessionStorage.setItem('contractiq_token', result.access_token)
+        window.sessionStorage.setItem('contractiq_role', formData.role)
       }
 
       setStatus('success')
       setMessage(`Login successful as ${formData.role}. Token saved for the current frontend session.`)
+      window.location.assign('/dashboard')
     } catch (error) {
       setStatus('error')
       setMessage(error.message)
