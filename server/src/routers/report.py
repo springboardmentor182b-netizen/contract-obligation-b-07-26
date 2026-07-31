@@ -7,14 +7,14 @@ from reportlab.pdfgen import canvas
 
 import pandas as pd
 
-from app.config.database import get_db
+from src.sql_database import get_db
 
-from app.schemas.report import (
+from src.schemas.report import (
     ReportCreate,
     ReportResponse
 )
 
-from app.services import report_service
+from src.services import report_service
 
 router = APIRouter(
     prefix="/reports",

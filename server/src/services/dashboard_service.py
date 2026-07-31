@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from datetime import date
-from app.models.obligation import Obligation
+from src.models.obligation import Obligation
 
 
 def get_dashboard_kpis(db: Session):

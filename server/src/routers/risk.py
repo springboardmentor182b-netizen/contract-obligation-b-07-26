@@ -2,14 +2,14 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
 
-from app.config.database import get_db
+from src.sql_database import get_db
 
-from app.schemas.risk import (
+from src.schemas.risk import (
     RiskCreate,
     RiskResponse
 )
 
-from app.services import risk_service
+from src.services import risk_service
 
 router = APIRouter(
     prefix="/risk",

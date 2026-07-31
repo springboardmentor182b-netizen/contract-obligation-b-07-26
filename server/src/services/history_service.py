@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 
-from app.models.history import History
-from app.schemas.history import HistoryCreate
+from src.models.history import History
+from src.schemas.history import HistoryCreate
 
 
 def get_all_history(db: Session):

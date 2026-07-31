@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 
-from app.models.audit import Audit
-from app.schemas.audit import AuditCreate
+from src.models.audit import Audit
+from src.schemas.audit import AuditCreate
 
 
 def get_all_audits(db: Session):

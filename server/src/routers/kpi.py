@@ -2,9 +2,9 @@ from fastapi import APIRouter, Depends
 
 from sqlalchemy.orm import Session
 
-from app.config.database import get_db
+from src.sql_database import get_db
 
-from app.services.kpi_service import get_dashboard_kpis
+from src.services.kpi_service import get_dashboard_kpis
 
 
 router = APIRouter(

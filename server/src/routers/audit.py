@@ -2,14 +2,14 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
 
-from app.config.database import get_db
+from src.sql_database import get_db
 
-from app.schemas.audit import (
+from src.schemas.audit import (
     AuditCreate,
     AuditResponse
 )
 
-from app.services import audit_service
+from src.services import audit_service
 
 router = APIRouter(
     prefix="/audit",

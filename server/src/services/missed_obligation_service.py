@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 
-from app.models.missed_obligation import MissedObligation
-from app.schemas.missed_obligation import MissedObligationCreate
+from src.models.missed_obligation import MissedObligation
+from src.schemas.missed_obligation import MissedObligationCreate
 
 
 def get_all_missed_obligations(db: Session):

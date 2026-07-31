@@ -2,14 +2,14 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
 
-from app.config.database import get_db
+from src.sql_database import get_db
 
-from app.schemas.history import (
+from src.schemas.history import (
     HistoryCreate,
     HistoryResponse
 )
 
-from app.services import history_service
+from src.services import history_service
 
 router = APIRouter(
     prefix="/history",

@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Any
 
 from .config import DATA_FILE, DATA_DIR
-from .schemas import ComplianceLevel, ContractStatus, ObligationStatus, RenewalStatus, Role
+from .core_schemas import ComplianceLevel, ContractStatus, ObligationStatus, RenewalStatus, Role
 
 
 TABLES = [
