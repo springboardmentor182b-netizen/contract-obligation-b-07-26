@@ -29,7 +29,7 @@
    MAIN DASHBOARD
 =========================== */
 
-.dashboard-content{
+.tracker-dashboard-content{
 
     display:grid;
 
@@ -45,7 +45,7 @@
    LEFT SIDE
 =========================== */
 
-.left-content{
+.tracker-left-content{
 
     display:flex;
 
@@ -71,7 +71,7 @@
    RIGHT SIDE
 =========================== */
 
-.right-content{
+.tracker-right-content{
 
     display:flex;
 
@@ -114,9 +114,9 @@
    COMMON CARD STYLE
 =========================== */
 
-.left-content > *,
+.tracker-left-content > *,
 
-.right-content > *{
+.tracker-right-content > *{
 
     background:#FFFFFF;
 
@@ -130,9 +130,9 @@
 
 }
 
-.left-content > *:hover,
+.tracker-left-content > *:hover,
 
-.right-content > *:hover{
+.tracker-right-content > *:hover{
 
     box-shadow:0 10px 30px rgba(15,23,42,.08);
 
@@ -154,7 +154,7 @@ grid-template-columns:repeat(4,1fr);
 
 @media(max-width:1200px){
 
-.dashboard-content{
+.tracker-dashboard-content{
 
 grid-template-columns:1fr;
 
@@ -176,7 +176,7 @@ grid-template-columns:repeat(2,1fr);
 
 }
 
-.right-content{
+.tracker-right-content{
 
 grid-template-columns:1fr;
 

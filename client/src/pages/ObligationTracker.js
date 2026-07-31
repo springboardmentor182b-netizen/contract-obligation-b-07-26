@@ -105,9 +105,9 @@ function ObligationTracker() {
 				setPriority
 			}),
 			/* @__PURE__ */ _jsxs("div", {
-				className: "dashboard-content",
+				className: "tracker-dashboard-content",
 				children: [/* @__PURE__ */ _jsxs("div", {
-					className: "left-content",
+					className: "tracker-left-content",
 					children: [/* @__PURE__ */ _jsx(ObligationTable, {
 						search,
 						status,
@@ -120,7 +120,7 @@ function ObligationTracker() {
 						})
 					})]
 				}), /* @__PURE__ */ _jsxs("div", {
-					className: "right-content",
+					className: "tracker-right-content",
 					children: [/* @__PURE__ */ _jsx(Calendar, {}), /* @__PURE__ */ _jsx(UpcomingDeadlines, {})]
 				})]
 			}),
