@@ -28,6 +28,6 @@ def get_connection():
         host="localhost",
         database="contractiq",
         user="postgres",
-        password="9896224545",
+        password="2006",
         port="5432",
     )

@@ -9,265 +9,94 @@ import FeaturesCard from "../components/RenewalManagement/FeaturesCard";
 import StatusCard from "../components/RenewalManagement/StatusCard";
 import AddRenewalModal from "../components/RenewalManagement/AddRenewalModal";
 
-
-const API_URL = "http://127.0.0.1:8000/renewals/";
-
-
 const RenewalManagement = () => {
-
   const [renewals, setRenewals] = useState([]);
   const [filteredRenewals, setFilteredRenewals] = useState([]);
-
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
 
-
-
   const fetchRenewals = async () => {
-
     try {
-
       setLoading(true);
 
-      const response = await fetch(API_URL);
-
+      const response = await fetch("/renewals/");
 
       if (!response.ok) {
         throw new Error("Failed to fetch renewals");
       }
 
-
       const data = await response.json();
-
 
       setRenewals(data);
       setFilteredRenewals(data);
-
-
-    } catch(error) {
-
-      console.error(
-        "Fetch Renewal Error:",
-        error
-      );
-
+    } catch (error) {
+      console.error("Fetch Renewal Error:", error);
     } finally {
-
       setLoading(false);
-
     }
-
   };
 
-
-
   useEffect(() => {
-
     fetchRenewals();
-
   }, []);
 
-
-
-
   const handleSearch = (value) => {
-
-
     if (!value) {
-
       setFilteredRenewals(renewals);
-
       return;
-
     }
 
-
-    const searchText =
-      value.toLowerCase();
-
-
+    const search = value.toLowerCase();
 
     const result = renewals.filter((item) =>
-
       Object.values(item)
         .join(" ")
         .toLowerCase()
-        .includes(searchText)
-
+        .includes(search)
     );
 
-
     setFilteredRenewals(result);
-
   };
 
-
-
-
   return (
-
     <motion.div
-
-      className="
-        w-full
-        px-5
-        py-4
-        space-y-5
-      "
-
-
-      initial={{
-        opacity:0,
-        y:15
-      }}
-
-
-      animate={{
-        opacity:1,
-        y:0
-      }}
-
-
-      transition={{
-        duration:0.3
-      }}
-
+      className="w-full space-y-6"
+      initial={{ opacity: 0, y: 15 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
     >
+      <Header onAdd={() => setShowModal(true)} />
 
+      <StatsCards renewals={renewals} />
 
-      {/* Header */}
+      <SearchBar onSearch={handleSearch} />
 
-      <div className="w-full">
+      <RenewalTable
+        renewals={filteredRenewals}
+        loading={loading}
+        refresh={fetchRenewals}
+      />
 
-        <Header
-          onAdd={() =>
-            setShowModal(true)
-          }
-        />
-
-      </div>
-
-
-
-      {/* Statistics */}
-
-      <div className="w-full">
-
-        <StatsCards
-          renewals={renewals}
-        />
-
-      </div>
-
-
-
-
-      {/* Search */}
-
-      <div className="w-full">
-
-        <SearchBar
-          onSearch={handleSearch}
-        />
-
-      </div>
-
-
-
-
-      {/* Table */}
-
-      <div className="w-full">
-
-        <RenewalTable
-
-          renewals={filteredRenewals}
-
-          loading={loading}
-
-          refresh={fetchRenewals}
-
-        />
-
-      </div>
-
-
-
-
-      {/* Bottom Information Cards */}
-
-      <div
-        className="
-          grid
-          grid-cols-12
-          gap-5
-          w-full
-        "
-      >
-
-
-        <div
-          className="
-            col-span-12
-            lg:col-span-7
-          "
-        >
-
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2">
           <FeaturesCard />
-
         </div>
 
-
-
-        <div
-          className="
-            col-span-12
-            lg:col-span-5
-          "
-        >
-
-          <StatusCard
-            renewals={renewals}
-          />
-
+        <div className="lg:col-span-1">
+          <StatusCard renewals={renewals} />
         </div>
-
-
       </div>
-
-
-
-
-
-      {/* Add Renewal Modal */}
 
       <AnimatePresence>
-
-        {
-          showModal && (
-
-            <AddRenewalModal
-
-              onClose={() =>
-                setShowModal(false)
-              }
-
-              refresh={fetchRenewals}
-
-            />
-
-          )
-        }
-
+        {showModal && (
+          <AddRenewalModal
+            onClose={() => setShowModal(false)}
+            refresh={fetchRenewals}
+          />
+        )}
       </AnimatePresence>
-
-
-
     </motion.div>
-
   );
-
 };
-
 
 export default RenewalManagement;

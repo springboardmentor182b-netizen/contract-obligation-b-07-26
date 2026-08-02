@@ -52,11 +52,15 @@ function DashboardCard({ title, value, percent }) {
     },
   };
 
-  const item = cardMap[title];
+  const item = cardMap[title] || {
+    icon: <FaFileContract />,
+    bg: "#F3F4F6",
+    color: "#6B7280",
+    percentColor: "#16A34A",
+  };
 
   return (
     <div className="dashboard-card">
-
       <span
         className="card-percent"
         style={{ color: item.percentColor }}
@@ -77,7 +81,6 @@ function DashboardCard({ title, value, percent }) {
       <h2>{value}</h2>
 
       <p>{title}</p>
-
     </div>
   );
 }
