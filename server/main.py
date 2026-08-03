@@ -920,3 +920,1410 @@ def delete_security_setting(security_id: int):
     return {
         "message": "Security settings deleted successfully"
     }
+class Notification(BaseModel):
+
+    email_notifications: bool = True
+
+    sms_notifications: bool = False
+
+    push_notifications: bool = True
+
+    contract_reminders: bool = True
+
+    renewal_alerts: bool = True
+
+    compliance_alerts: bool = True
+
+    weekly_summary: bool = False
+@app.get("/settings/notifications")
+def get_notifications():
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT
+            id,
+            email_notifications,
+            sms_notifications,
+            push_notifications,
+            contract_reminders,
+            renewal_alerts,
+            compliance_alerts,
+            weekly_summary
+        FROM notification_settings
+        ORDER BY id;
+    """)
+
+    rows = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    return [
+        {
+            "id": row[0],
+            "email_notifications": row[1],
+            "sms_notifications": row[2],
+            "push_notifications": row[3],
+            "contract_reminders": row[4],
+            "renewal_alerts": row[5],
+            "compliance_alerts": row[6],
+            "weekly_summary": row[7]
+        }
+        for row in rows
+    ]
+@app.get("/settings/notifications/{notification_id}")
+def get_notification(notification_id: int):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT
+            id,
+            email_notifications,
+            sms_notifications,
+            push_notifications,
+            contract_reminders,
+            renewal_alerts,
+            compliance_alerts,
+            weekly_summary
+        FROM notification_settings
+        WHERE id=%s
+    """, (notification_id,))
+
+    row = cursor.fetchone()
+
+    cursor.close()
+    conn.close()
+
+    if not row:
+        raise HTTPException(
+            status_code=404,
+            detail="Notification settings not found"
+        )
+
+    return {
+        "id": row[0],
+        "email_notifications": row[1],
+        "sms_notifications": row[2],
+        "push_notifications": row[3],
+        "contract_reminders": row[4],
+        "renewal_alerts": row[5],
+        "compliance_alerts": row[6],
+        "weekly_summary": row[7]
+    }
+@app.post("/settings/notifications")
+def add_notification(notification: Notification):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+        INSERT INTO notification_settings
+        (
+            email_notifications,
+            sms_notifications,
+            push_notifications,
+            contract_reminders,
+            renewal_alerts,
+            compliance_alerts,
+            weekly_summary
+        )
+        VALUES
+        (
+            %s,%s,%s,%s,%s,%s,%s
+        )
+        RETURNING id
+        """,
+        (
+            notification.email_notifications,
+            notification.sms_notifications,
+            notification.push_notifications,
+            notification.contract_reminders,
+            notification.renewal_alerts,
+            notification.compliance_alerts,
+            notification.weekly_summary,
+        ),
+    )
+
+    notification_id = cursor.fetchone()[0]
+
+    conn.commit()
+
+    cursor.close()
+    conn.close()
+
+    return {
+        "message": "Notification settings created successfully",
+        "id": notification_id
+    }
+@app.put("/settings/notifications/{notification_id}")
+def update_notification(
+    notification_id: int,
+    notification: Notification
+):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+        UPDATE notification_settings
+        SET
+            email_notifications=%s,
+            sms_notifications=%s,
+            push_notifications=%s,
+            contract_reminders=%s,
+            renewal_alerts=%s,
+            compliance_alerts=%s,
+            weekly_summary=%s
+        WHERE id=%s
+        """,
+        (
+            notification.email_notifications,
+            notification.sms_notifications,
+            notification.push_notifications,
+            notification.contract_reminders,
+            notification.renewal_alerts,
+            notification.compliance_alerts,
+            notification.weekly_summary,
+            notification_id,
+        ),
+    )
+
+    conn.commit()
+
+    if cursor.rowcount == 0:
+        cursor.close()
+        conn.close()
+        raise HTTPException(
+            status_code=404,
+            detail="Notification settings not found"
+        )
+
+    cursor.close()
+    conn.close()
+
+    return {
+        "message": "Notification settings updated successfully"
+    }
+@app.delete("/settings/notifications/{notification_id}")
+def delete_notification(notification_id: int):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        "DELETE FROM notification_settings WHERE id=%s",
+        (notification_id,)
+    )
+
+    conn.commit()
+
+    if cursor.rowcount == 0:
+        cursor.close()
+        conn.close()
+        raise HTTPException(
+            status_code=404,
+            detail="Notification settings not found"
+        )
+
+    cursor.close()
+    conn.close()
+
+    return {
+        "message": "Notification settings deleted successfully"
+    }
+class Appearance(BaseModel):
+
+    theme: str
+
+    language: str
+
+    font_size: str
+
+    date_format: str
+
+    time_format: str
+@app.get("/settings/appearance")
+def get_appearance_settings():
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT
+            id,
+            theme,
+            language,
+            font_size,
+            date_format,
+            time_format
+        FROM appearance_settings
+        ORDER BY id;
+    """)
+
+    rows = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    return [
+        {
+            "id": row[0],
+            "theme": row[1],
+            "language": row[2],
+            "font_size": row[3],
+            "date_format": row[4],
+            "time_format": row[5]
+        }
+        for row in rows
+    ]
+@app.get("/settings/appearance/{appearance_id}")
+def get_appearance_setting(appearance_id: int):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT
+            id,
+            theme,
+            language,
+            font_size,
+            date_format,
+            time_format
+        FROM appearance_settings
+        WHERE id=%s
+    """, (appearance_id,))
+
+    row = cursor.fetchone()
+
+    cursor.close()
+    conn.close()
+
+    if not row:
+        raise HTTPException(
+            status_code=404,
+            detail="Appearance settings not found"
+        )
+
+    return {
+        "id": row[0],
+        "theme": row[1],
+        "language": row[2],
+        "font_size": row[3],
+        "date_format": row[4],
+        "time_format": row[5]
+    }
+@app.post("/settings/appearance")
+def add_appearance_setting(appearance: Appearance):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+        INSERT INTO appearance_settings
+        (
+            theme,
+            language,
+            font_size,
+            date_format,
+            time_format
+        )
+        VALUES
+        (
+            %s,%s,%s,%s,%s
+        )
+        RETURNING id
+        """,
+        (
+            appearance.theme,
+            appearance.language,
+            appearance.font_size,
+            appearance.date_format,
+            appearance.time_format,
+        ),
+    )
+
+    appearance_id = cursor.fetchone()[0]
+
+    conn.commit()
+
+    cursor.close()
+    conn.close()
+
+    return {
+        "message": "Appearance settings created successfully",
+        "id": appearance_id
+    }
+@app.put("/settings/appearance/{appearance_id}")
+def update_appearance_setting(
+    appearance_id: int,
+    appearance: Appearance
+):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+        UPDATE appearance_settings
+        SET
+            theme=%s,
+            language=%s,
+            font_size=%s,
+            date_format=%s,
+            time_format=%s
+        WHERE id=%s
+        """,
+        (
+            appearance.theme,
+            appearance.language,
+            appearance.font_size,
+            appearance.date_format,
+            appearance.time_format,
+            appearance_id,
+        ),
+    )
+
+    conn.commit()
+
+    if cursor.rowcount == 0:
+        cursor.close()
+        conn.close()
+        raise HTTPException(
+            status_code=404,
+            detail="Appearance settings not found"
+        )
+
+    cursor.close()
+    conn.close()
+
+    return {
+        "message": "Appearance settings updated successfully"
+    }
+@app.delete("/settings/appearance/{appearance_id}")
+def delete_appearance_setting(appearance_id: int):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        "DELETE FROM appearance_settings WHERE id=%s",
+        (appearance_id,)
+    )
+
+    conn.commit()
+
+    if cursor.rowcount == 0:
+        cursor.close()
+        conn.close()
+        raise HTTPException(
+            status_code=404,
+            detail="Appearance settings not found"
+        )
+
+    cursor.close()
+    conn.close()
+
+    return {
+        "message": "Appearance settings deleted successfully"
+    }
+
+class Billing(BaseModel):
+
+    billingName: str
+
+    billingEmail: str
+
+    taxId: str
+
+    address: str
+@app.get("/settings/billing")
+def get_billing_settings():
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT
+            id,
+            billing_name,
+            billing_email,
+            tax_id,
+            address
+        FROM billing_settings
+        ORDER BY id;
+    """)
+
+    rows = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    return [
+        {
+            "id": row[0],
+            "billingName": row[1],
+            "billingEmail": row[2],
+            "taxId": row[3],
+            "address": row[4]
+        }
+        for row in rows
+    ]
+@app.get("/settings/billing/{billing_id}")
+def get_billing_setting(billing_id: int):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+        SELECT
+            id,
+            billing_name,
+            billing_email,
+            tax_id,
+            address
+        FROM billing_settings
+        WHERE id=%s
+        """,
+        (billing_id,)
+    )
+
+    row = cursor.fetchone()
+
+    cursor.close()
+    conn.close()
+
+    if not row:
+        raise HTTPException(
+            status_code=404,
+            detail="Billing settings not found"
+        )
+
+    return {
+        "id": row[0],
+        "billingName": row[1],
+        "billingEmail": row[2],
+        "taxId": row[3],
+        "address": row[4]
+    }
+@app.get("/settings/billing/{billing_id}")
+def get_billing_setting(billing_id: int):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+        SELECT
+            id,
+            billing_name,
+            billing_email,
+            tax_id,
+            address
+        FROM billing_settings
+        WHERE id=%s
+        """,
+        (billing_id,),
+    )
+
+    row = cursor.fetchone()
+
+    cursor.close()
+    conn.close()
+
+    if not row:
+        raise HTTPException(
+            status_code=404,
+            detail="Billing settings not found"
+        )
+
+    return {
+        "id": row[0],
+        "billingName": row[1],
+        "billingEmail": row[2],
+        "taxId": row[3],
+        "address": row[4],
+    }
+@app.post("/settings/billing")
+def add_billing_setting(billing: Billing):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+        INSERT INTO billing_settings
+        (
+            billing_name,
+            billing_email,
+            tax_id,
+            address
+        )
+        VALUES
+        (
+            %s,%s,%s,%s
+        )
+        RETURNING id
+        """,
+        (
+            billing.billingName,
+            billing.billingEmail,
+            billing.taxId,
+            billing.address,
+        ),
+    )
+
+    billing_id = cursor.fetchone()[0]
+
+    conn.commit()
+
+    cursor.close()
+    conn.close()
+
+    return {
+        "message": "Billing settings created successfully",
+        "id": billing_id
+    }
+@app.put("/settings/billing/{billing_id}")
+def update_billing_setting(
+    billing_id: int,
+    billing: Billing
+):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+        UPDATE billing_settings
+        SET
+            billing_name=%s,
+            billing_email=%s,
+            tax_id=%s,
+            address=%s
+        WHERE id=%s
+        """,
+        (
+            billing.billingName,
+            billing.billingEmail,
+            billing.taxId,
+            billing.address,
+            billing_id,
+        ),
+    )
+
+    conn.commit()
+
+    if cursor.rowcount == 0:
+        cursor.close()
+        conn.close()
+        raise HTTPException(
+            status_code=404,
+            detail="Billing settings not found"
+        )
+
+    cursor.close()
+    conn.close()
+
+    return {
+        "message": "Billing settings updated successfully"
+    }
+@app.delete("/settings/billing/{billing_id}")
+def delete_billing_setting(billing_id: int):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        "DELETE FROM billing_settings WHERE id=%s",
+        (billing_id,),
+    )
+
+    conn.commit()
+
+    if cursor.rowcount == 0:
+        cursor.close()
+        conn.close()
+        raise HTTPException(
+            status_code=404,
+            detail="Billing settings not found"
+        )
+
+    cursor.close()
+    conn.close()
+
+    return {
+        "message": "Billing settings deleted successfully"
+    }
+class Compliance(BaseModel):
+
+    complianceMode: str
+
+    auditFrequency: str
+
+    retentionPeriod: str
+
+    autoArchive: bool
+
+    complianceOfficer: str
+@app.get("/settings/compliance")
+def get_compliance_settings():
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT
+            id,
+            compliance_mode,
+            audit_frequency,
+            retention_period,
+            auto_archive,
+            compliance_officer
+        FROM compliance_settings
+        ORDER BY id
+    """)
+
+    rows = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    return [
+        {
+            "id": row[0],
+            "complianceMode": row[1],
+            "auditFrequency": row[2],
+            "retentionPeriod": row[3],
+            "autoArchive": row[4],
+            "complianceOfficer": row[5],
+        }
+        for row in rows
+    ]
+@app.get("/settings/compliance/{compliance_id}")
+def get_compliance_setting(compliance_id: int):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT
+            id,
+            compliance_mode,
+            audit_frequency,
+            retention_period,
+            auto_archive,
+            compliance_officer
+        FROM compliance_settings
+        WHERE id=%s
+    """, (compliance_id,))
+
+    row = cursor.fetchone()
+
+    cursor.close()
+    conn.close()
+
+    if not row:
+        raise HTTPException(
+            status_code=404,
+            detail="Compliance settings not found"
+        )
+
+    return {
+        "id": row[0],
+        "complianceMode": row[1],
+        "auditFrequency": row[2],
+        "retentionPeriod": row[3],
+        "autoArchive": row[4],
+        "complianceOfficer": row[5],
+    }
+@app.post("/settings/compliance")
+def add_compliance_setting(compliance: Compliance):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        INSERT INTO compliance_settings
+        (
+            compliance_mode,
+            audit_frequency,
+            retention_period,
+            auto_archive,
+            compliance_officer
+        )
+        VALUES
+        (%s,%s,%s,%s,%s)
+        RETURNING id
+    """,
+    (
+        compliance.complianceMode,
+        compliance.auditFrequency,
+        compliance.retentionPeriod,
+        compliance.autoArchive,
+        compliance.complianceOfficer,
+    ))
+
+    compliance_id = cursor.fetchone()[0]
+
+    conn.commit()
+
+    cursor.close()
+    conn.close()
+
+    return {
+        "message": "Compliance settings created successfully",
+        "id": compliance_id
+    }
+@app.put("/settings/compliance/{compliance_id}")
+def update_compliance_setting(
+    compliance_id: int,
+    compliance: Compliance
+):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        UPDATE compliance_settings
+        SET
+            compliance_mode=%s,
+            audit_frequency=%s,
+            retention_period=%s,
+            auto_archive=%s,
+            compliance_officer=%s
+        WHERE id=%s
+    """,
+    (
+        compliance.complianceMode,
+        compliance.auditFrequency,
+        compliance.retentionPeriod,
+        compliance.autoArchive,
+        compliance.complianceOfficer,
+        compliance_id,
+    ))
+
+    conn.commit()
+
+    if cursor.rowcount == 0:
+        cursor.close()
+        conn.close()
+        raise HTTPException(
+            status_code=404,
+            detail="Compliance settings not found"
+        )
+
+    cursor.close()
+    conn.close()
+
+    return {
+        "message": "Compliance settings updated successfully"
+    }
+@app.delete("/settings/compliance/{compliance_id}")
+def delete_compliance_setting(compliance_id: int):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        "DELETE FROM compliance_settings WHERE id=%s",
+        (compliance_id,)
+    )
+
+    conn.commit()
+
+    if cursor.rowcount == 0:
+        cursor.close()
+        conn.close()
+        raise HTTPException(
+            status_code=404,
+            detail="Compliance settings not found"
+        )
+
+    cursor.close()
+    conn.close()
+
+    return {
+        "message": "Compliance settings deleted successfully"
+    }
+class ContractDefaults(BaseModel):
+
+    defaultContractType: str
+
+    defaultDuration: str
+
+    renewalType: str
+
+    reminderDays: int
+
+    approvalRequired: bool
+
+    defaultOwner: str
+@app.get("/settings/contract-defaults")
+def get_contract_defaults():
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT
+            id,
+            default_contract_type,
+            default_duration,
+            renewal_type,
+            reminder_days,
+            approval_required,
+            default_owner
+        FROM contract_defaults
+        ORDER BY id
+    """)
+
+    rows = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    return [
+        {
+            "id": row[0],
+            "defaultContractType": row[1],
+            "defaultDuration": row[2],
+            "renewalType": row[3],
+            "reminderDays": row[4],
+            "approvalRequired": row[5],
+            "defaultOwner": row[6]
+        }
+        for row in rows
+    ]
+@app.get("/settings/contract-defaults/{default_id}")
+def get_contract_default(default_id: int):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT
+            id,
+            default_contract_type,
+            default_duration,
+            renewal_type,
+            reminder_days,
+            approval_required,
+            default_owner
+        FROM contract_defaults
+        WHERE id=%s
+    """, (default_id,))
+
+    row = cursor.fetchone()
+
+    cursor.close()
+    conn.close()
+
+    if not row:
+        raise HTTPException(
+            status_code=404,
+            detail="Contract defaults not found"
+        )
+
+    return {
+        "id": row[0],
+        "defaultContractType": row[1],
+        "defaultDuration": row[2],
+        "renewalType": row[3],
+        "reminderDays": row[4],
+        "approvalRequired": row[5],
+        "defaultOwner": row[6]
+    }
+@app.post("/settings/contract-defaults")
+def add_contract_default(defaults: ContractDefaults):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        INSERT INTO contract_defaults
+        (
+            default_contract_type,
+            default_duration,
+            renewal_type,
+            reminder_days,
+            approval_required,
+            default_owner
+        )
+        VALUES
+        (%s,%s,%s,%s,%s,%s)
+        RETURNING id
+    """,
+    (
+        defaults.defaultContractType,
+        defaults.defaultDuration,
+        defaults.renewalType,
+        defaults.reminderDays,
+        defaults.approvalRequired,
+        defaults.defaultOwner
+    ))
+
+    default_id = cursor.fetchone()[0]
+
+    conn.commit()
+
+    cursor.close()
+    conn.close()
+
+    return {
+        "message": "Contract defaults created successfully",
+        "id": default_id
+    }
+@app.put("/settings/contract-defaults/{default_id}")
+def update_contract_default(
+    default_id: int,
+    defaults: ContractDefaults
+):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        UPDATE contract_defaults
+        SET
+            default_contract_type=%s,
+            default_duration=%s,
+            renewal_type=%s,
+            reminder_days=%s,
+            approval_required=%s,
+            default_owner=%s
+        WHERE id=%s
+    """,
+    (
+        defaults.defaultContractType,
+        defaults.defaultDuration,
+        defaults.renewalType,
+        defaults.reminderDays,
+        defaults.approvalRequired,
+        defaults.defaultOwner,
+        default_id
+    ))
+
+    conn.commit()
+
+    if cursor.rowcount == 0:
+        cursor.close()
+        conn.close()
+
+        raise HTTPException(
+            status_code=404,
+            detail="Contract defaults not found"
+        )
+
+    cursor.close()
+    conn.close()
+
+    return {
+        "message": "Contract defaults updated successfully"
+    }
+@app.delete("/settings/contract-defaults/{default_id}")
+def delete_contract_default(default_id: int):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        "DELETE FROM contract_defaults WHERE id=%s",
+        (default_id,)
+    )
+
+    conn.commit()
+
+    if cursor.rowcount == 0:
+
+        cursor.close()
+        conn.close()
+
+        raise HTTPException(
+            status_code=404,
+            detail="Contract defaults not found"
+        )
+
+    cursor.close()
+    conn.close()
+
+    return {
+        "message": "Contract defaults deleted successfully"
+    }
+class Integration(BaseModel):
+
+    name: str
+
+    icon: str
+
+    description: str
+
+    connected: bool
+
+    connectedSince: str
+@app.get("/settings/integrations")
+def get_integrations():
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT
+            id,
+            name,
+            icon,
+            description,
+            connected,
+            connected_since
+        FROM integration_settings
+        ORDER BY id
+    """)
+
+    rows = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    return [
+        {
+            "id": row[0],
+            "name": row[1],
+            "icon": row[2],
+            "description": row[3],
+            "connected": row[4],
+            "connectedSince": row[5]
+        }
+        for row in rows
+    ]
+@app.get("/settings/integrations/{integration_id}")
+def get_integration(integration_id: int):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT
+            id,
+            name,
+            icon,
+            description,
+            connected,
+            connected_since
+        FROM integration_settings
+        WHERE id=%s
+    """, (integration_id,))
+
+    row = cursor.fetchone()
+
+    cursor.close()
+    conn.close()
+
+    if not row:
+        raise HTTPException(
+            status_code=404,
+            detail="Integration not found"
+        )
+
+    return {
+        "id": row[0],
+        "name": row[1],
+        "icon": row[2],
+        "description": row[3],
+        "connected": row[4],
+        "connectedSince": row[5]
+    }
+@app.post("/settings/integrations")
+def add_integration(integration: Integration):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        INSERT INTO integration_settings
+        (
+            name,
+            icon,
+            description,
+            connected,
+            connected_since
+        )
+        VALUES
+        (%s,%s,%s,%s,%s)
+        RETURNING id
+    """,
+    (
+        integration.name,
+        integration.icon,
+        integration.description,
+        integration.connected,
+        integration.connectedSince
+    ))
+
+    integration_id = cursor.fetchone()[0]
+
+    conn.commit()
+
+    cursor.close()
+    conn.close()
+
+    return {
+        "message": "Integration created successfully",
+        "id": integration_id
+    }
+@app.put("/settings/integrations/{integration_id}")
+def update_integration(
+    integration_id: int,
+    integration: Integration
+):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        UPDATE integration_settings
+        SET
+            name=%s,
+            icon=%s,
+            description=%s,
+            connected=%s,
+            connected_since=%s
+        WHERE id=%s
+    """,
+    (
+        integration.name,
+        integration.icon,
+        integration.description,
+        integration.connected,
+        integration.connectedSince,
+        integration_id
+    ))
+
+    conn.commit()
+
+    if cursor.rowcount == 0:
+        cursor.close()
+        conn.close()
+
+        raise HTTPException(
+            status_code=404,
+            detail="Integration not found"
+        )
+
+    cursor.close()
+    conn.close()
+
+    return {
+        "message": "Integration updated successfully"
+    }
+@app.delete("/settings/integrations/{integration_id}")
+def delete_integration(integration_id: int):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        "DELETE FROM integration_settings WHERE id=%s",
+        (integration_id,)
+    )
+
+    conn.commit()
+
+    if cursor.rowcount == 0:
+
+        cursor.close()
+        conn.close()
+
+        raise HTTPException(
+            status_code=404,
+            detail="Integration not found"
+        )
+
+    cursor.close()
+    conn.close()
+
+    return {
+        "message": "Integration deleted successfully"
+    }
+class DangerZone(BaseModel):
+
+    accountStatus: str
+
+    deleteRequested: bool
+
+    deleteReason: str
+@app.get("/settings/danger-zone")
+def get_danger_zone():
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT
+            id,
+            account_status,
+            delete_requested,
+            delete_reason
+        FROM danger_zone
+        ORDER BY id
+    """)
+
+    rows = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+    return [
+        {
+            "id": row[0],
+            "accountStatus": row[1],
+            "deleteRequested": row[2],
+            "deleteReason": row[3]
+        }
+        for row in rows
+    ]
+@app.get("/settings/danger-zone/{danger_id}")
+def get_danger_zone_by_id(danger_id: int):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT
+            id,
+            account_status,
+            delete_requested,
+            delete_reason
+        FROM danger_zone
+        WHERE id=%s
+    """, (danger_id,))
+
+    row = cursor.fetchone()
+
+    cursor.close()
+    conn.close()
+
+    if not row:
+        raise HTTPException(
+            status_code=404,
+            detail="Danger Zone settings not found"
+        )
+
+    return {
+        "id": row[0],
+        "accountStatus": row[1],
+        "deleteRequested": row[2],
+        "deleteReason": row[3]
+    }
+@app.post("/settings/danger-zone")
+def add_danger_zone(data: DangerZone):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        INSERT INTO danger_zone
+        (
+            account_status,
+            delete_requested,
+            delete_reason
+        )
+        VALUES
+        (%s,%s,%s)
+        RETURNING id
+    """,
+    (
+        data.accountStatus,
+        data.deleteRequested,
+        data.deleteReason
+    ))
+
+    danger_id = cursor.fetchone()[0]
+
+    conn.commit()
+
+    cursor.close()
+    conn.close()
+
+    return {
+        "message": "Danger Zone settings created successfully",
+        "id": danger_id
+    }
+@app.put("/settings/danger-zone/{danger_id}")
+def update_danger_zone(
+    danger_id: int,
+    data: DangerZone
+):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        UPDATE danger_zone
+        SET
+            account_status=%s,
+            delete_requested=%s,
+            delete_reason=%s
+        WHERE id=%s
+    """,
+    (
+        data.accountStatus,
+        data.deleteRequested,
+        data.deleteReason,
+        danger_id
+    ))
+
+    conn.commit()
+
+    if cursor.rowcount == 0:
+
+        cursor.close()
+        conn.close()
+
+        raise HTTPException(
+            status_code=404,
+            detail="Danger Zone settings not found"
+        )
+
+    cursor.close()
+    conn.close()
+
+    return {
+        "message": "Danger Zone settings updated successfully"
+    }
+@app.delete("/settings/danger-zone/{danger_id}")
+def delete_danger_zone(danger_id: int):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        "DELETE FROM danger_zone WHERE id=%s",
+        (danger_id,)
+    )
+
+    conn.commit()
+
+    if cursor.rowcount == 0:
+
+        cursor.close()
+        conn.close()
+
+        raise HTTPException(
+            status_code=404,
+            detail="Danger Zone settings not found"
+        )
+
+    cursor.close()
+    conn.close()
+
+    return {
+        "message": "Danger Zone settings deleted successfully"
+    }
