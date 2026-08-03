@@ -22,7 +22,6 @@ function Header({ openModal, obligations }) {
 }
 
 export default Header;
-
 import React from "react";
 import "./Header.css";
 
