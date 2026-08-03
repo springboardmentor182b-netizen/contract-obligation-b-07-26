@@ -19,29 +19,16 @@ def psycopg_database_url() -> str:
 
 CREATE_USERS_TABLE = """
 CREATE TABLE IF NOT EXISTS users (
-    user_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    full_name VARCHAR(100) NOT NULL,
-    email VARCHAR(150) NOT NULL UNIQUE,
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name TEXT NOT NULL,
+    email TEXT NOT NULL UNIQUE,
     password_hash TEXT NOT NULL,
     role TEXT NOT NULL,
-    phone VARCHAR(15),
-    department VARCHAR(100),
-    status BOOLEAN NOT NULL DEFAULT TRUE,
+    department TEXT,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
-"""
-
-USER_PROJECTION = """
-    user_id AS id,
-    full_name AS name,
-    email,
-    password_hash,
-    role,
-    department,
-    status AS is_active,
-    created_at,
-    updated_at
 """
 
 
@@ -50,6 +37,34 @@ def get_connection():
         psycopg_database_url(),
         row_factory=dict_row,
     )
+
+
+def user_columns(cursor) -> set[str]:
+    cursor.execute(
+        """
+        SELECT column_name
+        FROM information_schema.columns
+        WHERE table_name = 'users'
+        """
+    )
+    return {row["column_name"] for row in cursor.fetchall()}
+
+
+def user_projection(columns: set[str]) -> str:
+    id_column = "user_id" if "user_id" in columns else "id"
+    name_column = "full_name" if "full_name" in columns else "name"
+    active_column = "status" if "status" in columns else "is_active"
+    return f"""
+        {id_column} AS id,
+        {name_column} AS name,
+        email,
+        password_hash,
+        role,
+        department,
+        {active_column} AS is_active,
+        created_at,
+        updated_at
+    """
 
 
 def initialize_database() -> None:
@@ -70,9 +85,10 @@ def normalize_user(user: dict[str, Any] | None) -> dict[str, Any] | None:
 def find_user_by_email(email: str) -> dict[str, Any] | None:
     with get_connection() as connection:
         with connection.cursor() as cursor:
+            columns = user_columns(cursor)
             cursor.execute(
                 f"""
-                SELECT {USER_PROJECTION}
+                SELECT {user_projection(columns)}
                 FROM users
                 WHERE lower(email) = lower(%s)
                 """,
@@ -84,11 +100,13 @@ def find_user_by_email(email: str) -> dict[str, Any] | None:
 def find_user_by_id(user_id: str) -> dict[str, Any] | None:
     with get_connection() as connection:
         with connection.cursor() as cursor:
+            columns = user_columns(cursor)
+            id_column = "user_id" if "user_id" in columns else "id"
             cursor.execute(
                 f"""
-                SELECT {USER_PROJECTION}
+                SELECT {user_projection(columns)}
                 FROM users
-                WHERE user_id = %s
+                WHERE {id_column} = %s
                 """,
                 (user_id,),
             )
@@ -98,17 +116,19 @@ def find_user_by_id(user_id: str) -> dict[str, Any] | None:
 def create_user(payload: dict[str, Any]) -> dict[str, Any]:
     with get_connection() as connection:
         with connection.cursor() as cursor:
+            columns = user_columns(cursor)
+            name_column = "full_name" if "full_name" in columns else "name"
             cursor.execute(
                 f"""
                 INSERT INTO users (
-                    full_name,
+                    {name_column},
                     email,
                     password_hash,
                     role,
                     department
                 )
                 VALUES (%s, lower(%s), %s, %s, %s)
-                RETURNING {USER_PROJECTION}
+                RETURNING {user_projection(columns)}
                 """,
                 (
                     payload["name"],
@@ -124,9 +144,10 @@ def create_user(payload: dict[str, Any]) -> dict[str, Any]:
 def list_users() -> list[dict[str, Any]]:
     with get_connection() as connection:
         with connection.cursor() as cursor:
+            columns = user_columns(cursor)
             cursor.execute(
                 f"""
-                SELECT {USER_PROJECTION}
+                SELECT {user_projection(columns)}
                 FROM users
                 ORDER BY created_at DESC
                 """
@@ -137,12 +158,13 @@ def list_users() -> list[dict[str, Any]]:
 def update_user_password(email: str, password_hash: str) -> dict[str, Any] | None:
     with get_connection() as connection:
         with connection.cursor() as cursor:
+            columns = user_columns(cursor)
             cursor.execute(
                 f"""
                 UPDATE users
                 SET password_hash = %s, updated_at = NOW()
                 WHERE lower(email) = lower(%s)
-                RETURNING {USER_PROJECTION}
+                RETURNING {user_projection(columns)}
                 """,
                 (password_hash, email),
             )

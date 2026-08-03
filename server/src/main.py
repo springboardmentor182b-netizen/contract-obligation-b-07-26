@@ -16,7 +16,7 @@ from .routers import risk as risk_router
 
 from .auth.security import create_token, get_current_user, hash_password, require_roles, verify_password
 from .database import create_user, find_user_by_email, initialize_database, list_users as list_database_users, update_user_password
-from .schemas import (
+from .core_schemas import (
     APIRecord,
     ComplianceLevel,
     ContractCreate,
