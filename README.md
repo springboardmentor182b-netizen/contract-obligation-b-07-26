@@ -196,7 +196,7 @@ Displays user activities including
 - Profile Updated
 - Notification Received
 
----
+
 
 ## Upcoming Deadlines
 
@@ -215,7 +215,6 @@ Status badges
 - Completed
 - Overdue
 
----
 
 # User Profile
 
