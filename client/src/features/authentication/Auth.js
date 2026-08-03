@@ -63,13 +63,20 @@ export function Auth({ onLogin }) {
 			if (rememberMe) {
 				window.localStorage.setItem("contractiq_token", result.access_token);
 				window.localStorage.setItem("contractiq_role", formData.role);
+			} else {
+				window.sessionStorage.setItem("contractiq_token", result.access_token);
+				window.sessionStorage.setItem("contractiq_role", formData.role);
 			}
-			onLogin({
-				token: result.access_token,
-				role: formData.role
-			});
 			setStatus("success");
 			setMessage("Login successful");
+			if (typeof onLogin === "function") {
+				onLogin({
+					token: result.access_token,
+					role: formData.role
+				});
+			} else {
+				window.location.assign("/dashboard");
+			}
 		} catch (error) {
 			setStatus("error");
 			setMessage(error.message);
