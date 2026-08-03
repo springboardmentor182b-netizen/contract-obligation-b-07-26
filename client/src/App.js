@@ -1,46 +1,46 @@
 import React from 'react'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 
+import './App.css'
 import Home from './pages/Home'
-import "./App.css";
-import{
-ToastContainer
-}
-from"react-toastify";
-import"react-toastify/dist/ReactToastify.css";
-import ObligationTracker from "./pages/ObligationTracker";
+import { Auth } from './features/authentication/Auth'
 
-function App() {
-  return (
-    <div className="App">
-      <ObligationTracker />
-<ToastContainer
-position="top-right"
-autoClose={3000}
-/>
-    </div>
-  );
+function ProtectedDashboard() {
+  const token = window.localStorage.getItem('contractiq_token')
+    || window.sessionStorage.getItem('contractiq_token')
+    || window.localStorage.getItem('access_token')
+  return token ? React.createElement(Home) : React.createElement(Navigate, { to: '/login', replace: true })
 }
 
-export default App;
 export default function App() {
-  return React.createElement(Home)
+  return React.createElement(
+    BrowserRouter,
+    null,
+    React.createElement(
+      Routes,
+      null,
+      React.createElement(Route, {
+        path: '/',
+        element: React.createElement(Navigate, {
+          to: '/login',
+          replace: true,
+        }),
+      }),
+      React.createElement(Route, {
+        path: '/login',
+        element: React.createElement(Auth),
+      }),
+      React.createElement(Route, {
+        path: '/dashboard',
+        element: React.createElement(ProtectedDashboard),
+      }),
+      React.createElement(Route, {
+        path: '*',
+        element: React.createElement(Navigate, {
+          to: '/login',
+          replace: true,
+        }),
+      }),
+    ),
+  )
 }
-import "./App.css";
-
-import ComplianceDashboard from "./pages/ComplianceDashboard";
-
-function App() {
-
-return (
-
-<div>
-
-<ComplianceDashboard/>
-
-</div>
-
-);
-
-}
-
-export default App;

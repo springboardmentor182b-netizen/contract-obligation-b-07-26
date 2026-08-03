@@ -6,7 +6,8 @@ export async function login(apiBaseUrl, credentials) {
   })
 
   if (!response.ok) {
-    throw new Error('Invalid login credentials')
+    const error = await response.json().catch(() => null)
+    throw new Error(error?.detail || 'Invalid login credentials')
   }
 
   return response.json()

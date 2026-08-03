@@ -3,18 +3,14 @@ from sqlalchemy.orm import Session
 from typing import List
 from fastapi.responses import FileResponse
 
-from reportlab.pdfgen import canvas
+from ..database.session import get_db
 
-import pandas as pd
-
-from app.config.database import get_db
-
-from app.schemas.report import (
+from ..feature_schemas.report import (
     ReportCreate,
     ReportResponse
 )
 
-from app.services import report_service
+from ..services import report_service
 
 router = APIRouter(
     prefix="/reports",
@@ -170,6 +166,11 @@ def download_pdf(
     db:Session=Depends(get_db)
 ):
 
+    try:
+        from reportlab.pdfgen import canvas
+    except ModuleNotFoundError as exc:
+        raise HTTPException(status_code=503, detail="PDF export requires the reportlab package.") from exc
+
 
     report=report_service.get_report_by_id(
         db,
@@ -227,6 +228,11 @@ def download_excel(
     report_id:int,
     db:Session=Depends(get_db)
 ):
+
+    try:
+        import pandas as pd
+    except ModuleNotFoundError as exc:
+        raise HTTPException(status_code=503, detail="Excel export requires the pandas package.") from exc
 
 
     report=report_service.get_report_by_id(
