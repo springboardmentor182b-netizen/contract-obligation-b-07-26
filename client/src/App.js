@@ -1,34 +1,51 @@
-import { useState } from "react";
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import "./App.css";
-import { Auth } from "./features/authentication/Auth";
-import { Dashboard } from "./pages/Dashboard";
-import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
-function App() {
-	const [session, setSession] = useState(() => {
-		const token = window.localStorage.getItem("contractiq_token");
-		const role = window.localStorage.getItem("contractiq_role");
-		return token ? {
-			token,
-			role
-		} : null;
-	});
-	function handleLogout() {
-		window.localStorage.removeItem("contractiq_token");
-		window.localStorage.removeItem("contractiq_role");
-		setSession(null);
-	}
-	return /* @__PURE__ */ _jsxs("div", {
-		className: "App",
-		children: [session ? /* @__PURE__ */ _jsx(Dashboard, {
-			userRole: session.role,
-			onLogout: handleLogout
-		}) : /* @__PURE__ */ _jsx(Auth, { onLogin: setSession }), /* @__PURE__ */ _jsx(ToastContainer, {
-			position: "top-right",
-			autoClose: 3e3
-		})]
-	});
-}
-export default App;
+import React from 'react'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 
+import './App.css'
+import Home from './pages/Home'
+import Reports from './pages/Reports'
+import { Auth } from './features/authentication/Auth'
+
+function ProtectedRoute({ page }) {
+  const token = window.localStorage.getItem('contractiq_token')
+    || window.sessionStorage.getItem('contractiq_token')
+    || window.localStorage.getItem('access_token')
+  return token ? React.createElement(page) : React.createElement(Navigate, { to: '/login', replace: true })
+}
+
+export default function App() {
+  return React.createElement(
+    BrowserRouter,
+    null,
+    React.createElement(
+      Routes,
+      null,
+      React.createElement(Route, {
+        path: '/',
+        element: React.createElement(Navigate, {
+          to: '/login',
+          replace: true,
+        }),
+      }),
+      React.createElement(Route, {
+        path: '/login',
+        element: React.createElement(Auth),
+      }),
+      React.createElement(Route, {
+        path: '/dashboard',
+        element: React.createElement(ProtectedRoute, { page: Home }),
+      }),
+      React.createElement(Route, {
+        path: '/reports',
+        element: React.createElement(ProtectedRoute, { page: Reports }),
+      }),
+      React.createElement(Route, {
+        path: '*',
+        element: React.createElement(Navigate, {
+          to: '/login',
+          replace: true,
+        }),
+      }),
+    ),
+  )
+}

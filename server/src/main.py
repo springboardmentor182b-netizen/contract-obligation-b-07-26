@@ -6,9 +6,17 @@ from typing import Any
 from fastapi import Depends, FastAPI, HTTPException, Query, status
 from fastapi.middleware.cors import CORSMiddleware
 
+from .dashboard.router import router as dashboard_router
+from .models import audit, compliance, history, missed_obligation, report, risk  # noqa: F401
+from .routers import audit as audit_router
+from .routers import compliance as compliance_router
+from .routers import header, history as history_router, kpi, missed_obligation as missed_obligation_router
+from .routers import report as report_router
+from .routers import risk as risk_router
+
 from .auth.security import create_token, get_current_user, hash_password, require_roles, verify_password
 from .database import create_user, find_user_by_email, initialize_database, list_users as list_database_users, update_user_password
-from .core_schemas import (
+from .schemas import (
     APIRecord,
     ComplianceLevel,
     ContractCreate,
@@ -31,19 +39,8 @@ from .core_schemas import (
     UserPublic,
 )
 from .storage import store
-from .sql_database import Base, engine
-from .models import audit, compliance, history, missed_obligation, obligation, report, risk
-from .routers import audit as audit_router
-from .routers import compliance as compliance_router
-from .routers import header as header_router
-from .routers import history as history_router
-from .routers import kpi as kpi_router
-from .routers import missed_obligation as missed_obligation_router
-from .routers import report as report_router
-from .routers import risk as risk_router
-from .routers.dashboard_routers import router as dashboard_router
-from .routers.obligation_routers import router as obligation_router
-Base.metadata.create_all(bind=engine)
+from .database.session import Base, engine
+
 app = FastAPI(
     title="ContractIQ: Contract Obligation Tracking API",
     version="1.0.0",
@@ -52,31 +49,26 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-        "http://localhost:5174",
-        "http://127.0.0.1:5174",
-    ],
+    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-app.include_router(obligation_router)
+
+@app.on_event("startup")
+def startup() -> None:
+    initialize_database()
+    Base.metadata.create_all(bind=engine)
+
 app.include_router(dashboard_router)
+app.include_router(kpi.router)
+app.include_router(header.router)
 app.include_router(compliance_router.router)
 app.include_router(audit_router.router)
 app.include_router(report_router.router)
 app.include_router(history_router.router)
 app.include_router(risk_router.router)
 app.include_router(missed_obligation_router.router)
-app.include_router(header_router.router)
-app.include_router(kpi_router.router)
-
-@app.on_event("startup")
-def startup() -> None:
-    initialize_database()
-
 
 def public_user(user: dict[str, Any]) -> dict[str, Any]:
     return {key: value for key, value in user.items() if key != "password_hash"}
@@ -310,7 +302,6 @@ def compliance_summary(_: dict[str, Any] = Depends(get_current_user)) -> dict[st
             overdue += 1
 
     return {"total_obligations": len(obligations), "by_compliance_level": by_level, "overdue_obligations": overdue}
-
 
 def role_dashboard(role: str) -> dict[str, Any]:
     dashboards = {

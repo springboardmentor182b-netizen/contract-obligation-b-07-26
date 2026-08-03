@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 
-from src.models.compliance import Compliance
-from src.schemas.compliance import ComplianceCreate
+from ..models.compliance import Compliance
+from ..feature_schemas.compliance import ComplianceCreate
 
 
 def get_all_compliance(db: Session):

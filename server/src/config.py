@@ -1,3 +1,5 @@
+"""Application configuration loaded from server/.env."""
+
 import os
 from pathlib import Path
 
@@ -6,14 +8,16 @@ from sqlalchemy.engine import URL
 
 
 BASE_DIR = Path(__file__).resolve().parents[1]
+load_dotenv(BASE_DIR / ".env")
+
+APP_NAME = os.getenv("APP_NAME", "ContractIQ API")
+TOKEN_SECRET = os.getenv("TOKEN_SECRET", "replace-this-secret-in-production")
+TOKEN_TTL_SECONDS = int(os.getenv("TOKEN_TTL_SECONDS", "28800"))
+
+# Retained for teammate modules that still use the legacy JSON store.
 DATA_DIR = BASE_DIR / "data"
 DATA_FILE = DATA_DIR / "contractiq.json"
 
-load_dotenv(BASE_DIR / ".env")
-
-APP_NAME = "ContractIQ API"
-TOKEN_SECRET = "replace-this-secret-in-production"
-TOKEN_TTL_SECONDS = 60 * 60 * 8
 
 def env_value(*names: str, default: str | None = None) -> str | None:
     for name in names:

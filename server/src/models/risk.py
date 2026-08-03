@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String
-from src.sql_database import Base
+from ..database.session import Base
 
 
 class Risk(Base):
