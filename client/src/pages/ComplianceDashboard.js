@@ -36,34 +36,11 @@ function ComplianceDashboard() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-
-        loadKPIs();
-
+        getDashboardKPIs()
+            .then(setKpis)
+            .catch((error) => console.log(error))
+            .finally(() => setLoading(false));
     }, []);
-
-    const loadKPIs = async () => {
-
-        try {
-
-            const data = await getDashboardKPIs();
-
-            setKpis(data);
-
-        }
-
-        catch (error) {
-
-            console.log(error);
-
-        }
-
-        finally {
-
-            setLoading(false);
-
-        }
-
-    };
 
     if (loading) {
 

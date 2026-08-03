@@ -32,7 +32,7 @@ function ObligationTable({
 
     }, []);
 
-    const loadData = () => {
+    function loadData() {
 
         setLoading(true);
 
@@ -54,7 +54,7 @@ function ObligationTable({
 
             });
 
-    };
+    }
 
     const handleView = (item) => {
 
@@ -301,6 +301,8 @@ Status : ${item.status}`
             </table>
 
             <EditObligationModal
+
+                key={selectedObligation?.id ?? "new"}
 
                 isOpen={isEditOpen}
 
