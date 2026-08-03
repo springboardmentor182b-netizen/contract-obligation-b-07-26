@@ -3,6 +3,7 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 
 import './App.css'
 import Home from './pages/Home'
+import Notifications from './pages/Notifications.js'
 import { Auth } from './features/authentication/Auth'
 
 function ProtectedDashboard() {
@@ -35,6 +36,10 @@ export default function App() {
         element: React.createElement(ProtectedDashboard),
       }),
       React.createElement(Route, {
+        path: '/notifications',
+        element: React.createElement(ProtectedNotifications),
+      }),
+      React.createElement(Route, {
         path: '*',
         element: React.createElement(Navigate, {
           to: '/login',
@@ -43,4 +48,11 @@ export default function App() {
       }),
     ),
   )
+}
+
+function ProtectedNotifications() {
+  const token = window.localStorage.getItem('contractiq_token')
+    || window.sessionStorage.getItem('contractiq_token')
+    || window.localStorage.getItem('access_token')
+  return token ? React.createElement(Notifications) : React.createElement(Navigate, { to: '/login', replace: true })
 }
