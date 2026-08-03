@@ -39,6 +39,8 @@ user-dashboard/
 │
 └── README.md
 ```
+Runs on http://localhost:8000 (docs at `/docs`). Seeds the 10 contracts and 5
+obligations from the screenshot into a local SQLite file on first run.
 
 ---
 
