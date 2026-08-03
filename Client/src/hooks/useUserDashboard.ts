@@ -1,4 +1,5 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import axios from 'axios';
 
 type UserStatus = 'Active' | 'Suspended';
 export type SystemRole =
@@ -39,13 +40,7 @@ export type DashboardTab =
   | 'Permission Matrix'
   | 'Activity Logs';
 
-const initialUsers: DashboardUser[] = [
-  { id: 'u1', name: 'Sarah Chen', email: 'sarah.chen@contractiq.com', assignedRole: 'Legal Manager', department: 'Legal', status: 'Active', lastActive: '2 hours ago' },
-  { id: 'u2', name: 'David Park', email: 'david.park@contractiq.com', assignedRole: 'Compliance Officer', department: 'Compliance', status: 'Active', lastActive: '23 minutes ago' },
-  { id: 'u3', name: 'Lisa Torres', email: 'lisa.torres@contractiq.com', assignedRole: 'Contract Manager', department: 'Operations', status: 'Suspended', lastActive: '1 day ago' },
-  { id: 'u4', name: 'Mark Johnson', email: 'mark.johnson@contractiq.com', assignedRole: 'Department Head', department: 'Procurement', status: 'Active', lastActive: '4 hours ago' },
-  { id: 'u5', name: 'James Lee', email: 'james.lee@contractiq.com', assignedRole: 'Employee', department: 'Procurement', status: 'Active', lastActive: '5 hours ago' },
-];
+const API_BASE_URL = 'http://localhost:8000';
 
 const initialPermissionMatrix: PermissionMatrix = {
   Administrator: { Contracts: 'Write', Compliance: 'Write', Renewals: 'Read', Reports: 'Write', 'Admin Panel': 'Write' },
@@ -66,62 +61,102 @@ const initialActivities: AuditActivity[] = [
 
 export function useUserDashboard() {
   const [activeTab, setActiveTab] = useState<DashboardTab>('Overview & Profile');
-  const [users, setUsers] = useState<DashboardUser[]>(initialUsers);
+  const [users, setUsers] = useState<DashboardUser[]>([]);
   const [permissionMatrix, setPermissionMatrix] = useState<PermissionMatrix>(initialPermissionMatrix);
   const [activities, setActivities] = useState<AuditActivity[]>(initialActivities);
 
+  const [metricsData, setMetricsData] = useState<any>({
+    total_users: 0,
+    active_users: 0,
+    roles_defined: 0,
+    permissions_count: 0,
+    departments_count: 0,
+    active_sessions: 0
+  });
+
+  const [profileData, setProfileData] = useState<any>({
+    name: '',
+    email: '',
+    phone: '',
+    department: '',
+    designation: '',
+    role: '',
+    status: '',
+    employee_id: '',
+    last_login: ''
+  });
+  
+  const [sessionsData, setSessionsData] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const metricsRes = await axios.get(`${API_BASE_URL}/api/metrics`);
+        setMetricsData(metricsRes.data);
+
+        const profileRes = await axios.get(`${API_BASE_URL}/api/profile`);
+        setProfileData(profileRes.data);
+
+        const usersRes = await axios.get(`${API_BASE_URL}/api/users`);
+        const mappedUsers = usersRes.data.map((u: any) => ({
+          ...u,
+          id: u.employee_id,
+          assignedRole: u.role,
+          lastActive: u.last_login
+        }));
+        setUsers(mappedUsers);
+
+        const sessionsRes = await axios.get(`${API_BASE_URL}/api/sessions`);
+        setSessionsData(sessionsRes.data);
+      } catch (error) {
+        console.error("Error fetching dashboard data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   const statistics = useMemo(
     () => [
-      { id: 'stat-1', value: 8, label: 'Total users', badge: 'users' },
-      { id: 'stat-2', value: 7, label: 'Active users', badge: 'active' },
-      { id: 'stat-3', value: 6, label: 'Roles defined', badge: 'roles' },
-      { id: 'stat-4', value: 42, label: 'Permissions', badge: 'permissions' },
-      { id: 'stat-5', value: 7, label: 'Departments', badge: 'departments' },
-      { id: 'stat-6', value: 2, label: 'Active sessions', badge: 'sessions' },
+      { id: 'stat-1', value: metricsData.total_users, label: 'Total users', badge: 'users' },
+      { id: 'stat-2', value: metricsData.active_users, label: 'Active users', badge: 'active' },
+      { id: 'stat-3', value: metricsData.roles_defined, label: 'Roles defined', badge: 'roles' },
+      { id: 'stat-4', value: metricsData.permissions_count, label: 'Permissions', badge: 'permissions' },
+      { id: 'stat-5', value: metricsData.departments_count, label: 'Departments', badge: 'departments' },
+      { id: 'stat-6', value: metricsData.active_sessions, label: 'Active sessions', badge: 'sessions' },
     ],
-    []
+    [metricsData]
   );
 
-  const profile = useMemo(
-    () => ({
-      initials: 'SC',
-      name: 'Sarah Chen',
-      title: 'Legal Manager',
-      status: 'Active',
-      lastLogin: 'Last login: Jun 3, 2024',
+  const profile = useMemo(() => {
+    const initials = profileData.name ? profileData.name.split(' ').map((n: string) => n[0]).join('').slice(0, 2) : 'U';
+    return {
+      initials,
+      name: profileData.name || 'Loading...',
+      title: profileData.designation,
+      status: profileData.status,
+      lastLogin: `Last login: ${profileData.last_login}`,
       details: [
-        { label: 'Employee ID', value: 'EMP-001' },
-        { label: 'Email', value: 'sarah.chen@contractiq.com' },
-        { label: 'Phone', value: '+1 (555) 010-2345' },
-        { label: 'Department', value: 'Legal' },
-        { label: 'Designation', value: 'Senior Legal Manager' },
-        { label: 'Role', value: 'Legal Manager' },
+        { label: 'Employee ID', value: profileData.employee_id },
+        { label: 'Email', value: profileData.email },
+        { label: 'Phone', value: profileData.phone },
+        { label: 'Department', value: profileData.department },
+        { label: 'Designation', value: profileData.designation },
+        { label: 'Role', value: profileData.role },
       ],
-    }),
-    []
-  );
+    };
+  }, [profileData]);
 
-  const sessions = useMemo(
-    () => [
-      {
-        id: 'session-1',
-        browser: 'Chrome 124 / Windows 11',
-        location: 'New York, US',
-        status: 'Current',
-        login: 'Jun 3, 2024 9:14 AM',
-        expires: 'Jun 3, 2024 5:14 PM',
-      },
-      {
-        id: 'session-2',
-        browser: 'Safari 17 / macOS Sonoma',
-        location: 'Remote â€” VPN',
-        status: 'Logged out',
-        login: 'Jun 3, 2024 8:00 AM',
-        expires: 'Jun 3, 2024 4:00 PM',
-      },
-    ],
-    []
-  );
+  const sessions = useMemo(() => {
+    return sessionsData.map((s: any) => ({
+      id: s.id,
+      browser: s.device,
+      location: s.location,
+      status: s.is_current ? 'Current' : 'Logged out',
+      login: s.login_time,
+      expires: s.expires_time,
+    }));
+  }, [sessionsData]);
 
   const securityCards = useMemo(
     () => [
@@ -135,7 +170,7 @@ export function useUserDashboard() {
     () => ({
       title: 'User & Role Management',
       subtitle: 'Manage users, roles, permissions, and authentication across ContractIQ',
-      date: 'June 3, 2024',
+      date: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
       actions: [
         { label: 'Invite User', outline: true },
         { label: '+ New Role', outline: false },
@@ -161,6 +196,7 @@ export function useUserDashboard() {
   );
 
   const toggleUserStatus = useCallback((id: string) => {
+    // In a real app, you would make a PUT/PATCH request to the server here
     setUsers((current) =>
       current.map((user) =>
         user.id === id
