@@ -33,7 +33,7 @@ function RiskIndicator() {
 
     }, []);
 
-    const loadRisks = async () => {
+    async function loadRisks() {
 
         try {
 
@@ -57,7 +57,7 @@ function RiskIndicator() {
 
         }
 
-    };
+    }
 
     // ===============================
     // KPI Calculations
