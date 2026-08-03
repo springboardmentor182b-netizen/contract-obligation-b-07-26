@@ -1,7 +1,7 @@
 import React from 'react';
 import { FileText } from 'lucide-react';
 
-// We add 'history' as a parameter (prop) here
+
 export default function VersionHistory({ history = [] }) {
   return (
     <div style={{ background: 'white', padding: '20px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>

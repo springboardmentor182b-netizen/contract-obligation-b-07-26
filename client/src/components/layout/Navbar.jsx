@@ -51,7 +51,7 @@ export default function Navbar({ toggleSidebar }) {
         </div>
       </div>
 
-      {/* Right Side: Search, Notifications, Profile */}
+      
       <div className="nav-tools">
         <div className="search-input-wrapper" style={{ position: 'relative' }}>
           <Search size={16} color="#94a3b8" style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }} />

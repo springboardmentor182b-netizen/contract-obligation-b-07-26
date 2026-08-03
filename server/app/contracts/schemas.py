@@ -27,3 +27,4 @@ class ContractResponse(ContractBase):
 
     class Config:
         from_attributes = True
+        
