@@ -1,12 +1,15 @@
 import os
 from pathlib import Path
 
+from dotenv import load_dotenv
 from sqlalchemy.engine import URL
 
 
 BASE_DIR = Path(__file__).resolve().parents[1]
 DATA_DIR = BASE_DIR / "data"
 DATA_FILE = DATA_DIR / "contractiq.json"
+
+load_dotenv(BASE_DIR / ".env")
 
 APP_NAME = "ContractIQ API"
 TOKEN_SECRET = "replace-this-secret-in-production"
