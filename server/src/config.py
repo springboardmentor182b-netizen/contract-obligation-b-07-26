@@ -1,17 +1,25 @@
-from pathlib import Path
+"""Application configuration loaded from server/.env."""
+
 import os
+from pathlib import Path
+
+from dotenv import load_dotenv
 
 
 BASE_DIR = Path(__file__).resolve().parents[1]
-DATA_DIR = BASE_DIR / "data"
-DATA_FILE = DATA_DIR / "contractiq.json"
+load_dotenv(BASE_DIR / ".env")
 
-APP_NAME = "ContractIQ API"
-TOKEN_SECRET = "replace-this-secret-in-production"
-TOKEN_TTL_SECONDS = 60 * 60 * 8
-DATABASE_URL = os.getenv(
-    "DATABASE_URL",
-    "postgresql://postgres:postgres@localhost:5432/contractiq_db",
+APP_NAME = os.getenv("APP_NAME", "ContractIQ API")
+
+DATABASE_URL = os.getenv("DATABASE_URL")
+if not DATABASE_URL:
+    raise RuntimeError(
+        "DATABASE_URL is not configured. Add it to server/.env."
+    )
+
+TOKEN_SECRET = os.getenv(
+    "TOKEN_SECRET",
+    "replace-this-secret-in-production",
 )
 import os
 from dotenv import load_dotenv
@@ -24,3 +32,8 @@ ALGORITHM = os.getenv("ALGORITHM")
 ACCESS_TOKEN_EXPIRE_MINUTES = int(
     os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES")
 )
+TOKEN_TTL_SECONDS = int(os.getenv("TOKEN_TTL_SECONDS", "28800"))
+
+# Retained for teammate modules that still use the legacy JSON store.
+DATA_DIR = BASE_DIR / "data"
+DATA_FILE = DATA_DIR / "contractiq.json"

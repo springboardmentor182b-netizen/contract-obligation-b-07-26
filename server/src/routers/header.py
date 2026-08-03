@@ -1,8 +1,7 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from fastapi.responses import FileResponse
 
-from reportlab.pdfgen import canvas
-
+import importlib
 import tempfile
 
 router = APIRouter(
@@ -17,6 +16,12 @@ router = APIRouter(
 @router.get("/export/pdf")
 
 def export_dashboard():
+
+    try:
+        canvas_module = importlib.import_module("reportlab.pdfgen.canvas")
+        canvas = canvas_module.Canvas
+    except ModuleNotFoundError as exc:
+        raise HTTPException(status_code=503, detail="PDF export requires the reportlab package.") from exc
 
     temp = tempfile.NamedTemporaryFile(
 

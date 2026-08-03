@@ -6,7 +6,11 @@ export async function signup(apiBaseUrl, payload) {
   })
 
   if (!response.ok) {
-    throw new Error('Unable to create account')
+    const error = await response.json().catch(() => null)
+    const detail = Array.isArray(error?.detail)
+      ? error.detail.map((item) => item.msg).join('. ')
+      : error?.detail
+    throw new Error(detail || 'Unable to create account')
   }
 
   return response.json()
