@@ -1,4 +1,4 @@
-import api from "./axios";
+import api from "../utils/axios";
 
 // Get All Audits
 export const getAudits = async () => {

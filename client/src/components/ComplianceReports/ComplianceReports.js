@@ -2,7 +2,7 @@ import "./ComplianceReports.css";
 
 import { useEffect, useState } from "react";
 
-import BASE_URL from "../../api/config";
+import { API_BASE_URL } from "../../features/authentication/constants";
 
 import {
     DocumentPlusIcon
@@ -44,11 +44,11 @@ function ComplianceReports() {
 
 
 
-    useEffect(()=>{
-
-        loadReports();
-
-    },[]);
+    useEffect(() => {
+        getReports()
+            .then(setReports)
+            .catch((error) => console.log(error));
+    }, []);
 
 
 
@@ -64,7 +64,7 @@ function ComplianceReports() {
     const handlePDF = (id)=>{
 
         window.open(
-    `${BASE_URL}/reports/${id}/pdf`,
+    `${API_BASE_URL}/api/reports/${id}/pdf`,
     "_blank"
 );
 
@@ -75,7 +75,7 @@ function ComplianceReports() {
     const handleExcel = (id)=>{
 
         window.open(
-    `${BASE_URL}/reports/${id}/excel`,
+    `${API_BASE_URL}/api/reports/${id}/excel`,
     "_blank"
 );
 

@@ -1,127 +1,44 @@
-import "./Calendar.css";
-import {useEffect,useState} from "react";
-import BASE_URL from "../../api/api";
+import { useMemo, useState } from 'react'
+import './Calendar.css'
 
-function Calendar(){
+const weekdays = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 
-const [events,setEvents]=useState([]);
-
-const days=[
-"","","","1","2","3","4",
-"5","6","7","8","9","10","11",
-"12","13","14","15","16","17","18",
-"19","20","21","22","23","24","25",
-"26","27","28","29","30","31"
-];
-
-useEffect(()=>{
-
-fetch(`${BASE_URL}/dashboard/calendar`)
-
-.then(res=>res.json())
-
-.then(data=>{
-
-setEvents(data);
-
-})
-
-.catch(err=>console.log(err));
-
-},[]);
-
-return(
-
-<div className="calendar-card">
-
-<div className="calendar-header">
-
-<h3>July 2026</h3>
-
-<div>
-
-❮ ❯
-
-</div>
-
-</div>
-
-<div className="week">
-
-<span>Sun</span>
-
-<span>Mon</span>
-
-<span>Tue</span>
-
-<span>Wed</span>
-
-<span>Thu</span>
-
-<span>Fri</span>
-
-<span>Sat</span>
-
-</div>
-
-<div className="dates">
-
-{
-
-days.map((day,index)=>{
-
-const hasEvent=
-
-events.find(
-
-event=>
-
-new Date(event.date)
-
-.getDate()
-
-.toString()===day
-
-);
-
-return(
-
-<div
-
-key={index}
-
-className={
-
-hasEvent
-
-?
-
-"active-day"
-
-:
-
-"date"
-
+function dateKey(year, month, day) {
+  return `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
 }
 
->
+export default function Calendar({ obligations = [] }) {
+  const [visibleMonth, setVisibleMonth] = useState(() => {
+    const now = new Date()
+    return new Date(now.getFullYear(), now.getMonth(), 1)
+  })
 
-{day}
+  const year = visibleMonth.getFullYear()
+  const month = visibleMonth.getMonth()
+  const monthLabel = visibleMonth.toLocaleDateString(undefined, { month: 'long', year: 'numeric' })
+  const calendarDays = useMemo(() => {
+    const firstDay = new Date(year, month, 1).getDay()
+    const daysInMonth = new Date(year, month + 1, 0).getDate()
+    return Array.from({ length: firstDay + daysInMonth }, (_, index) => index < firstDay ? null : index - firstDay + 1)
+  }, [month, year])
+  const dueDates = useMemo(() => new Set(
+    obligations.map((item) => item.due_date).filter(Boolean),
+  ), [obligations])
 
-</div>
-
-);
-
-})
-
+  return <section className="calendar-card" aria-label="Obligation due-date calendar">
+    <div className="calendar-header">
+      <h3>{monthLabel}</h3>
+      <div className="calendar-navigation">
+        <button type="button" onClick={() => setVisibleMonth(new Date(year, month - 1, 1))} aria-label="Previous month">‹</button>
+        <button type="button" onClick={() => setVisibleMonth(new Date(year, month + 1, 1))} aria-label="Next month">›</button>
+      </div>
+    </div>
+    <div className="week">{weekdays.map((day) => <span key={day}>{day}</span>)}</div>
+    <div className="dates">
+      {calendarDays.map((day, index) => {
+        const hasDueDate = day && dueDates.has(dateKey(year, month, day))
+        return <span key={`${day || 'blank'}-${index}`} className={hasDueDate ? 'active-day' : 'date'} title={hasDueDate ? 'Obligation due' : undefined}>{day}</span>
+      })}
+    </div>
+  </section>
 }
-
-</div>
-
-</div>
-
-);
-
-}
-
-export default Calendar;

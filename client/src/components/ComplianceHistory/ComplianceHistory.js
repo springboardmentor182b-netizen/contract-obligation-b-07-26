@@ -15,36 +15,14 @@ function ComplianceHistory() {
     const [error, setError] = useState("");
 
     useEffect(() => {
-
-        loadHistory();
-
+        getHistory()
+            .then(setHistoryData)
+            .catch((err) => {
+                console.log(err);
+                setError("Unable to load compliance history.");
+            })
+            .finally(() => setLoading(false));
     }, []);
-
-    const loadHistory = async () => {
-
-        try {
-
-            const data = await getHistory();
-
-            setHistoryData(data);
-
-        }
-
-        catch (err) {
-
-            console.log(err);
-
-            setError("Unable to load compliance history.");
-
-        }
-
-        finally {
-
-            setLoading(false);
-
-        }
-
-    };
 
     if (loading) {
 
