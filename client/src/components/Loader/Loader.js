@@ -1,5 +1,3 @@
-import { Circles } from "react-loader-spinner";
-
 function Loader(){
 
 return(
@@ -12,14 +10,16 @@ padding:"30px"
 }}
 >
 
-<Circles
-
-height="80"
-
-width="80"
-
-color="#2563EB"
-
+<span
+aria-label="Loading"
+style={{
+width:"38px",
+height:"38px",
+border:"4px solid #dbeafe",
+borderTopColor:"#2563EB",
+borderRadius:"50%",
+animation:"spin 0.8s linear infinite"
+}}
 />
 
 </div>

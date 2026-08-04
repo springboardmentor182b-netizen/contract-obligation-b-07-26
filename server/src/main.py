@@ -17,6 +17,7 @@ from .routers import risk as risk_router
 from .auth.security import create_token, get_current_user, hash_password, require_roles, verify_password
 from .database import create_user, find_user_by_email, initialize_database, initialize_notifications_table, list_users as list_database_users, update_user_password
 from .database.notifications import create_notification as create_postgres_notification, list_notifications as list_postgres_notifications, mark_all_notifications_read, mark_notification_read as mark_postgres_notification_read
+from .database.obligations import list_obligations as list_postgres_obligations
 from .schemas import (
     APIRecord,
     ComplianceLevel,
@@ -228,7 +229,7 @@ def list_obligations(
     status_filter: ObligationStatus | None = Query(default=None, alias="status"),
     _: dict[str, Any] = Depends(get_current_user),
 ) -> list[dict[str, Any]]:
-    obligations = store.list("obligations")
+    obligations = list_postgres_obligations()
     if contract_id:
         obligations = [item for item in obligations if item["contract_id"] == contract_id]
     if status_filter:

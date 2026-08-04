@@ -22,9 +22,9 @@ function ComplianceDonutChart({ data = [] }) {
 
                 <div className="status-chart">
 
-                    <ResponsiveContainer
+                        <ResponsiveContainer
                         width="100%"
-                        height={260}
+                        height="100%"
                     >
 
                         <PieChart>
@@ -33,8 +33,10 @@ function ComplianceDonutChart({ data = [] }) {
                                 data={data}
                                 dataKey="value"
                                 nameKey="name"
-                                innerRadius={60}
-                                outerRadius={95}
+                                cx="50%"
+                                cy="50%"
+                                innerRadius="54%"
+                                outerRadius="84%"
                                 paddingAngle={3}
                             >
 
