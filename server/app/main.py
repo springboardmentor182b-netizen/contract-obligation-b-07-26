@@ -4,6 +4,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.database import engine
 from app.contracts import models
 from app.contracts.router import router as contracts_router
+from app.analytics.router import router as analytics_router
+app.include_router(analytics_router)
 
 # Create database tables automatically
 models.Base.metadata.create_all(bind=engine)
