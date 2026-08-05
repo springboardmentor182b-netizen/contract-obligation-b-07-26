@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const AppearanceSection = () => {
+  const [appearanceId, setAppearanceId] = useState(null);
 
   const [appearance, setAppearance] = useState({
     theme: "Light",
@@ -12,6 +13,89 @@ const AppearanceSection = () => {
     animations: true,
     accent: "Gold",
   });
+
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    fetchAppearance();
+  }, []);
+
+  const fetchAppearance = async () => {
+    try {
+      setLoading(true);
+
+      const response = await fetch(
+        "http://127.0.0.1:8000/settings/appearance"
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch appearance settings");
+      }
+
+      const data = await response.json();
+
+      if (data.length > 0) {
+        const item = data[0];
+
+        setAppearanceId(item.id);
+
+        setAppearance({
+          theme: item.theme,
+          sidebarWidth: item.sidebarWidth,
+          tableDensity: item.tableDensity,
+          pageSize: item.pageSize,
+          stickyHeader: item.stickyHeader,
+          avatars: item.avatars,
+          animations: item.animations,
+          accent: item.accent,
+        });
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSave = async () => {
+    try {
+      setLoading(true);
+
+      const url = appearanceId
+        ? `http://127.0.0.1:8000/settings/appearance/${appearanceId}`
+        : "http://127.0.0.1:8000/settings/appearance";
+
+      const method = appearanceId ? "PUT" : "POST";
+
+      const response = await fetch(url, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(appearance),
+      });
+
+      if (!response.ok) {
+  const errorText = await response.text();
+  console.log("Backend Error:", errorText);
+  alert(errorText);
+  throw new Error(errorText);
+}
+
+      const result = await response.json();
+
+      if (!appearanceId) {
+        setAppearanceId(result.id);
+      }
+
+      alert("Appearance settings saved successfully!");
+    } catch (error) {
+      console.error(error);
+      alert("Failed to save appearance settings.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleChange = (e) => {
     setAppearance({
@@ -43,285 +127,289 @@ const AppearanceSection = () => {
   );
 
   return (
+  <div className="space-y-8">
 
-    <div className="space-y-8">
+  {/* Header */}
 
-      {/* Header */}
+  <div className="flex items-center justify-between">
 
-      <div className="flex items-center justify-between">
+    <div>
+
+      <h1 className="text-3xl font-bold text-[#1F2937]">
+        Appearance
+      </h1>
+
+      <p className="mt-2 text-gray-500">
+        Manage your appearance preferences
+      </p>
+
+    </div>
+
+    <button
+      onClick={handleSave}
+      disabled={loading}
+      className="rounded-xl bg-[#D4AF37] px-6 py-3 font-semibold disabled:opacity-50"
+    >
+      {loading ? "Saving..." : "Save Changes"}
+    </button>
+
+  </div>
+
+  {/* Theme */}
+
+  <div className="rounded-2xl bg-white shadow border">
+
+    <div className="border-b p-6">
+
+      <h2 className="text-2xl font-semibold">
+        Theme
+      </h2>
+
+      <p className="text-gray-500 mt-1">
+        Choose your preferred interface color mode.
+      </p>
+
+    </div>
+
+    <div className="p-6 space-y-4">
+
+      {/* Light */}
+
+      <label className="flex cursor-pointer items-center justify-between rounded-xl border border-gray-300 p-5 hover:border-[#D4AF37]">
 
         <div>
 
-          <h1 className="text-3xl font-bold text-[#1F2937]">
-            Appearance
-          </h1>
-
-          <p className="mt-2 text-gray-500">
-            Manage your appearance preferences
-          </p>
+          <h3 className="font-semibold text-[#1F2937]">
+            Light
+          </h3>
 
         </div>
 
-        <button className="rounded-xl bg-[#D4AF37] px-6 py-3 font-semibold">
-          Save Changes
-        </button>
+        <input
+          type="radio"
+          name="theme"
+          value="Light"
+          checked={appearance.theme === "Light"}
+          onChange={handleChange}
+          className="h-5 w-5 accent-[#D4AF37]"
+        />
+
+      </label>
+
+      {/* Dark */}
+
+      <label className="flex cursor-pointer items-center justify-between rounded-xl border border-gray-300 p-5 hover:border-[#D4AF37]">
+
+        <div>
+
+          <h3 className="font-semibold text-[#1F2937]">
+            Dark
+          </h3>
+
+        </div>
+
+        <input
+          type="radio"
+          name="theme"
+          value="Dark"
+          checked={appearance.theme === "Dark"}
+          onChange={handleChange}
+          className="h-5 w-5 accent-[#D4AF37]"
+        />
+
+      </label>
+
+      {/* System */}
+
+      <label className="flex cursor-pointer items-center justify-between rounded-xl border border-gray-300 p-5 hover:border-[#D4AF37]">
+
+        <div>
+
+          <h3 className="font-semibold text-[#1F2937]">
+            System
+          </h3>
+
+        </div>
+
+        <input
+          type="radio"
+          name="theme"
+          value="System"
+          checked={appearance.theme === "System"}
+          onChange={handleChange}
+          className="h-5 w-5 accent-[#D4AF37]"
+        />
+
+      </label>
+
+    </div>
+
+  </div>{/* Density & Layout */}
+
+<div className="rounded-2xl bg-white shadow border">
+
+  <div className="border-b p-6">
+
+    <h2 className="text-2xl font-semibold">
+      Density & Layout
+    </h2>
+
+    <p className="mt-1 text-gray-500">
+      Adjust interface density and content display preferences.
+    </p>
+
+  </div>
+
+  <div className="p-6 space-y-6">
+
+    {/* Sidebar Width */}
+
+    <div>
+
+      <label className="mb-2 block font-medium">
+        Sidebar width
+      </label>
+
+      <p className="mb-3 text-sm text-gray-500">
+        Width of the left navigation panel
+      </p>
+
+      <select
+        name="sidebarWidth"
+        value={appearance.sidebarWidth}
+        onChange={handleChange}
+        className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-[#D4AF37]"
+      >
+        <option>Default (240px)</option>
+        <option>Compact (200px)</option>
+        <option>Wide (280px)</option>
+      </select>
+
+    </div>
+
+    {/* Table Density */}
+
+    <div>
+
+      <label className="mb-2 block font-medium">
+        Table density
+      </label>
+
+      <p className="mb-3 text-sm text-gray-500">
+        Row height in contract and log tables
+      </p>
+
+      <select
+        name="tableDensity"
+        value={appearance.tableDensity}
+        onChange={handleChange}
+        className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-[#D4AF37]"
+      >
+        <option>Compact</option>
+        <option>Default</option>
+        <option>Comfortable</option>
+      </select>
+
+    </div>
+
+    {/* Default Page Size */}
+
+    <div>
+
+      <label className="mb-2 block font-medium">
+        Default page size
+      </label>
+
+      <p className="mb-3 text-sm text-gray-500">
+        Number of rows shown per page
+      </p>
+
+      <select
+        name="pageSize"
+        value={appearance.pageSize}
+        onChange={handleChange}
+        className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-[#D4AF37]"
+      >
+        <option>10</option>
+        <option>25</option>
+        <option>50</option>
+        <option>100</option>
+      </select>
+
+    </div>
+
+    {/* Sticky Header */}
+
+    <div className="flex items-center justify-between rounded-xl border border-gray-200 p-5">
+
+      <div>
+
+        <h3 className="font-semibold text-[#1F2937]">
+          Sticky header
+        </h3>
+
+        <p className="mt-1 text-sm text-gray-500">
+          Keep table headers visible when scrolling
+        </p>
 
       </div>
 
-      {/* Theme */}
+      <Toggle
+        value={appearance.stickyHeader}
+        onClick={() => toggle("stickyHeader")}
+      />
 
-      <div className="rounded-2xl bg-white shadow border">
+    </div>
 
-        <div className="border-b p-6">
+    {/* Show Avatars */}
 
-          <h2 className="text-2xl font-semibold">
-            Theme
-          </h2>
+    <div className="flex items-center justify-between rounded-xl border border-gray-200 p-5">
 
-          <p className="text-gray-500 mt-1">
-            Choose your preferred interface color mode.
-          </p>
+      <div>
 
-        </div>
+        <h3 className="font-semibold text-[#1F2937]">
+          Show avatars in tables
+        </h3>
 
-        <div className="p-6 space-y-4">          {/* Light */}
-
-          <label className="flex cursor-pointer items-center justify-between rounded-xl border border-gray-300 p-5 hover:border-[#D4AF37]">
-
-            <div>
-
-              <h3 className="font-semibold text-[#1F2937]">
-                Light
-              </h3>
-
-            </div>
-
-            <input
-              type="radio"
-              name="theme"
-              value="Light"
-              checked={appearance.theme === "Light"}
-              onChange={handleChange}
-              className="h-5 w-5 accent-[#D4AF37]"
-            />
-
-          </label>
-
-          {/* Dark */}
-
-          <label className="flex cursor-pointer items-center justify-between rounded-xl border border-gray-300 p-5 hover:border-[#D4AF37]">
-
-            <div>
-
-              <h3 className="font-semibold text-[#1F2937]">
-                Dark
-              </h3>
-
-            </div>
-
-            <input
-              type="radio"
-              name="theme"
-              value="Dark"
-              checked={appearance.theme === "Dark"}
-              onChange={handleChange}
-              className="h-5 w-5 accent-[#D4AF37]"
-            />
-
-          </label>
-
-          {/* System */}
-
-          <label className="flex cursor-pointer items-center justify-between rounded-xl border border-gray-300 p-5 hover:border-[#D4AF37]">
-
-            <div>
-
-              <h3 className="font-semibold text-[#1F2937]">
-                System
-              </h3>
-
-            </div>
-
-            <input
-              type="radio"
-              name="theme"
-              value="System"
-              checked={appearance.theme === "System"}
-              onChange={handleChange}
-              className="h-5 w-5 accent-[#D4AF37]"
-            />
-
-          </label>
-
-        </div>
+        <p className="mt-1 text-sm text-gray-500">
+          Display user avatar thumbnails in tables
+        </p>
 
       </div>
 
-      {/* Density & Layout */}
+      <Toggle
+        value={appearance.avatars}
+        onClick={() => toggle("avatars")}
+      />
 
-      <div className="rounded-2xl bg-white shadow border">
+    </div>
 
-        <div className="border-b p-6">
+    {/* Animated Transitions */}
 
-          <h2 className="text-2xl font-semibold">
-            Density & Layout
-          </h2>
+    <div className="flex items-center justify-between rounded-xl border border-gray-200 p-5">
 
-          <p className="mt-1 text-gray-500">
-            Adjust interface density and content display preferences.
-          </p>
+      <div>
 
-        </div>
+        <h3 className="font-semibold text-[#1F2937]">
+          Animated transitions
+        </h3>
 
-        <div className="p-6 space-y-6">          {/* Sidebar Width */}
-
-          <div>
-
-            <label className="mb-2 block font-medium">
-              Sidebar width
-            </label>
-
-            <p className="mb-3 text-sm text-gray-500">
-              Width of the left navigation panel
-            </p>
-
-            <select
-              name="sidebarWidth"
-              value={appearance.sidebarWidth}
-              onChange={handleChange}
-              className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-[#D4AF37]"
-            >
-              <option>Default (240px)</option>
-              <option>Compact (200px)</option>
-              <option>Wide (280px)</option>
-            </select>
-
-          </div>
-
-          {/* Table Density */}
-
-          <div>
-
-            <label className="mb-2 block font-medium">
-              Table density
-            </label>
-
-            <p className="mb-3 text-sm text-gray-500">
-              Row height in contract and log tables
-            </p>
-
-            <select
-              name="tableDensity"
-              value={appearance.tableDensity}
-              onChange={handleChange}
-              className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-[#D4AF37]"
-            >
-              <option>Compact</option>
-              <option>Default</option>
-              <option>Comfortable</option>
-            </select>
-
-          </div>
-
-          {/* Default Page Size */}
-
-          <div>
-
-            <label className="mb-2 block font-medium">
-              Default page size
-            </label>
-
-            <p className="mb-3 text-sm text-gray-500">
-              Number of rows shown per page
-            </p>
-
-            <select
-              name="pageSize"
-              value={appearance.pageSize}
-              onChange={handleChange}
-              className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-[#D4AF37]"
-            >
-              <option>10</option>
-              <option>25</option>
-              <option>50</option>
-              <option>100</option>
-            </select>
-
-          </div>
-
-          {/* Sticky Header */}
-
-          <div className="flex items-center justify-between rounded-xl border border-gray-200 p-5">
-
-            <div>
-
-              <h3 className="font-semibold text-[#1F2937]">
-                Sticky header
-              </h3>
-
-              <p className="mt-1 text-sm text-gray-500">
-                Keep table headers visible when scrolling
-              </p>
-
-            </div>
-
-            <Toggle
-              value={appearance.stickyHeader}
-              onClick={() => toggle("stickyHeader")}
-            />
-
-          </div>
-
-          {/* Show Avatars */}
-
-          <div className="flex items-center justify-between rounded-xl border border-gray-200 p-5">
-
-            <div>
-
-              <h3 className="font-semibold text-[#1F2937]">
-                Show avatars in tables
-              </h3>
-
-              <p className="mt-1 text-sm text-gray-500">
-                Display user avatar thumbnails in tables
-              </p>
-
-            </div>
-
-            <Toggle
-              value={appearance.avatars}
-              onClick={() => toggle("avatars")}
-            />
-
-          </div>
-
-          {/* Animated Transitions */}
-
-          <div className="flex items-center justify-between rounded-xl border border-gray-200 p-5">
-
-            <div>
-
-              <h3 className="font-semibold text-[#1F2937]">
-                Animated transitions
-              </h3>
-
-              <p className="mt-1 text-sm text-gray-500">
-                Enable smooth UI transition animations
-              </p>
-
-            </div>
-
-            <Toggle
-              value={appearance.animations}
-              onClick={() => toggle("animations")}
-            />
-
-          </div>
-
-        </div>
+        <p className="mt-1 text-sm text-gray-500">
+          Enable smooth UI transition animations
+        </p>
 
       </div>
 
+      <Toggle
+        value={appearance.animations}
+        onClick={() => toggle("animations")}
+      />
+
+    </div>
+
+  </div>
+
+</div>
       {/* Accent Color */}
 
       <div className="rounded-2xl bg-white shadow border">
@@ -338,10 +426,13 @@ const AppearanceSection = () => {
 
         </div>
 
-        <div className="p-6 grid grid-cols-4 gap-4">          {["Gold", "Blue", "Green", "Purple"].map((color) => (
+        <div className="p-6 grid grid-cols-4 gap-4">
+
+          {["Gold", "Blue", "Green", "Purple"].map((color) => (
 
             <button
               key={color}
+              type="button"
               onClick={() =>
                 setAppearance({
                   ...appearance,
@@ -378,8 +469,8 @@ const AppearanceSection = () => {
         </div>
 
       </div>
-
-    </div>
+</div>
+    
   );
 };
 

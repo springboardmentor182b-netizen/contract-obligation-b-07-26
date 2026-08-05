@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const ContractDefaultsSection = () => {
+  const [defaultId, setDefaultId] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const [defaults, setDefaults] = useState({
     category: "Vendor",
@@ -13,6 +15,7 @@ const ContractDefaultsSection = () => {
     reminder60: true,
     reminder30: true,
     reminder14: true,
+
     autoArchive: false,
 
     workflow: [
@@ -23,403 +26,388 @@ const ContractDefaultsSection = () => {
     ],
   });
 
-  const handleChange = (e) => {
-    setDefaults({
-      ...defaults,
-      [e.target.name]: e.target.value,
-    });
-  };
+  useEffect(() => {
+    fetchDefaults();
+  }, []);
 
-  const toggle = (key) => {
-    setDefaults({
-      ...defaults,
-      [key]: !defaults[key],
-    });
-  };
+  const fetchDefaults = async () => {
+    try {
+      setLoading(true);
 
-  const addStep = () => {
-    const step = prompt("Enter workflow step");
+      const response = await fetch(
+        "http://127.0.0.1:8000/settings/contract-defaults"
+      );
 
-    if (step) {
-      setDefaults({
-        ...defaults,
-        workflow: [...defaults.workflow, step],
-      });
+      if (!response.ok) {
+        throw new Error("Failed to fetch Contract Defaults");
+      }
+
+      const data = await response.json();
+
+      if (data.length > 0) {
+        const item = data[0];
+
+        setDefaultId(item.id);
+
+        setDefaults({
+          category: item.category,
+          status: item.status,
+          law: item.law,
+          numbering: item.numbering,
+          renewal: item.renewal,
+
+          reminder90: item.reminder90,
+          reminder60: item.reminder60,
+          reminder30: item.reminder30,
+          reminder14: item.reminder14,
+
+          autoArchive: item.autoArchive,
+
+          workflow: item.workflow || [],
+        });
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    } finally {
+      setLoading(false);
     }
   };
+  const handleSave = async () => {
+  try {
+    setLoading(true);
 
-  const Toggle = ({ value, onClick }) => (
-    <button
-      onClick={onClick}
-      className={`relative h-7 w-14 rounded-full ${
-        value ? "bg-[#D4AF37]" : "bg-gray-300"
+    const url = defaultId
+      ? `http://127.0.0.1:8000/settings/contract-defaults/${defaultId}`
+      : "http://127.0.0.1:8000/settings/contract-defaults";
+
+    const method = defaultId ? "PUT" : "POST";
+
+    const body = {
+      category: defaults.category,
+      status: defaults.status,
+      law: defaults.law,
+      numbering: defaults.numbering,
+      renewal: defaults.renewal,
+
+      reminder90: defaults.reminder90,
+      reminder60: defaults.reminder60,
+      reminder30: defaults.reminder30,
+      reminder14: defaults.reminder14,
+
+      autoArchive: defaults.autoArchive,
+
+      workflow: defaults.workflow,
+    };
+
+    const response = await fetch(url, {
+      method,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      console.log(error);
+      throw new Error(error);
+    }
+
+    const result = await response.json();
+
+    if (!defaultId) {
+      setDefaultId(result.id);
+    }
+
+    alert("Contract Defaults saved successfully!");
+  } catch (error) {
+    console.error(error);
+    alert("Failed to save Contract Defaults.");
+  } finally {
+    setLoading(false);
+  }
+};
+
+const handleChange = (e) => {
+  setDefaults({
+    ...defaults,
+    [e.target.name]: e.target.value,
+  });
+};
+
+const toggle = (key) => {
+  setDefaults({
+    ...defaults,
+    [key]: !defaults[key],
+  });
+};
+
+const addStep = () => {
+  const step = prompt("Enter workflow step");
+
+  if (step && step.trim() !== "") {
+    setDefaults({
+      ...defaults,
+      workflow: [...defaults.workflow, step],
+    });
+  }
+};
+
+const Toggle = ({ value, onClick }) => (
+  <button
+    type="button"
+    onClick={onClick}
+    className={`relative h-7 w-14 rounded-full transition ${
+      value ? "bg-[#D4AF37]" : "bg-gray-300"
+    }`}
+  >
+    <span
+      className={`absolute top-1 h-5 w-5 rounded-full bg-white transition ${
+        value ? "left-8" : "left-1"
       }`}
-    >
-      <span
-        className={`absolute top-1 h-5 w-5 rounded-full bg-white transition ${
-          value ? "left-8" : "left-1"
-        }`}
-      />
-    </button>
-  );
+    />
+  </button>
+);
+return (
+  <div className="space-y-8">
 
-  return (
+    {/* Header */}
 
-    <div className="space-y-8">
+    <div className="flex items-center justify-between">
 
-      <div className="flex items-center justify-between">
+      <div>
+
+        <h1 className="text-3xl font-bold">
+          Contract Defaults
+        </h1>
+
+        <p className="mt-2 text-gray-500">
+          Manage your contract default settings
+        </p>
+
+      </div>
+
+      <button
+        onClick={handleSave}
+        disabled={loading}
+        className="rounded-xl bg-[#D4AF37] px-6 py-3 font-semibold disabled:opacity-50"
+      >
+        {loading ? "Saving..." : "Save Changes"}
+      </button>
+
+    </div>
+
+    {/* Default Contract Settings */}
+
+    <div className="rounded-2xl border bg-white shadow">
+
+      <div className="border-b p-6">
+
+        <h2 className="text-2xl font-semibold">
+          Default Contract Settings
+        </h2>
+
+        <p className="mt-1 text-gray-500">
+          Configure the default values used when creating contracts.
+        </p>
+
+      </div>
+
+      <div className="grid grid-cols-2 gap-6 p-6">
 
         <div>
 
-          <h1 className="text-3xl font-bold">
-            Contract Defaults
-          </h1>
-
-          <p className="mt-2 text-gray-500">
-            Manage your contract defaults preferences
-          </p>
-
-        </div>
-
-        <button className="rounded-xl bg-[#D4AF37] px-6 py-3 font-semibold">
-          Save Changes
-        </button>
-
-      </div>
-
-      {/* Default Contract Settings */}
-
-      <div className="rounded-2xl border bg-white shadow">
-
-        <div className="border-b p-6">
-
-          <h2 className="text-2xl font-semibold">
-            Default Contract Settings
-          </h2>
-
-          <p className="mt-1 text-gray-500">
-            Pre-fill defaults used when creating new contracts.
-          </p>
-
-        </div>
-
-        <div className="grid grid-cols-2 gap-6 p-6">          {/* Default Category */}
-
-          <div>
-
-            <label className="mb-2 block font-medium">
-              Default Category
-            </label>
-
-            <p className="mb-3 text-sm text-gray-500">
-              Pre-selected category for new contracts
-            </p>
-
-            <select
-              name="category"
-              value={defaults.category}
-              onChange={handleChange}
-              className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-[#D4AF37]"
-            >
-              <option>Vendor</option>
-              <option>Customer</option>
-              <option>Employment</option>
-              <option>Procurement</option>
-              <option>NDA</option>
-            </select>
-
-          </div>
-
-          {/* Default Status */}
-
-          <div>
-
-            <label className="mb-2 block font-medium">
-              Default Status
-            </label>
-
-            <p className="mb-3 text-sm text-gray-500">
-              Starting status when a contract is created
-            </p>
-
-            <select
-              name="status"
-              value={defaults.status}
-              onChange={handleChange}
-              className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-[#D4AF37]"
-            >
-              <option>Draft</option>
-              <option>Under Review</option>
-              <option>Pending Approval</option>
-            </select>
-
-          </div>
-
-          {/* Default Governing Law */}
-
-          <div>
-
-            <label className="mb-2 block font-medium">
-              Default Governing Law
-            </label>
-
-            <p className="mb-3 text-sm text-gray-500">
-              Jurisdiction applied to new contracts
-            </p>
-
-            <select
-              name="law"
-              value={defaults.law}
-              onChange={handleChange}
-              className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-[#D4AF37]"
-            >
-              <option>New York Law</option>
-              <option>California Law</option>
-              <option>Texas Law</option>
-              <option>English Law</option>
-            </select>
-
-          </div>
-
-          {/* Auto-numbering Format */}
-
-          <div>
-
-            <label className="mb-2 block font-medium">
-              Auto-numbering Format
-            </label>
-
-            <p className="mb-3 text-sm text-gray-500">
-              Pattern for Contract ID generation
-            </p>
-
-            <input
-              type="text"
-              name="numbering"
-              value={defaults.numbering}
-              onChange={handleChange}
-              className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-[#D4AF37]"
-            />
-
-          </div>
-
-          {/* Default Renewal Cycle */}
-
-          <div>
-
-            <label className="mb-2 block font-medium">
-              Default Renewal Cycle
-            </label>
-
-            <p className="mb-3 text-sm text-gray-500">
-              Renewal period applied to new contracts
-            </p>
-
-            <select
-              name="renewal"
-              value={defaults.renewal}
-              onChange={handleChange}
-              className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-[#D4AF37]"
-            >
-              <option>6 Months</option>
-              <option>1 Year</option>
-              <option>2 Years</option>
-              <option>3 Years</option>
-            </select>
-
-          </div>
-
-        </div>
-
-      </div>
-
-      {/* Renewal & Reminder Defaults */}
-
-      <div className="rounded-2xl border bg-white shadow">
-
-        <div className="border-b p-6">
-
-          <h2 className="text-2xl font-semibold">
-            Renewal & Reminder Defaults
-          </h2>
-
-          <p className="mt-1 text-gray-500">
-            Default reminder schedule applied to all contracts.
-          </p>
-
-        </div>
-
-        <div className="space-y-4 p-6">          {/* 90-day Reminder */}
-
-          <div className="flex items-center justify-between rounded-xl border border-gray-200 p-5">
-
-            <div>
-
-              <h3 className="font-semibold">
-                90-day reminder
-              </h3>
-
-              <p className="mt-1 text-sm text-gray-500">
-                Send alert 90 days before any contract expires
-              </p>
-
-            </div>
-
-            <Toggle
-              value={defaults.reminder90}
-              onClick={() => toggle("reminder90")}
-            />
-
-          </div>
-
-          {/* 60-day Reminder */}
-
-          <div className="flex items-center justify-between rounded-xl border border-gray-200 p-5">
-
-            <div>
-
-              <h3 className="font-semibold">
-                60-day reminder
-              </h3>
-
-              <p className="mt-1 text-sm text-gray-500">
-                Send alert 60 days before any contract expires
-              </p>
-
-            </div>
-
-            <Toggle
-              value={defaults.reminder60}
-              onClick={() => toggle("reminder60")}
-            />
-
-          </div>
-
-          {/* 30-day Reminder */}
-
-          <div className="flex items-center justify-between rounded-xl border border-gray-200 p-5">
-
-            <div>
-
-              <h3 className="font-semibold">
-                30-day reminder
-              </h3>
-
-              <p className="mt-1 text-sm text-gray-500">
-                Send alert 30 days before any contract expires
-              </p>
-
-            </div>
-
-            <Toggle
-              value={defaults.reminder30}
-              onClick={() => toggle("reminder30")}
-            />
-
-          </div>
-
-          {/* 14-day Reminder */}
-
-          <div className="flex items-center justify-between rounded-xl border border-gray-200 p-5">
-
-            <div>
-
-              <h3 className="font-semibold">
-                14-day reminder
-              </h3>
-
-              <p className="mt-1 text-sm text-gray-500">
-                Final escalation 14 days before expiry
-              </p>
-
-            </div>
-
-            <Toggle
-              value={defaults.reminder14}
-              onClick={() => toggle("reminder14")}
-            />
-
-          </div>
-
-          {/* Auto Archive */}
-
-          <div className="flex items-center justify-between rounded-xl border border-gray-200 p-5">
-
-            <div>
-
-              <h3 className="font-semibold">
-                Auto-archive expired
-              </h3>
-
-              <p className="mt-1 text-sm text-gray-500">
-                Automatically archive contracts after expiry
-              </p>
-
-            </div>
-
-            <Toggle
-              value={defaults.autoArchive}
-              onClick={() => toggle("autoArchive")}
-            />
-
-          </div>
-
-        </div>
-
-      </div>
-
-      {/* Approval Workflow Defaults */}
-
-      <div className="rounded-2xl border bg-white shadow">
-
-        <div className="border-b p-6">
-
-          <h2 className="text-2xl font-semibold">
-            Approval Workflow Defaults
-          </h2>
-
-          <p className="mt-1 text-gray-500">
-            Default approval pipeline applied to new contracts.
-          </p>
-
-        </div>
-
-        <div className="space-y-4 p-6">          {defaults.workflow.map((step, index) => (
-
-            <div
-              key={index}
-              className="flex items-center gap-5 rounded-xl border border-gray-200 p-5"
-            >
-
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#D4AF37] font-bold text-white">
-                {index + 1}
-              </div>
-
-              <div className="flex-1">
-
-                <h3 className="font-semibold text-[#1F2937]">
-                  {step}
-                </h3>
-
-              </div>
-
-            </div>
-
-          ))}
-
-          <button
-            onClick={addStep}
-            className="w-full rounded-xl border-2 border-dashed border-[#D4AF37] py-4 font-semibold text-[#D4AF37] transition hover:bg-[#FFF8E1]"
+          <label className="mb-2 block font-medium">
+            Default Category
+          </label>
+
+          <select
+            name="category"
+            value={defaults.category}
+            onChange={handleChange}
+            className="w-full rounded-lg border border-gray-300 px-4 py-3"
           >
-            + Add Step
-          </button>
+            <option>Vendor</option>
+            <option>Customer</option>
+            <option>Employment</option>
+            <option>Procurement</option>
+            <option>NDA</option>
+          </select>
+
+        </div>
+
+        <div>
+
+          <label className="mb-2 block font-medium">
+            Default Status
+          </label>
+
+          <select
+            name="status"
+            value={defaults.status}
+            onChange={handleChange}
+            className="w-full rounded-lg border border-gray-300 px-4 py-3"
+          >
+            <option>Draft</option>
+            <option>Under Review</option>
+            <option>Pending Approval</option>
+          </select>
+
+        </div>
+
+        <div>
+
+          <label className="mb-2 block font-medium">
+            Governing Law
+          </label>
+
+          <input
+            type="text"
+            name="law"
+            value={defaults.law}
+            onChange={handleChange}
+            className="w-full rounded-lg border border-gray-300 px-4 py-3"
+          />
+
+        </div>
+
+        <div>
+
+          <label className="mb-2 block font-medium">
+            Numbering Format
+          </label>
+
+          <input
+            type="text"
+            name="numbering"
+            value={defaults.numbering}
+            onChange={handleChange}
+            className="w-full rounded-lg border border-gray-300 px-4 py-3"
+          />
+
+        </div>
+
+        <div>
+
+          <label className="mb-2 block font-medium">
+            Renewal Cycle
+          </label>
+
+          <select
+            name="renewal"
+            value={defaults.renewal}
+            onChange={handleChange}
+            className="w-full rounded-lg border border-gray-300 px-4 py-3"
+          >
+            <option>6 Months</option>
+            <option>1 Year</option>
+            <option>2 Years</option>
+            <option>3 Years</option>
+          </select>
 
         </div>
 
       </div>
 
     </div>
-  );
+
+    {/* Renewal & Reminder Defaults */}
+
+    <div className="rounded-2xl border bg-white shadow">
+
+      <div className="border-b p-6">
+
+        <h2 className="text-2xl font-semibold">
+          Renewal & Reminder Defaults
+        </h2>
+
+      </div>
+
+      <div className="space-y-4 p-6">
+
+        {[
+          ["90-day Reminder","reminder90"],
+          ["60-day Reminder","reminder60"],
+          ["30-day Reminder","reminder30"],
+          ["14-day Reminder","reminder14"],
+          ["Auto Archive","autoArchive"],
+        ].map(([title,key])=>(
+          <div
+            key={key}
+            className="flex items-center justify-between rounded-xl border border-gray-200 p-5"
+          >
+
+            <h3 className="font-semibold">
+              {title}
+            </h3>
+
+            <Toggle
+              value={defaults[key]}
+              onClick={()=>toggle(key)}
+            />
+
+          </div>
+        ))}
+
+      </div>
+
+    </div>
+        {/* Approval Workflow Defaults */}
+
+    <div className="rounded-2xl border bg-white shadow">
+
+      <div className="border-b p-6">
+
+        <h2 className="text-2xl font-semibold">
+          Approval Workflow Defaults
+        </h2>
+
+        <p className="mt-1 text-gray-500">
+          Default approval workflow for newly created contracts.
+        </p>
+
+      </div>
+
+      <div className="space-y-4 p-6">
+
+        {defaults.workflow.map((step, index) => (
+
+          <div
+            key={index}
+            className="flex items-center gap-5 rounded-xl border border-gray-200 p-5"
+          >
+
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#D4AF37] text-white font-bold">
+              {index + 1}
+            </div>
+
+            <div className="flex-1">
+
+              <h3 className="font-semibold text-[#1F2937]">
+                {step}
+              </h3>
+
+            </div>
+
+          </div>
+
+        ))}
+
+        <button
+          type="button"
+          onClick={addStep}
+          className="w-full rounded-xl border-2 border-dashed border-[#D4AF37] py-4 font-semibold text-[#D4AF37] hover:bg-[#FFF8E1]"
+        >
+          + Add Workflow Step
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+);
+
 };
 
 export default ContractDefaultsSection;
