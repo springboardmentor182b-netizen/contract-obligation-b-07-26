@@ -84,3 +84,24 @@ function isAuthenticated() {
     || window.sessionStorage.getItem('contractiq_token')
     || window.localStorage.getItem('access_token'))
 }
+import "./App.css";
+
+import { BrowserRouter } from "react-router-dom";
+
+import AppRoutes from "./routes/AppRoutes";
+
+function App() {
+
+    return (
+
+        <BrowserRouter>
+
+            <AppRoutes />
+
+        </BrowserRouter>
+
+    );
+
+}
+
+export default App;

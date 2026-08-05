@@ -313,3 +313,147 @@ Tables
 - history
 - risk
 - missed_obligation
+
+# User Management System - Backend
+
+## Overview
+
+This is the FastAPI backend for the User Management System.
+
+The backend provides REST APIs for authentication, user management, role management, and JWT-based authorization.
+
+---
+
+## Technologies Used
+
+- FastAPI
+- Python
+- PostgreSQL
+- SQLAlchemy
+- Pydantic
+- Passlib
+- JWT Authentication
+- Uvicorn
+
+---
+
+## Features
+
+- User Registration
+- Secure Login
+- JWT Authentication
+- User CRUD Operations
+- Role Management
+- Password Hashing
+- PostgreSQL Integration
+- REST API
+
+---
+
+## Project Structure
+
+```
+src
+│
+├── database
+├── models
+├── routers
+├── schemas
+├── services
+├── utils
+└── main.py
+```
+
+---
+
+## Installation
+
+Create virtual environment
+
+```bash
+python -m venv venv
+```
+
+Activate virtual environment
+
+Windows
+
+```bash
+venv\Scripts\activate
+```
+
+Install dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+---
+
+## Database
+
+Create PostgreSQL database
+
+```
+usermanagement
+```
+
+---
+
+## Run Server
+
+```bash
+uvicorn app.main:app --reload
+```
+
+Server runs at
+
+```
+http://localhost:8000
+```
+
+Swagger Documentation
+
+```
+http://localhost:8000/docs
+```
+
+ReDoc
+
+```
+http://localhost:8000/redoc
+```
+
+---
+
+## API Endpoints
+
+Authentication
+
+- POST /register
+- POST /login
+- POST /forgot-password
+- POST /reset-password
+
+Users
+
+- GET /users
+- POST /users
+- PUT /users/{user_id}
+- DELETE /users/{user_id}
+
+Roles
+
+- GET /roles
+- POST /roles
+- PUT /roles/{role_id}
+- DELETE /roles/{role_id}
+---
+
+## Security
+
+- Password hashing using Passlib
+- JWT Authentication
+- SQLAlchemy ORM
+- Pydantic Validation
+
