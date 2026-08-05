@@ -3,7 +3,22 @@ import React from 'react'
 function statusClass(value = '') {
   return value.toLowerCase().replaceAll(' ', '-')
 }
-export default function UpcomingDeadlines({ deadlines = [] }) {
+export default function UpcomingDeadlines({ deadlines = [], compact = false }) {
+  if (compact) {
+    return React.createElement('section', { className: 'dashboard-card deadlines-card compact-deadlines' },
+      React.createElement('div', { className: 'card-heading deadlines-heading' },
+        React.createElement('div', null, React.createElement('h2', null, 'Upcoming Deadlines'), React.createElement('p', null, 'Next 90 days')),
+      ),
+      React.createElement('div', { className: 'compact-deadline-list' },
+        deadlines.length ? deadlines.map((deadline) => React.createElement('article', { className: 'compact-deadline-item', key: deadline.id },
+          React.createElement('strong', null, deadline.obligation),
+          React.createElement('span', null, deadline.contract_number),
+          React.createElement('time', null, deadline.due_date),
+        )) : React.createElement('p', { className: 'empty-state' }, 'No upcoming deadlines.'),
+      ),
+    )
+  }
+
   const rows = deadlines.length
     ? deadlines.map((deadline) => React.createElement('tr', { key: deadline.id },
       React.createElement('td', { className: 'contract-code' }, deadline.contract_number),

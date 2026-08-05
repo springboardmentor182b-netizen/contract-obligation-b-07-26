@@ -1,4 +1,4 @@
-import api from "./axios";
+import api from "../utils/axios";
 
 // Get All History
 export const getHistory = async () => {

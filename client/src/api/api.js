@@ -20,3 +20,4 @@ export default BASE_URL
 export const getObligations = () => request('/obligations')
 export const createObligation = (data) => request('/obligations', { method: 'POST', body: JSON.stringify(data) })
 export const updateObligation = (id, data) => request(`/obligations/${id}`, { method: 'PATCH', body: JSON.stringify(data) })
+export const deleteObligation = (id) => request(`/obligations/${id}`, { method: 'DELETE' })
