@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Ignore client dependencies
 client/node_modules/
 client/dist/
@@ -20,3 +21,83 @@ server/*.sqlite3
 # OS
 .DS_Store
 Thumbs.db
+=======
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+server/.env
+client/.env
+
+# Python virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# Python generated files
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# Node dependencies and generated files
+node_modules/
+client/node_modules/
+client/dist/
+client/.vite/
+.npm/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# IDE settings
+.vscode/
+.idea/
+*.code-workspace
+
+# Operating system files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Temporary files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+.cache/
+tmp/
+temp/
+
+# Runtime logs
+*.log
+logs/
+
+# PostgreSQL exports/backups
+*.backup
+*.dump
+*.sql.gz
+
+# Python build artifacts
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Local testing and generated reports
+test-results/
+playwright-report/
+coverage/
+__pycache__/
+*.py[cod]
+server/data/
+server/venv/
+>>>>>>> origin/main-group-A

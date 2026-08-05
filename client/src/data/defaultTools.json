@@ -1,0 +1,14 @@
+[
+  {
+    "id": "contracts",
+    "label": "Contracts"
+  },
+  {
+    "id": "obligations",
+    "label": "Obligations"
+  },
+  {
+    "id": "renewals",
+    "label": "Renewals"
+  }
+]
