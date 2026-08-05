@@ -121,20 +121,6 @@ const Login = () => {
               </li>
             </ul>
 
-            <div className="access-roles">
-              <h3>ACCESS ROLES</h3>
-              <div className="role-badges">
-                <span className="role-badge">Administrator</span>
-                <span className="role-badge">Legal Manager</span>
-                <span className="role-badge">Compliance Officer</span>
-                <span className="role-badge">Contract Manager</span>
-                <span className="role-badge">Department Head</span>
-                <span className="role-badge">Employee</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
         <div className="auth-footer">
           <span>🔒</span>
           <span>Secure by JWT · Authentication · RBAC</span>
@@ -290,31 +276,7 @@ const Login = () => {
               </p>
             </form>
           )}
-
-          {/* Demo Access Section */}
-          {activeTab === 'signin' && (
-            <div className="demo-access">
-              <h4>DEMO ACCESS</h4>
-              <div className="demo-roles">
-                <div className="demo-role">
-                  <strong>Administrator</strong>
-                  <small>admin@company.com</small>
-                </div>
-                <div className="demo-role">
-                  <strong>Legal Manager</strong>
-                  <small>legal@company.com</small>
-                </div>
-                <div className="demo-role">
-                  <strong>Compliance Officer</strong>
-                  <small>compliance@company.com</small>
-                </div>
-                <div className="demo-role">
-                  <strong>Contract Manager</strong>
-                  <small>manager@company.com</small>
-                </div>
-              </div>
-            </div>
-          )}
+            
         </div>
       </div>
     </div>
