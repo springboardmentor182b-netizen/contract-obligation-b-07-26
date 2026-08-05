@@ -1,3 +1,4 @@
+import Notification_Screen from "./Notification_Screen";
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 
@@ -27,6 +28,15 @@ export default function AppRoutes() {
       
       <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
       <Route path="/users" element={<ProtectedRoute><Users /></ProtectedRoute>} />
+
+      <Route
+  path="/notification"
+  element={
+    <ProtectedRoute>
+      <Notification_Screen />
+    </ProtectedRoute>
+  }
+/>
       
       {/* Here is your correctly configured Compliance route! */}
       <Route path="/compliance" element={<ProtectedRoute><ComplianceMonitoring /></ProtectedRoute>} />
