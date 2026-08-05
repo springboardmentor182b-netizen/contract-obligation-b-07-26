@@ -21,3 +21,10 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+
+client/node_modules/
+server/venv/
+__pycache__/
+*.pyc
+.env
+*.db
