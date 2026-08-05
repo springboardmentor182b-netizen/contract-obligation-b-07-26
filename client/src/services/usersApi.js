@@ -1,4 +1,7 @@
-
+/**
+ * Users API service — raw fetch calls only. Business/state logic lives in
+ * hooks/useUserManagement.js.
+ */
 
 const BASE_URL = import.meta.env?.VITE_API_BASE_URL || process.env.REACT_APP_API_BASE_URL || '/api';
 
@@ -28,7 +31,11 @@ async function request(path, options = {}) {
   return res.json();
 }
 
-
+/**
+ * GET /users?page=1&pageSize=10&search=&role=&status=
+ * -> { items: Array<User>, total: number }
+ * User = { id, name, email, role, status, department, createdAt, lastLoginAt }
+ */
 export function getUsers({ page = 1, pageSize = 10, search = '', role = '', status = '' } = {}) {
   const params = new URLSearchParams({ page, pageSize, search, role, status });
   return request(`/users?${params.toString()}`);
@@ -39,7 +46,11 @@ export function getUser(id) {
   return request(`/users/${id}`);
 }
 
-
+/**
+ * POST /users
+ * body: { name, email, role, department, password }
+ * -> User
+ */
 export function createUser(payload) {
   return request('/users', {
     method: 'POST',
@@ -47,6 +58,11 @@ export function createUser(payload) {
   });
 }
 
+/**
+ * PATCH /users/{id}
+ * body: partial { name, email, department }
+ * -> User
+ */
 export function updateUser(id, payload) {
   return request(`/users/${id}`, {
     method: 'PATCH',
@@ -54,7 +70,11 @@ export function updateUser(id, payload) {
   });
 }
 
-
+/**
+ * PATCH /users/{id}/role
+ * body: { role }
+ * -> User
+ */
 export function updateUserRole(id, role) {
   return request(`/users/${id}/role`, {
     method: 'PATCH',
@@ -62,7 +82,11 @@ export function updateUserRole(id, role) {
   });
 }
 
-
+/**
+ * PATCH /users/{id}/status
+ * body: { status: 'active' | 'inactive' }
+ * -> User
+ */
 export function updateUserStatus(id, status) {
   return request(`/users/${id}/status`, {
     method: 'PATCH',
