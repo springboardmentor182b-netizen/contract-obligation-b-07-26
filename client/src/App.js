@@ -1,23 +1,3 @@
-<<<<<<< HEAD
-
-import React from "react";
-import "./App.css";
-import { ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import ObligationTracker from "./pages/ObligationTracker";
-
-export default function App() {
-  return (
-    <div className="App">
-      <ObligationTracker />
-      <ToastContainer
-        position="top-right"
-        autoClose={3000}
-      />
-    </div>
-  );
-}f
-=======
 import React from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 
@@ -104,4 +84,25 @@ function isAuthenticated() {
     || window.sessionStorage.getItem('contractiq_token')
     || window.localStorage.getItem('access_token'))
 }
->>>>>>> fb79317a17b8dd58157808f025a1210e4a595049
+
+import "./App.css";
+
+import { BrowserRouter } from "react-router-dom";
+
+import AppRoutes from "./routes/AppRoutes";
+
+function App() {
+
+    return (
+
+        <BrowserRouter>
+
+            <AppRoutes />
+
+        </BrowserRouter>
+
+    );
+
+}
+
+export default App;

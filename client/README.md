@@ -324,3 +324,123 @@ Runs on
 ```
 http://localhost:3000
 ```
+# User Management System - Frontend
+
+## Overview
+
+This is the React frontend for the User Management System.
+
+The application provides a modern and responsive interface for managing users, supporting role-based access control, authentication, and user administration.
+
+---
+
+## Technologies Used
+
+- React.js
+- JavaScript (ES6)
+- CSS3
+- Axios
+- Heroicons
+- React Router DOM
+
+---
+
+## Features
+
+- Secure User Login
+- User Registration
+- Dashboard
+- User Management
+- Add User
+- Edit User
+- Delete User
+- View User Details
+- Search Users
+- Role-wise Filtering
+- Responsive UI
+- JWT Authentication Integration
+
+---
+
+## Project Structure
+
+```
+src
+│
+├── api/
+│   ├── authApi.js
+│   ├── userApi.js
+│   └── roleApi.js
+│
+│
+├── components/
+│   ├── Header/
+│   ├── DashboardCards/
+│   ├── RoleTabs/
+│   ├── SearchBar/
+│   ├── UserTable/
+│   ├── AddUserModal/
+│   └── EditUserModal/
+│
+├── config/
+│   └── config.js
+│
+├── pages/
+│   ├── Dashboard/
+│   ├── Login/
+│   ├── Register/
+│   ├── Profile/
+│   ├── ForgotPassword/
+│   └── ResetPassword/
+│
+├── App.js
+└── index.js
+```
+
+---
+
+## Installation
+
+Clone the repository
+
+```bash
+git clone <repository-url>
+```
+
+Go to client folder
+
+```bash
+cd client
+```
+
+Install dependencies
+
+```bash
+npm install
+```
+
+Start the application
+
+```bash
+npm start
+```
+
+Application runs at
+
+```
+http://localhost:3000
+```
+
+---
+
+
+## Main Components
+
+- Header
+- Dashboard Cards
+- Role Tabs
+- Search Bar
+- User Table
+- Add User Modal
+- Edit User Modal
+

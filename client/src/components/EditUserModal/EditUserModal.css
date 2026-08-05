@@ -1,0 +1,211 @@
+.edit-modal-overlay {
+
+    position: fixed;
+
+    top:0;
+    left:0;
+
+    width:100%;
+    height:100%;
+
+    background:rgba(0,0,0,0.45);
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    z-index:1000;
+
+}
+
+
+
+.edit-user-modal {
+
+    width:650px;
+
+    background:white;
+
+    border-radius:12px;
+
+    padding:25px;
+
+    box-shadow:0 10px 30px rgba(0,0,0,0.2);
+
+}
+
+
+
+
+.edit-modal-header {
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:20px;
+
+}
+
+
+
+.edit-modal-header h2 {
+
+    color:#1e293b;
+
+    font-size:22px;
+
+}
+
+
+
+.edit-close-btn {
+
+    border:none;
+
+    background:none;
+
+    font-size:28px;
+
+    cursor:pointer;
+
+    color:#64748b;
+
+}
+
+
+
+
+.edit-form-grid {
+
+    display:grid;
+
+    grid-template-columns:repeat(2,1fr);
+
+    gap:18px;
+
+}
+
+
+
+.edit-form-group {
+
+    display:flex;
+
+    flex-direction:column;
+
+}
+
+
+
+.edit-form-group label {
+
+    font-size:14px;
+
+    font-weight:600;
+
+    color:#334155;
+
+    margin-bottom:6px;
+
+}
+
+
+
+.edit-form-group input,
+.edit-form-group select {
+
+
+    padding:10px;
+
+    border:1px solid #cbd5e1;
+
+    border-radius:6px;
+
+    font-size:14px;
+
+}
+
+
+
+.edit-form-group input:focus,
+.edit-form-group select:focus {
+
+    outline:none;
+
+    border-color:#2563eb;
+
+}
+
+
+
+
+.edit-actions {
+
+    margin-top:25px;
+
+    display:flex;
+
+    justify-content:flex-end;
+
+    gap:15px;
+
+}
+
+
+
+.edit-cancel-btn {
+
+
+    padding:10px 22px;
+
+    background:white;
+
+    border:1px solid #cbd5e1;
+
+    border-radius:6px;
+
+    cursor:pointer;
+
+}
+
+
+
+.update-btn {
+
+
+    padding:10px 25px;
+
+    background:#2563eb;
+
+    color:white;
+
+    border:none;
+
+    border-radius:6px;
+
+    font-weight:600;
+
+    cursor:pointer;
+
+}
+
+
+
+.update-btn:hover {
+
+    background:#1d4ed8;
+
+}
+
+
+
+.edit-cancel-btn:hover {
+
+    background:#f1f5f9;
+
+}

@@ -414,7 +414,6 @@ def list_activities(_: dict[str, Any] = Depends(get_current_user)) -> list[dict[
     return sorted(store.list("activities"), key=lambda item: item["created_at"], reverse=True)
 
 
-<<<<<<< HEAD
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -478,4 +477,11 @@ def home():
         "message": "Compliance Monitoring API Running Successfully"
     }
 =======
->>>>>>> fb79317a17b8dd58157808f025a1210e4a595049
+app.include_router(auth.router)
+app.include_router(users.router)
+app.include_router(roles.router)
+@app.get("/")
+def root():
+    return {
+        "message": "User Management API Running Successfully"
+    }
