@@ -19,6 +19,7 @@ DATA_DIR = BASE_DIR / "data"
 DATA_FILE = DATA_DIR / "contractiq.json"
 
 
+
 def env_value(*names: str, default: str | None = None) -> str | None:
     for name in names:
         value = os.getenv(name)
@@ -38,3 +39,16 @@ if not DATABASE_URL:
         port=int(env_value("DATABASE_PORT", "DB_PORT", default="5432")),
         database=env_value("DATABASE_NAME", "DB_NAME", default="contractiq_db"),
     ).render_as_string(hide_password=False)
+
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+DATABASE_URL = os.getenv("DATABASE_URL")
+SECRET_KEY = os.getenv("SECRET_KEY")
+ALGORITHM = os.getenv("ALGORITHM")
+ACCESS_TOKEN_EXPIRE_MINUTES = int(
+    os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES")
+)
+
