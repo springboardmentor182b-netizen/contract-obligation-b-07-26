@@ -1,35 +1,71 @@
 import {
+  ResponsiveContainer,
   BarChart,
   Bar,
   XAxis,
   YAxis,
+  CartesianGrid,
   Tooltip,
 } from "recharts";
-
-const data = [
-  { department: "Legal", contracts: 72 },
-  { department: "Finance", contracts: 58 },
-  { department: "HR", contracts: 43 },
-  { department: "IT", contracts: 41 },
-];
+import { useEffect,useState } from "react";
+import { getContractsByDepartment } from "../api/dashboardApi";
 
 function ContractsByDepartment() {
-  return (
-    <div
-      style={{
-        background: "#fff",
-        padding: "20px",
-        borderRadius: "12px",
-      }}
-    >
-      <h2>Contracts by Department</h2>
+  const[data, setData] = useState([]);
 
-      <BarChart width={500} height={300} data={data}>
-        <XAxis dataKey="department" />
-        <YAxis />
-        <Tooltip />
-        <Bar dataKey="contracts" fill="#4F46E5" />
-      </BarChart>
+  useEffect(() => {
+    async function fetchDepartments(){
+      try{
+        const response = await getContractsByDepartment();
+        setData(response);
+      } catch (error){
+        console.error("Error fetching contracts by department:",error);
+      }
+    }
+    fetchDepartments();
+  },[]);
+  return (
+    <div 
+      className="compliance-card"
+      style={{paddingTop:"12px", paddingBottom:"12px"}}
+    >
+
+      <div className="chart-header">
+        <div>
+          <h2>Contracts by Department</h2>
+          <p>Active contracts by business unit</p>
+        </div>
+
+      </div>
+
+      <div className="chart-container">
+        <ResponsiveContainer width="100%" height={220}>
+          <BarChart data={data}>
+            <CartesianGrid strokeDasharray="3 3" vertical={false} horizontal={false} />
+
+            <XAxis
+            dataKey="department"
+            axisLine={false}
+            tickLine={false} 
+            />
+
+            <YAxis
+             domain={[0, 60]} 
+             axisLine={false}
+             tickLine={false}
+             tickMargin={10}/>
+
+            <Tooltip />
+
+            <Bar
+              dataKey="compliance"
+              fill="#F59E0B"
+              radius={[8, 8, 0, 0]}
+            />
+          </BarChart>
+        </ResponsiveContainer>
+      </div>
+
     </div>
   );
 }
