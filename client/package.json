@@ -2,7 +2,6 @@
   "name": "client",
   "private": true,
   "version": "0.0.0",
-  "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -11,6 +10,13 @@
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
+    "jspdf": "^4.2.1",
+    "jspdf-autotable": "^5.0.8",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "react-loader-spinner": "^8.0.2",
+    "react-toastify": "^11.1.0",
+    "recharts": "^3.10.0"
     "axios": "^1.18.1",
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.8",
