@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import "./AddObligationModal.css";
 
 function EditObligationModal({
@@ -8,27 +8,14 @@ function EditObligationModal({
     onUpdate
 }) {
 
-    const [formData, setFormData] = useState({
-        title: "",
-        department: "",
-        owner: "",
-        due_date: "",
-        priority: "",
-        status: ""
-    });
-
-    useEffect(() => {
-        if (obligation) {
-            setFormData({
-                title: obligation.title,
-                department: obligation.department,
-                owner: obligation.owner,
-                due_date: obligation.due_date,
-                priority: obligation.priority,
-                status: obligation.status
-            });
-        }
-    }, [obligation]);
+    const [formData, setFormData] = useState(() => ({
+        title: obligation?.title ?? "",
+        department: obligation?.department ?? "",
+        owner: obligation?.owner ?? "",
+        due_date: obligation?.due_date ?? "",
+        priority: obligation?.priority ?? "",
+        status: obligation?.status ?? ""
+    }));
 
     if (!isOpen) return null;
 

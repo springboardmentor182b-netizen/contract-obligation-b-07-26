@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, Float, DateTime
 from sqlalchemy.sql import func
 
-from app.config.database import Base
+from ..database.session import Base
 
 
 class Compliance(Base):

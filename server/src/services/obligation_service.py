@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
-from app.models.obligation import Obligation
-from app.schemas.obligation import ObligationCreate
+from ..models.obligation import Obligation
+from ..obligation_schemas import ObligationCreate
 
 
 # CREATE

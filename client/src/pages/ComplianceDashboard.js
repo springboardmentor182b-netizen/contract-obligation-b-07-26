@@ -14,6 +14,10 @@ import AuditSummary from "../components/AuditSummary/AuditSummary";
 import ComplianceHistory from "../components/ComplianceHistory/ComplianceHistory";
 
 import { getDashboardKPIs } from "../api/kpiApi";
+import Navbar from "../layout/Navbar";
+import PageContainer from "../layout/PageContainer";
+import Sidebar from "../layout/Sidebar";
+import { getDashboard, getProfile } from "../features/dashboard/services/dashboardApi";
 
 import {
 
@@ -31,38 +35,38 @@ function ComplianceDashboard() {
 
     const [activeTab, setActiveTab] = useState("overview");
 
-    const [kpis, setKpis] = useState(null);
+    const [kpis, setKpis] = useState({});
+
+    const [profile, setProfile] = useState(null);
+    const [dashboard, setDashboard] = useState(null);
+    const [sidebarCollapsed, setSidebarCollapsed] = useState(
+        () => localStorage.getItem('contractiq_sidebar_collapsed') === 'true',
+    );
 
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-
-        loadKPIs();
-
+        getDashboardKPIs()
+            .then(setKpis)
+            .catch((error) => console.log(error))
+            .finally(() => setLoading(false));
     }, []);
 
-    const loadKPIs = async () => {
+    useEffect(() => {
+        Promise.all([getProfile(), getDashboard()])
+            .then(([user, dashboardData]) => {
+                setProfile(user);
+                setDashboard(dashboardData);
+            })
+            .catch((error) => console.log(error));
+    }, []);
 
-        try {
-
-            const data = await getDashboardKPIs();
-
-            setKpis(data);
-
-        }
-
-        catch (error) {
-
-            console.log(error);
-
-        }
-
-        finally {
-
-            setLoading(false);
-
-        }
-
+    const toggleSidebar = () => {
+        setSidebarCollapsed((current) => {
+            const next = !current;
+            localStorage.setItem('contractiq_sidebar_collapsed', String(next));
+            return next;
+        });
     };
 
     if (loading) {
@@ -187,7 +191,26 @@ function ComplianceDashboard() {
 
     return (
 
-        <div className="dashboard-page">
+        <div className="app-shell">
+
+            <Sidebar
+                profile={profile}
+                stats={dashboard?.stats}
+                collapsed={sidebarCollapsed}
+                onToggle={toggleSidebar}
+            />
+
+            <div className="app-main">
+
+                <Navbar
+                    profile={profile}
+                    pageTitle="Compliance"
+                    unreadCount={dashboard?.unread_notifications || 0}
+                />
+
+                <PageContainer>
+
+                    <div className="dashboard-page">
 
             <Header />
 
@@ -256,6 +279,12 @@ function ComplianceDashboard() {
                     )?.component
 
                 }
+
+            </div>
+
+                    </div>
+
+                </PageContainer>
 
             </div>
 

@@ -1,4 +1,4 @@
-import api from "./axios";
+import api from "../utils/axios";
 
 // Get All Risks
 export const getRisks = async () => {

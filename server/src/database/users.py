@@ -8,23 +8,48 @@ from psycopg.rows import dict_row
 from ..config import DATABASE_URL
 
 
+def psycopg_database_url() -> str:
+    """Convert SQLAlchemy's psycopg URL into a libpq-compatible URL."""
+    return DATABASE_URL.replace(
+        "postgresql+psycopg://",
+        "postgresql://",
+        1,
+    )
+
+
 CREATE_USERS_TABLE = """
 CREATE TABLE IF NOT EXISTS users (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    name TEXT NOT NULL,
-    email TEXT NOT NULL UNIQUE,
+    user_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    full_name VARCHAR(100) NOT NULL,
+    email VARCHAR(150) NOT NULL UNIQUE,
     password_hash TEXT NOT NULL,
     role TEXT NOT NULL,
-    department TEXT,
-    is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    phone VARCHAR(15),
+    department VARCHAR(100),
+    status BOOLEAN NOT NULL DEFAULT TRUE,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 """
 
+USER_PROJECTION = """
+    user_id AS id,
+    full_name AS name,
+    email,
+    password_hash,
+    role,
+    department,
+    status AS is_active,
+    created_at,
+    updated_at
+"""
+
 
 def get_connection():
-    return psycopg.connect(DATABASE_URL, row_factory=dict_row)
+    return psycopg.connect(
+        psycopg_database_url(),
+        row_factory=dict_row,
+    )
 
 
 def initialize_database() -> None:
@@ -46,8 +71,8 @@ def find_user_by_email(email: str) -> dict[str, Any] | None:
     with get_connection() as connection:
         with connection.cursor() as cursor:
             cursor.execute(
-                """
-                SELECT id, name, email, password_hash, role, department, is_active, created_at, updated_at
+                f"""
+                SELECT {USER_PROJECTION}
                 FROM users
                 WHERE lower(email) = lower(%s)
                 """,
@@ -60,10 +85,10 @@ def find_user_by_id(user_id: str) -> dict[str, Any] | None:
     with get_connection() as connection:
         with connection.cursor() as cursor:
             cursor.execute(
-                """
-                SELECT id, name, email, password_hash, role, department, is_active, created_at, updated_at
+                f"""
+                SELECT {USER_PROJECTION}
                 FROM users
-                WHERE id = %s
+                WHERE user_id = %s
                 """,
                 (user_id,),
             )
@@ -74,10 +99,16 @@ def create_user(payload: dict[str, Any]) -> dict[str, Any]:
     with get_connection() as connection:
         with connection.cursor() as cursor:
             cursor.execute(
-                """
-                INSERT INTO users (name, email, password_hash, role, department)
+                f"""
+                INSERT INTO users (
+                    full_name,
+                    email,
+                    password_hash,
+                    role,
+                    department
+                )
                 VALUES (%s, lower(%s), %s, %s, %s)
-                RETURNING id, name, email, password_hash, role, department, is_active, created_at, updated_at
+                RETURNING {USER_PROJECTION}
                 """,
                 (
                     payload["name"],
@@ -94,8 +125,8 @@ def list_users() -> list[dict[str, Any]]:
     with get_connection() as connection:
         with connection.cursor() as cursor:
             cursor.execute(
-                """
-                SELECT id, name, email, password_hash, role, department, is_active, created_at, updated_at
+                f"""
+                SELECT {USER_PROJECTION}
                 FROM users
                 ORDER BY created_at DESC
                 """
@@ -107,11 +138,11 @@ def update_user_password(email: str, password_hash: str) -> dict[str, Any] | Non
     with get_connection() as connection:
         with connection.cursor() as cursor:
             cursor.execute(
-                """
+                f"""
                 UPDATE users
                 SET password_hash = %s, updated_at = NOW()
                 WHERE lower(email) = lower(%s)
-                RETURNING id, name, email, password_hash, role, department, is_active, created_at, updated_at
+                RETURNING {USER_PROJECTION}
                 """,
                 (password_hash, email),
             )

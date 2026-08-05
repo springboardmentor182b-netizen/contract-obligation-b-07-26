@@ -6,8 +6,18 @@ from typing import Any
 from fastapi import Depends, FastAPI, HTTPException, Query, status
 from fastapi.middleware.cors import CORSMiddleware
 
+from .dashboard.router import router as dashboard_router
+from .models import audit, compliance, history, missed_obligation, report, risk  # noqa: F401
+from .routers import audit as audit_router
+from .routers import compliance as compliance_router
+from .routers import header, history as history_router, kpi, missed_obligation as missed_obligation_router
+from .routers import report as report_router
+from .routers import risk as risk_router
+
 from .auth.security import create_token, get_current_user, hash_password, require_roles, verify_password
-from .database import create_user, find_user_by_email, initialize_database, list_users as list_database_users, update_user_password
+from .database import create_user, find_user_by_email, initialize_database, initialize_notifications_table, list_users as list_database_users, update_user_password
+from .database.notifications import create_notification as create_postgres_notification, list_notifications as list_postgres_notifications, mark_all_notifications_read, mark_notification_read as mark_postgres_notification_read
+from .database.obligations import list_obligations as list_postgres_obligations
 from .schemas import (
     APIRecord,
     ComplianceLevel,
@@ -31,12 +41,7 @@ from .schemas import (
     UserPublic,
 )
 from .storage import store
-from fastapi import FastAPI
-from app.config.database import Base, engine
-from app.routers.obligation_routers import router as obligation_router
-from app.routers.dashboard_routers import router as dashboard_router
-from app.models.obligation import Obligation
-Base.metadata.create_all(bind=engine)
+from .database.session import Base, engine
 
 app = FastAPI(
     title="ContractIQ: Contract Obligation Tracking API",
@@ -51,12 +56,21 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-app.include_router(obligation_router)
-app.include_router(dashboard_router)
 @app.on_event("startup")
 def startup() -> None:
     initialize_database()
+    initialize_notifications_table()
+    Base.metadata.create_all(bind=engine)
 
+app.include_router(dashboard_router)
+app.include_router(kpi.router)
+app.include_router(header.router)
+app.include_router(compliance_router.router)
+app.include_router(audit_router.router)
+app.include_router(report_router.router)
+app.include_router(history_router.router)
+app.include_router(risk_router.router)
+app.include_router(missed_obligation_router.router)
 
 def public_user(user: dict[str, Any]) -> dict[str, Any]:
     return {key: value for key, value in user.items() if key != "password_hash"}
@@ -214,7 +228,7 @@ def list_obligations(
     status_filter: ObligationStatus | None = Query(default=None, alias="status"),
     _: dict[str, Any] = Depends(get_current_user),
 ) -> list[dict[str, Any]]:
-    obligations = store.list("obligations")
+    obligations = list_postgres_obligations()
     if contract_id:
         obligations = [item for item in obligations if item["contract_id"] == contract_id]
     if status_filter:
@@ -291,7 +305,6 @@ def compliance_summary(_: dict[str, Any] = Depends(get_current_user)) -> dict[st
 
     return {"total_obligations": len(obligations), "by_compliance_level": by_level, "overdue_obligations": overdue}
 
-
 def role_dashboard(role: str) -> dict[str, Any]:
     dashboards = {
         Role.administrator.value: {
@@ -344,12 +357,7 @@ def dashboard(current_user: dict[str, Any] = Depends(get_current_user)) -> dict[
 
 @app.get("/api/notifications", response_model=list[APIRecord])
 def list_notifications(current_user: dict[str, Any] = Depends(get_current_user)) -> list[dict[str, Any]]:
-    notifications = store.list("notifications")
-    if current_user["role"] != Role.administrator.value:
-        notifications = [
-            item for item in notifications if item.get("recipient_user_id") in {None, current_user["id"]}
-        ]
-    return notifications
+    return list_postgres_notifications(current_user["id"], current_user["role"] == Role.administrator.value)
 
 
 @app.post("/api/notifications", response_model=APIRecord, status_code=status.HTTP_201_CREATED)
@@ -357,18 +365,23 @@ def create_notification(
     payload: NotificationCreate,
     current_user: dict[str, Any] = Depends(require_roles(Role.administrator.value, Role.legal_manager.value, Role.compliance_officer.value)),
 ) -> dict[str, Any]:
-    notification = store.create("notifications", {**model_payload(payload), "read": False})
+    notification = create_postgres_notification(model_payload(payload))
     store.audit("created", "notification", notification["id"], current_user["id"])
     return notification
 
 
 @app.post("/api/notifications/{notification_id}/read", response_model=APIRecord)
 def mark_notification_read(notification_id: str, current_user: dict[str, Any] = Depends(get_current_user)) -> dict[str, Any]:
-    notification = ensure_record("notifications", notification_id)
-    if notification.get("recipient_user_id") not in {None, current_user["id"]} and current_user["role"] != Role.administrator.value:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Cannot update this notification")
-    updated = store.update("notifications", notification_id, {"read": True})
+    updated = mark_postgres_notification_read(notification_id, current_user["id"], current_user["role"] == Role.administrator.value)
+    if not updated:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Notification not found")
     return updated
+
+
+@app.post("/api/notifications/read-all")
+def mark_all_notifications_as_read(current_user: dict[str, Any] = Depends(get_current_user)) -> dict[str, int]:
+    updated_count = mark_all_notifications_read(current_user["id"], current_user["role"] == Role.administrator.value)
+    return {"updated_count": updated_count}
 
 
 @app.post("/api/reports", response_model=APIRecord, status_code=status.HTTP_201_CREATED)
@@ -401,6 +414,7 @@ def list_activities(_: dict[str, Any] = Depends(get_current_user)) -> list[dict[
     return sorted(store.list("activities"), key=lambda item: item["created_at"], reverse=True)
 
 
+<<<<<<< HEAD
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -463,3 +477,5 @@ def home():
     return {
         "message": "Compliance Monitoring API Running Successfully"
     }
+=======
+>>>>>>> fb79317a17b8dd58157808f025a1210e4a595049

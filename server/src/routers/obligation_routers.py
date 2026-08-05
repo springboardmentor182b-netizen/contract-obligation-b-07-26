@@ -1,11 +1,17 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-from app.config.database import get_db
+from ..database.session import get_db
 
-from app.schemas.obligation import *
+from ..obligation_schemas import ObligationCreate
 
-from app.services.obligation_service import *
+from ..services.obligation_service import (
+    create_obligation,
+    get_all_obligations,
+    get_obligation,
+    update_obligation,
+)
+from ..models.obligation import Obligation
 
 router = APIRouter(
     prefix="/obligations",

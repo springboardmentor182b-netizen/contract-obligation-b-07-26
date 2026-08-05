@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import "./AddObligationModal.css";
 import { createObligation as addObligation } from "../api/api";
 import { toast } from "react-toastify";
