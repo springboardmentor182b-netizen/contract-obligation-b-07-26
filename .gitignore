@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Ignore client dependencies
 client/node_modules/
 client/dist/
@@ -100,4 +99,3 @@ __pycache__/
 *.py[cod]
 server/data/
 server/venv/
->>>>>>> origin/main-group-A
