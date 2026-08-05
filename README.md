@@ -1,5 +1,5 @@
 # contract-obligation-b-07-26
-# ContractIQ – Settings Module
+## ContractIQ – Settings Module
 
 ## Overview
 
