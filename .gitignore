@@ -1,0 +1,22 @@
+# Ignore client dependencies
+client/node_modules/
+client/dist/
+
+# Ignore Python virtual environment
+server/venv/
+server/.venv/
+
+# Ignore databases
+server/*.db
+server/*.sqlite3
+
+# Environment files
+**/.env
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

@@ -1,0 +1,31 @@
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--bg-secondary, #f3f4f6);
+}
+
+.main-content-wrapper {
+  flex: 1;
+  margin-left: 250px; /* Width of the fixed sidebar */
+  display: flex;
+  flex-direction: column;
+  min-width: 0; /* Prevent flex overflow */
+}
+
+.main-content {
+  flex: 1;
+  padding: 0;
+  /* The settings container already handles its own padding, 
+     so we just let it fill the space */
+}
+
+@media (max-width: 768px) {
+  .main-content-wrapper {
+    margin-left: 0;
+  }
+  
+  .global-sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+  }
+}
