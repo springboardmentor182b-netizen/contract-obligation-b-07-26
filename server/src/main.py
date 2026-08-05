@@ -1,16 +1,3 @@
-<<<<<<< HEAD
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from src.database.session import engine, Base
-from src.routers import settings
-
-app = FastAPI(title="Settings Module API")
-
-# CORS configuration
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
-=======
 from __future__ import annotations
 
 from datetime import date, datetime
@@ -65,27 +52,11 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
->>>>>>> origin/main-group-A
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-<<<<<<< HEAD
-# Create database tables
-Base.metadata.create_all(bind=engine)
-
-# Register routers
-app.include_router(settings.router, prefix="/settings", tags=["settings"])
-
-@app.get("/")
-def root():
-    return {"message": "Settings Module API Running"}
-
-@app.get("/health")
-def health():
-    return {"status": "ok"}
-=======
 @app.on_event("startup")
 def startup() -> None:
     initialize_database()
@@ -442,6 +413,3 @@ def list_audit_logs(_: dict[str, Any] = Depends(require_roles(Role.administrator
 @app.get("/api/activities", response_model=list[APIRecord])
 def list_activities(_: dict[str, Any] = Depends(get_current_user)) -> list[dict[str, Any]]:
     return sorted(store.list("activities"), key=lambda item: item["created_at"], reverse=True)
-
-
->>>>>>> origin/main-group-A
