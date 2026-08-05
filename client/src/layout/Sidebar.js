@@ -14,7 +14,6 @@ export default function Sidebar({
   profile,
   stats = [],
   collapsed = false,
-  onToggle,
 }) {
   const counts = Object.fromEntries(stats.map((stat) => [stat.key, stat.value]))
   const initials = profile?.name?.split(' ').map((part) => part[0]).join('').slice(0, 2).toUpperCase() || '-'
@@ -49,14 +48,6 @@ export default function Sidebar({
         React.createElement('small', null, profile?.role || ''),
       ),
       React.createElement('span', { className: 'profile-chevron' }, 'v'),
-      React.createElement('button', {
-        type: 'button',
-        className: 'collapse-button',
-        onClick: onToggle,
-        title: collapsed ? 'Expand sidebar' : 'Collapse sidebar',
-        'aria-label': collapsed ? 'Expand sidebar' : 'Collapse sidebar',
-        'aria-expanded': !collapsed,
-      }, collapsed ? '>' : '\u00d7 Collapse'),
     ),
   )
 }

@@ -8,7 +8,8 @@ export default defineConfig({
       name: 'treat-source-js-as-jsx',
       enforce: 'pre',
       async transform(code, id) {
-        if (id.includes('/src/') && id.endsWith('.js')) {
+        const normalizedId = id.replaceAll('\\', '/')
+        if (normalizedId.includes('/src/') && normalizedId.endsWith('.js')) {
           return transformWithOxc(code, id, { lang: 'jsx', jsx: { runtime: 'automatic' } })
         }
       },

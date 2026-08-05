@@ -27,6 +27,75 @@
   z-index: 20;
 }
 
+.navbar .notification-button {
+  position: relative;
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border: 1px solid #dbe3ef;
+  border-radius: 999px;
+  background: #ffffff;
+  box-shadow: 0 6px 14px rgba(16, 31, 61, 0.07);
+  color: #64748b;
+}
+
+.navbar .notification-button::before,
+.navbar .notification-button::after {
+  content: none;
+}
+
+.navbar .notification-button svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+}
+
+.navbar .notification-dot {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 8px;
+  height: 8px;
+  border: 2px solid #ffffff;
+  border-radius: 999px;
+  background: #ff3b57;
+}
+
+.navbar .profile-summary {
+  display: grid;
+  min-height: 46px;
+  grid-template-columns: 35px minmax(118px, auto) 12px;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid #dbe3ef;
+  border-radius: 999px;
+  background: #ffffff;
+  box-shadow: 0 6px 14px rgba(16, 31, 61, 0.07);
+  padding: 5px 13px 5px 6px;
+}
+
+.navbar .profile-copy strong {
+  color: #0f172a;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.navbar .profile-copy small {
+  color: #8aa0c2;
+  font-size: 12px;
+}
+
+.navbar .header-chevron {
+  color: #94a3b8;
+  font-size: 14px;
+  line-height: 1;
+}
+
 .app-main {
   flex: 0 0 calc(100% - 264px);
   width: calc(100% - 264px);

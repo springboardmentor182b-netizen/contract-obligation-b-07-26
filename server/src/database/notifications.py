@@ -12,7 +12,7 @@ from .users import get_connection
 CREATE_NOTIFICATIONS_TABLE = """
 CREATE TABLE IF NOT EXISTS notifications (
     notification_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID REFERENCES users(user_id) ON DELETE CASCADE,
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
     contract_id UUID,
     title VARCHAR(200) NOT NULL,
     message TEXT NOT NULL,
