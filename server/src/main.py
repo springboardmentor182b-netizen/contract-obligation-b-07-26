@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 from typing import Any
 
 from fastapi import Depends, FastAPI, HTTPException, Query, status
@@ -90,6 +90,28 @@ def ensure_record(table: str, record_id: str) -> dict[str, Any]:
 
 def parse_date(value: str | None) -> date | None:
     return date.fromisoformat(value) if value else None
+
+
+def build_compliance_summary(obligations: list[dict[str, Any]]) -> dict[str, Any]:
+    by_level = {level.value: 0 for level in ComplianceLevel}
+    overdue = 0
+    today = date.today()
+
+    for obligation in obligations:
+        compliance_level = obligation.get("compliance_level")
+        by_level[compliance_level] = by_level.get(compliance_level, 0) + 1
+
+        due_date = parse_date(obligation.get("due_date"))
+        if due_date and due_date < today and obligation["status"] != ObligationStatus.completed.value:
+            overdue += 1
+
+    return {
+        "total_obligations": len(obligations),
+        "by_compliance_level": by_level,
+        "overdue_obligations": overdue,
+    }
+
+
 @app.get("/")
 def home():
     return {
@@ -292,19 +314,7 @@ def update_renewal(
 
 @app.get("/api/compliance/summary")
 def compliance_summary(_: dict[str, Any] = Depends(get_current_user)) -> dict[str, Any]:
-    obligations = store.list("obligations")
-    by_level = {level.value: 0 for level in ComplianceLevel}
-    for obligation in obligations:
-        by_level[obligation["compliance_level"]] = by_level.get(obligation["compliance_level"], 0) + 1
-
-    overdue = 0
-    today = date.today()
-    for obligation in obligations:
-        due_date = parse_date(obligation.get("due_date"))
-        if due_date and due_date < today and obligation["status"] != ObligationStatus.completed.value:
-            overdue += 1
-
-    return {"total_obligations": len(obligations), "by_compliance_level": by_level, "overdue_obligations": overdue}
+    return build_compliance_summary(store.list("obligations"))
 
 def role_dashboard(role: str) -> dict[str, Any]:
     dashboards = {
@@ -349,7 +359,7 @@ def dashboard(current_user: dict[str, Any] = Depends(get_current_user)) -> dict[
         "upcoming_renewals": sum(1 for item in renewals if item["status"] == RenewalStatus.upcoming.value),
         "pending_obligations": sum(1 for item in obligations if item["status"] in {ObligationStatus.pending.value, ObligationStatus.in_progress.value}),
         "unread_notifications": sum(1 for item in notifications if not item.get("read", False)),
-        "compliance": compliance_summary(),
+        "compliance": build_compliance_summary(obligations),
         "recent_activities": activities,
         "user": public_user(current_user),
         "role_dashboard": role_dashboard(current_user["role"]),
@@ -392,7 +402,7 @@ def create_report(payload: ReportCreate, current_user: dict[str, Any] = Depends(
         {
             **model_payload(payload),
             "generated_by": current_user["id"],
-            "generated_at": datetime.utcnow().isoformat(),
+            "generated_at": datetime.now(timezone.utc).isoformat(),
             "download_url": None,
         },
     )

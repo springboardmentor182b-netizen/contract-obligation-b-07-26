@@ -19,7 +19,7 @@ def list_obligations() -> list[dict[str, Any]]:
                     o.obligation_id::text AS id,
                     o.contract_id::text AS contract_id,
                     o.title,
-                    COALESCE(c.contract_number, '—') AS contract_number,
+                    COALESCE(c.contract_number, '-') AS contract_number,
                     COALESCE(c.category, 'Unassigned') AS department,
                     COALESCE(u.full_name, 'Unassigned') AS owner,
                     o.due_date,

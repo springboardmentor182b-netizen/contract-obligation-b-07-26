@@ -55,9 +55,9 @@ function AddObligationModal({ isOpen, onClose }) {
 
     catch(error){
 
-        console.log(error);
+        console.error(error);
 
-        alert("Unable to save obligation");
+        window.alert("Unable to save obligation");
 
     }
 
@@ -73,7 +73,7 @@ function AddObligationModal({ isOpen, onClose }) {
           <h2>Add New Obligation</h2>
 
           <button className="close-btn" onClick={onClose}>
-            ✕
+            x
           </button>
 
         </div>

@@ -124,7 +124,7 @@ useEffect(() => {
         .slice(0, 6)
         .map((item) => ({
             id: item.id,
-            contract_number: item.contract_number || '—',
+            contract_number: item.contract_number || '-',
             obligation: item.title,
             due_date: item.due_date,
             assignee: item.owner || 'Unassigned',
