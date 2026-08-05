@@ -1,7 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Bell } from "lucide-react";
 
 const NotificationSection = () => {
+  const [notificationId, setNotificationId] = useState(null);
+
+  const [loading, setLoading] = useState(false);
+
   const [notifications, setNotifications] = useState({
     renewal: true,
     obligation: true,
@@ -17,15 +21,92 @@ const NotificationSection = () => {
     sms: false,
   });
 
+  useEffect(() => {
+    fetchNotifications();
+  }, []);
+
+  const fetchNotifications = async () => {
+    try {
+      setLoading(true);
+
+      const response = await fetch(
+        "http://127.0.0.1:8000/settings/notifications"
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch notification settings");
+      }
+
+      const data = await response.json();
+
+      if (data.length > 0) {
+        const item = data[0];
+
+        setNotificationId(item.id);
+
+        setNotifications({
+          renewal: item.renewal,
+          obligation: item.obligation,
+          approval: item.approval,
+          compliance: item.compliance,
+          activity: item.activity,
+          security: item.security,
+          system: item.system,
+          inApp: item.inApp,
+          email: item.email,
+          slack: item.slack,
+          sms: item.sms,
+        });
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSave = async () => {
+    try {
+      setLoading(true);
+
+      const url = notificationId
+        ? `http://127.0.0.1:8000/settings/notifications/${notificationId}`
+        : "http://127.0.0.1:8000/settings/notifications";
+
+      const method = notificationId ? "PUT" : "POST";
+
+      const response = await fetch(url, {
+        method,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(notifications),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save");
+      }
+
+      const result = await response.json();
+
+      if (!notificationId) {
+        setNotificationId(result.id);
+      }
+
+      alert("Notification settings saved successfully!");
+    } catch (error) {
+      console.error(error);
+      alert("Failed to save notification settings.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const toggleSwitch = (key) => {
     setNotifications((prev) => ({
       ...prev,
       [key]: !prev[key],
     }));
-  };
-
-  const handleSave = () => {
-    alert("Notification settings saved successfully! (Frontend only)");
   };
 
   const Toggle = ({ value, onClick }) => (
@@ -64,14 +145,14 @@ const NotificationSection = () => {
 
         <button
           onClick={handleSave}
-          className="rounded-xl bg-[#D4AF37] px-6 py-3 font-semibold text-[#1F2937]"
+          disabled={loading}
+          className="rounded-xl bg-[#D4AF37] px-6 py-3 font-semibold text-[#1F2937] disabled:opacity-50"
         >
-          Save Changes
+          {loading ? "Saving..." : "Save Changes"}
         </button>
 
       </div>
-
-      {/* Notification Preferences */}
+            {/* Notification Preferences */}
 
       <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
 
@@ -98,7 +179,8 @@ const NotificationSection = () => {
         </div>
 
         <div>
-                    {/* Renewal Reminders */}
+
+          {/* Renewal Reminders */}
 
           <div className="flex items-center justify-between border-b px-8 py-6">
 
@@ -211,9 +293,7 @@ const NotificationSection = () => {
               onClick={() => toggleSwitch("activity")}
             />
 
-          </div>
-
-          {/* Security Events */}
+          </div>          {/* Security Events */}
 
           <div className="flex items-center justify-between border-b px-8 py-6">
 
@@ -304,18 +384,18 @@ const NotificationSection = () => {
 
           </div>
 
-          {/* Email Digest */}
+          {/* Email Notifications */}
 
           <div className="flex items-center justify-between border-b px-8 py-6">
 
             <div>
 
               <h3 className="font-semibold text-[#1F2937]">
-                Email digest
+                Email notifications
               </h3>
 
               <p className="mt-1 text-sm text-gray-500">
-                Daily summary email at 8am
+                Receive notifications by email
               </p>
 
             </div>
@@ -325,50 +405,104 @@ const NotificationSection = () => {
               onClick={() => toggleSwitch("email")}
             />
 
-          </div>
+          </div>      {/* Delivery */}
 
-          {/* Slack */}
+      <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
+
+        <div className="border-b px-8 py-6">
+
+          <h2 className="text-2xl font-semibold">
+            Delivery
+          </h2>
+
+          <p className="mt-1 text-gray-500">
+            How notifications reach you.
+          </p>
+
+        </div>
+
+        <div>
 
           <div className="flex items-center justify-between border-b px-8 py-6">
 
             <div>
 
               <h3 className="font-semibold text-[#1F2937]">
-                Slack
+                Push Notifications
               </h3>
 
               <p className="mt-1 text-sm text-gray-500">
-                #contracts-alerts channel
+                Receive notifications inside ContractIQ
               </p>
 
             </div>
 
             <Toggle
-              value={notifications.slack}
-              onClick={() => toggleSwitch("slack")}
+              value={notifications.push_notifications}
+              onClick={() => toggleSwitch("push_notifications")}
             />
 
           </div>
 
-          {/* SMS */}
+          <div className="flex items-center justify-between border-b px-8 py-6">
+
+            <div>
+
+              <h3 className="font-semibold text-[#1F2937]">
+                Email Notifications
+              </h3>
+
+              <p className="mt-1 text-sm text-gray-500">
+                Receive notifications by email
+              </p>
+
+            </div>
+
+            <Toggle
+              value={notifications.email_notifications}
+              onClick={() => toggleSwitch("email_notifications")}
+            />
+
+          </div>
+
+          <div className="flex items-center justify-between border-b px-8 py-6">
+
+            <div>
+
+              <h3 className="font-semibold text-[#1F2937]">
+                SMS Notifications
+              </h3>
+
+              <p className="mt-1 text-sm text-gray-500">
+                Receive important alerts by SMS
+              </p>
+
+            </div>
+
+            <Toggle
+              value={notifications.sms_notifications}
+              onClick={() => toggleSwitch("sms_notifications")}
+            />
+
+          </div>
 
           <div className="flex items-center justify-between px-8 py-6">
 
             <div>
 
               <h3 className="font-semibold text-[#1F2937]">
-                SMS — Critical only
+                Weekly Summary
               </h3>
 
               <p className="mt-1 text-sm text-gray-500">
-                Text alerts for Critical priority only
+                Receive a weekly summary of all activities
               </p>
 
             </div>
 
             <Toggle
-              value={notifications.sms}
-              onClick={() => toggleSwitch("sms")}
+              value={notifications.weekly_summary}
+              onClick={() => toggleSwitch("weekly_summary")}
             />
 
           </div>
@@ -376,6 +510,9 @@ const NotificationSection = () => {
         </div>
 
       </div>
+
+    </div>
+    </div>
     </div>
   );
 };

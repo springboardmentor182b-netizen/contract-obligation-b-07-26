@@ -1,358 +1,499 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Shield, Smartphone, KeyRound } from "lucide-react";
 
+const API_URL = "http://127.0.0.1:8000/settings/security";
+
 const SecuritySection = () => {
-  const [passwords, setPasswords] = useState({
-    current: "",
+
+  const [securityId, setSecurityId] = useState(null);
+
+  const [loading, setLoading] = useState(false);
+
+
+  const [security, setSecurity] = useState({
+
+    currentPassword: "",
+
     newPassword: "",
-    confirm: "",
+
+    twoFactor: false,
+
+    sessionAlerts: true,
+
   });
 
-  const [twoFactor] = useState(true);
-  const [sessionAlerts, setSessionAlerts] = useState(true);
 
-  const handleChange = (e) => {
-    setPasswords({
-      ...passwords,
-      [e.target.name]: e.target.value,
+  useEffect(() => {
+
+    fetchSecurity();
+
+  }, []);
+
+
+
+  const fetchSecurity = async () => {
+
+    try {
+
+      const response = await fetch(API_URL);
+
+      const data = await response.json();
+
+
+      if(data.length > 0){
+
+        const item = data[0];
+
+
+        setSecurityId(item.id);
+
+
+        setSecurity({
+
+          currentPassword:item.currentPassword || "",
+
+          newPassword:item.newPassword || "",
+
+          twoFactor:item.twoFactor || false,
+
+          sessionAlerts:item.sessionAlerts ?? true,
+
+        });
+
+      }
+
+
+    } catch(error){
+
+      console.log(error);
+
+    }
+
+  };
+
+
+
+
+  const handleChange=(e)=>{
+
+    setSecurity({
+
+      ...security,
+
+      [e.target.name]:e.target.value
+
     });
+
   };
 
-  const handleSave = () => {
-    alert("Security settings saved successfully! (Frontend only)");
+
+
+
+  const handleSave=async()=>{
+
+
+    try{
+
+
+      setLoading(true);
+
+
+      const method = securityId ? "PUT" : "POST";
+
+
+      const url = securityId
+      ? `${API_URL}/${securityId}`
+      : API_URL;
+
+
+
+      const response = await fetch(url,{
+
+        method,
+
+        headers:{
+
+          "Content-Type":"application/json"
+
+        },
+
+
+        body:JSON.stringify(security)
+
+      });
+
+
+
+      const data=await response.json();
+
+
+
+      if(!securityId){
+
+        setSecurityId(data.id);
+
+      }
+
+
+      alert("Security settings saved successfully");
+
+
+    }
+
+    catch(error){
+
+      console.log(error);
+
+    }
+
+    finally{
+
+      setLoading(false);
+
+    }
+
+
   };
 
-  return (
-    <div className="space-y-8">
 
-      {/* Header */}
 
-      <div className="flex items-center justify-between">
 
-        <div>
+return (
 
-          <h1 className="text-3xl font-bold text-[#1F2937]">
-            Security & Access
-          </h1>
+<div className="space-y-8">
 
-          <p className="mt-2 text-gray-500">
-            Manage your security & access preferences
-          </p>
 
-        </div>
+{/* Header */}
 
-        <button
-          onClick={handleSave}
-          className="rounded-xl bg-[#D4AF37] px-6 py-3 font-semibold text-[#1F2937]"
-        >
-          Save Changes
-        </button>
+<div className="flex justify-between items-center">
 
-      </div>
 
-      {/* Password */}
+<div>
 
-      <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
+<h1 className="text-3xl font-bold text-[#1F2937]">
 
-        <div className="border-b px-8 py-6">
+Security & Access
 
-          <div className="flex items-center gap-3">
+</h1>
 
-            <Shield className="text-[#D4AF37]" size={26} />
 
-            <div>
+<p className="text-gray-500 mt-2">
 
-              <h2 className="text-2xl font-semibold">
-                Password
-              </h2>
+Manage your security settings
 
-              <p className="text-gray-500">
-                Change your account password. Must be at least 12 characters.
-              </p>
+</p>
 
-            </div>
 
-          </div>
+</div>
 
-        </div>
 
-        <div className="space-y-6 p-8">
 
-          <div>
+<button
 
-            <label className="mb-2 block font-medium">
-              Current Password
-            </label>
+onClick={handleSave}
 
-            <input
-              type="password"
-              name="current"
-              value={passwords.current}
-              onChange={handleChange}
-              className="w-full rounded-xl border border-gray-300 px-4 py-3 focus:border-[#D4AF37] outline-none"
-            />
+className="bg-[#D4AF37] px-6 py-3 rounded-xl font-semibold"
 
-          </div>
+>
 
-          <div>
+{loading ? "Saving..." : "Save Changes"}
 
-            <label className="mb-2 block font-medium">
-              New Password
-            </label>
+</button>
 
-            <input
-              type="password"
-              name="newPassword"
-              value={passwords.newPassword}
-              onChange={handleChange}
-              className="w-full rounded-xl border border-gray-300 px-4 py-3 focus:border-[#D4AF37] outline-none"
-            />
 
-          </div>
+</div>
 
-          <div>
 
-            <label className="mb-2 block font-medium">
-              Confirm Password
-            </label>
 
-            <input
-              type="password"
-              name="confirm"
-              value={passwords.confirm}
-              onChange={handleChange}
-              className="w-full rounded-xl border border-gray-300 px-4 py-3 focus:border-[#D4AF37] outline-none"
-            />
 
-          </div>
+{/* Password */}
 
-          <button className="rounded-xl bg-[#D4AF37] px-5 py-3 font-semibold text-[#1F2937]">
-            Update Password
-          </button>
 
-        </div>
+<div className="bg-white rounded-2xl shadow border p-8">
 
-      </div>
-            {/* Two-Factor Authentication */}
 
-      <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
+<div className="flex items-center gap-3 mb-6">
 
-        <div className="border-b px-8 py-6">
 
-          <div className="flex items-center gap-3">
+<Shield className="text-[#D4AF37]"/>
 
-            <Smartphone className="text-[#D4AF37]" size={26} />
 
-            <div>
+<h2 className="text-2xl font-semibold">
 
-              <h2 className="text-2xl font-semibold">
-                Two-Factor Authentication
-              </h2>
+Password
 
-              <p className="text-gray-500">
-                Add a second layer of protection to your account.
-              </p>
+</h2>
 
-            </div>
 
-          </div>
+</div>
 
-        </div>
 
-        <div className="flex items-center justify-between p-8">
 
-          <div>
 
-            <h3 className="font-semibold text-[#1F2937]">
-              2FA is enabled on your account
-            </h3>
+<label className="block mb-2 font-medium">
 
-            <p className="mt-1 text-sm text-gray-500">
-              Authenticator app configured · Last verified Dec 4, 2024
-            </p>
+Current Password
 
-          </div>
+</label>
 
-          <button className="rounded-xl border border-[#D4AF37] px-5 py-2 font-semibold text-[#D4AF37] hover:bg-[#D4AF37] hover:text-white transition">
-            Reconfigure
-          </button>
 
-        </div>
+<input
 
-      </div>
+type="password"
 
-      {/* Backup Codes */}
+name="currentPassword"
 
-      <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
+value={security.currentPassword}
 
-        <div className="flex items-center justify-between p-8">
+onChange={handleChange}
 
-          <div className="flex items-center gap-3">
+className="w-full border rounded-xl px-4 py-3 mb-5"
 
-            <KeyRound className="text-[#D4AF37]" size={24} />
+/>
 
-            <div>
 
-              <h2 className="text-xl font-semibold">
-                Backup Codes
-              </h2>
 
-              <p className="text-gray-500">
-                Generate one-time backup codes for account recovery.
-              </p>
 
-            </div>
+<label className="block mb-2 font-medium">
 
-          </div>
+New Password
 
-          <button className="rounded-xl border border-[#D4AF37] px-5 py-2 font-semibold text-[#D4AF37] hover:bg-[#D4AF37] hover:text-white transition">
-            Generate
-          </button>
+</label>
 
-        </div>
 
-      </div>
+<input
 
-      {/* Session Alerts */}
+type="password"
 
-      <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
+name="newPassword"
 
-        <div className="flex items-center justify-between p-8">
+value={security.newPassword}
 
-          <div>
+onChange={handleChange}
 
-            <h2 className="text-xl font-semibold">
-              Session Alerts
-            </h2>
+className="w-full border rounded-xl px-4 py-3 mb-5"
 
-            <p className="text-gray-500">
-              Email me when a new session is started on my account.
-            </p>
+/>
 
-          </div>
 
-          <button
-            onClick={() => setSessionAlerts(!sessionAlerts)}
-            className={`relative h-7 w-14 rounded-full transition ${
-              sessionAlerts
-                ? "bg-[#D4AF37]"
-                : "bg-gray-300"
-            }`}
-          >
 
-            <span
-              className={`absolute top-1 h-5 w-5 rounded-full bg-white transition ${
-                sessionAlerts
-                  ? "left-8"
-                  : "left-1"
-              }`}
-            ></span>
 
-          </button>
+<label className="block mb-2 font-medium">
 
-        </div>
+Confirm Password
 
-      </div>
-            {/* Active Sessions */}
+</label>
 
-      <div className="rounded-2xl border border-gray-200 bg-white shadow-sm">
 
-        <div className="border-b px-8 py-6">
+<input
 
-          <h2 className="text-2xl font-semibold">
-            Active Sessions
-          </h2>
+type="password"
 
-          <p className="mt-1 text-gray-500">
-            Devices currently signed into ContractIQ with your credentials.
-          </p>
+className="w-full border rounded-xl px-4 py-3"
 
-        </div>
+/>
 
-        {/* Current Session */}
 
-        <div className="flex items-center justify-between border-b px-8 py-6">
 
-          <div>
+</div>
 
-            <h3 className="font-semibold text-[#1F2937]">
-              MacBook Pro – Chrome 120
-            </h3>
 
-            <p className="mt-1 text-sm text-gray-500">
-              10.0.1.42 · New York, NY · Current session
-            </p>
 
-          </div>
 
-          <span className="rounded-full bg-green-100 px-4 py-1 text-sm font-semibold text-green-700">
-            Current
-          </span>
 
-        </div>
+{/* Two Factor */}
 
-        {/* Session 2 */}
 
-        <div className="flex items-center justify-between border-b px-8 py-6">
+<div className="bg-white rounded-2xl shadow border p-8">
 
-          <div>
 
-            <h3 className="font-semibold text-[#1F2937]">
-              iPhone 15 Pro – Safari
-            </h3>
+<div className="flex justify-between items-center">
 
-            <p className="mt-1 text-sm text-gray-500">
-              10.0.1.91 · New York, NY · 1 hour ago
-            </p>
 
-          </div>
+<div className="flex gap-3">
 
-          <button className="rounded-xl border border-red-500 px-5 py-2 font-semibold text-red-500 transition hover:bg-red-500 hover:text-white">
-            Revoke
-          </button>
 
-        </div>
+<Smartphone className="text-[#D4AF37]"/>
 
-        {/* Session 3 */}
 
-        <div className="flex items-center justify-between px-8 py-6">
+<div>
 
-          <div>
 
-            <h3 className="font-semibold text-[#1F2937]">
-              Windows 11 – Edge 119
-            </h3>
+<h2 className="text-xl font-semibold">
 
-            <p className="mt-1 text-sm text-gray-500">
-              192.168.4.11 · Newark, NJ · Yesterday 09:30
-            </p>
+Two-Factor Authentication
 
-          </div>
+</h2>
 
-          <button className="rounded-xl border border-red-500 px-5 py-2 font-semibold text-red-500 transition hover:bg-red-500 hover:text-white">
-            Revoke
-          </button>
 
-        </div>
+<p className="text-gray-500">
 
-      </div>
-            {/* Sign Out All Other Sessions */}
+Add extra protection to your account
 
-      <div className="flex justify-end">
+</p>
 
-        <button
-          className="rounded-xl bg-red-600 px-6 py-3 font-semibold text-white transition hover:bg-red-700"
-          onClick={() =>
-            alert("All other sessions have been signed out. (Frontend only)")
-          }
-        >
-          Sign out all other sessions
-        </button>
 
-      </div>
+</div>
 
-    </div>
-  );
+
+</div>
+
+
+
+<button
+
+onClick={()=>setSecurity({
+
+...security,
+
+twoFactor:!security.twoFactor
+
+})}
+
+
+className={`px-5 py-2 rounded-xl ${
+security.twoFactor
+?"bg-[#D4AF37]"
+:"bg-gray-300"
+}`}
+
+>
+
+{security.twoFactor ? "Enabled":"Disabled"}
+
+</button>
+
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+{/* Session Alerts */}
+
+
+
+<div className="bg-white rounded-2xl shadow border p-8">
+
+
+<div className="flex justify-between items-center">
+
+
+<div>
+
+
+<h2 className="text-xl font-semibold">
+
+Session Alerts
+
+</h2>
+
+
+<p className="text-gray-500">
+
+Email me when a new session starts
+
+</p>
+
+
+</div>
+
+
+
+
+<button
+
+onClick={()=>setSecurity({
+
+...security,
+
+sessionAlerts:!security.sessionAlerts
+
+})}
+
+
+className={`h-7 w-14 rounded-full ${
+security.sessionAlerts
+?"bg-[#D4AF37]"
+:"bg-gray-300"
+}`}
+
+>
+
+
+<span className="block bg-white w-5 h-5 rounded-full ml-1"></span>
+
+
+</button>
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+{/* Backup Codes */}
+
+
+<div className="bg-white rounded-2xl shadow border p-8 flex justify-between">
+
+
+<div className="flex gap-3">
+
+
+<KeyRound className="text-[#D4AF37]"/>
+
+
+<div>
+
+<h2 className="text-xl font-semibold">
+
+Backup Codes
+
+</h2>
+
+
+<p className="text-gray-500">
+
+Generate recovery codes
+
+</p>
+
+
+</div>
+
+
+</div>
+
+
+
+<button className="border border-[#D4AF37] px-5 py-2 rounded-xl">
+
+Generate
+
+</button>
+
+
+</div>
+
+
+
+
+</div>
+
+);
+
+
 };
+
 
 export default SecuritySection;

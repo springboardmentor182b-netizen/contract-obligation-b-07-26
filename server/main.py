@@ -5,6 +5,7 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import List
 from typing import Optional
+import json
 
 app = FastAPI(title="ContractIQ API")
 
@@ -49,19 +50,19 @@ class Obligation(BaseModel):
         return value
 class Profile(BaseModel):
 
-    first_name: str = Field(..., min_length=2)
+    firstName: str = Field(..., min_length=2)
 
-    last_name: str = Field(..., min_length=2)
+    lastName: str = Field(..., min_length=2)
 
     email: str
 
     phone: Optional[str] = None
 
-    job_title: Optional[str] = None
+    jobTitle: Optional[str] = None
 
     department: Optional[str] = None
 
-    employee_id: Optional[str] = None
+    employeeId: Optional[str] = None
 
     bio: Optional[str] = None
 
@@ -69,7 +70,7 @@ class Profile(BaseModel):
 
     timezone: Optional[str] = None
 
-    date_format: Optional[str] = None
+    dateFormat: Optional[str] = None
 
     currency: Optional[str] = None
 
@@ -198,115 +199,6 @@ def add_obligation(obligation: Obligation):
     }
 
 
-@app.put("/settings/profile/{profile_id}")
-def update_profile(profile_id: int, profile: Profile):
-
-    conn = get_connection()
-    cursor = conn.cursor()
-
-    cursor.execute(
-        """
-        UPDATE profile_settings
-        SET
-            first_name=%s,
-            last_name=%s,
-            email=%s,
-            phone=%s,
-            job_title=%s,
-            department=%s,
-            employee_id=%s,
-            bio=%s,
-            language=%s,
-            timezone=%s,
-            date_format=%s,
-            currency=%s
-        WHERE id=%s
-        """,
-        (
-            profile.first_name,
-            profile.last_name,
-            profile.email,
-            profile.phone,
-            profile.job_title,
-            profile.department,
-            profile.employee_id,
-            profile.bio,
-            profile.language,
-            profile.timezone,
-            profile.date_format,
-            profile.currency,
-            profile_id,
-        ),
-    )
-
-    conn.commit()
-
-    if cursor.rowcount == 0:
-        cursor.close()
-        conn.close()
-        raise HTTPException(
-            status_code=404,
-            detail="Profile not found"
-        )
-
-    cursor.close()
-    conn.close()
-
-    return {
-        "message": "Profile updated successfully"
-    }
-
-
-@app.delete("/obligations/{obligation_id}")
-def delete_obligation(obligation_id: str):
-    conn = get_connection()
-    cursor = conn.cursor()
-
-    cursor.execute(
-        "DELETE FROM obligations WHERE id = %s",
-        (obligation_id,)
-    )
-
-    conn.commit()
-
-    if cursor.rowcount == 0:
-        cursor.close()
-        conn.close()
-        raise HTTPException(status_code=404, detail="Obligation not found")
-
-    cursor.close()
-    conn.close()
-
-    return {
-        "message": "Obligation deleted successfully"
-    }
-@app.delete("/settings/profile/{profile_id}")
-def delete_profile(profile_id: int):
-
-    conn = get_connection()
-    cursor = conn.cursor()
-
-    cursor.execute(
-        "DELETE FROM profile_settings WHERE id = %s",
-        (profile_id,)
-    )
-
-    conn.commit()
-
-    if cursor.rowcount == 0:
-        cursor.close()
-        conn.close()
-        raise HTTPException(
-            status_code=404,
-            detail="Profile not found"
-        )
-
-    cursor.close()
-    conn.close()
-
-    return {
-        "message": "Profile deleted successfully"
-    }
 @app.get("/settings/profile")
 def get_profiles():
 
@@ -337,31 +229,31 @@ def get_profiles():
     cursor.close()
     conn.close()
 
+
     return [
         {
             "id": row[0],
-            "first_name": row[1],
-            "last_name": row[2],
+            "firstName": row[1],
+            "lastName": row[2],
             "email": row[3],
             "phone": row[4],
-            "job_title": row[5],
+            "jobTitle": row[5],
             "department": row[6],
-            "employee_id": row[7],
+            "employeeId": row[7],
             "bio": row[8],
             "language": row[9],
             "timezone": row[10],
-            "date_format": row[11],
+            "dateFormat": row[11],
             "currency": row[12]
         }
         for row in rows
     ]
-
-
 @app.get("/settings/profile/{profile_id}")
 def get_profile(profile_id: int):
 
     conn = get_connection()
     cursor = conn.cursor()
+
 
     cursor.execute("""
         SELECT
@@ -379,13 +271,16 @@ def get_profile(profile_id: int):
             date_format,
             currency
         FROM profile_settings
-        WHERE id = %s
-    """, (profile_id,))
+        WHERE id=%s
+    """,(profile_id,))
+
 
     row = cursor.fetchone()
 
+
     cursor.close()
     conn.close()
+
 
     if not row:
         raise HTTPException(
@@ -393,29 +288,33 @@ def get_profile(profile_id: int):
             detail="Profile not found"
         )
 
-    return {
+
+    return [
+    {
         "id": row[0],
-        "first_name": row[1],
-        "last_name": row[2],
+        "firstName": row[1],
+        "lastName": row[2],
         "email": row[3],
         "phone": row[4],
-        "job_title": row[5],
+        "jobTitle": row[5],
         "department": row[6],
-        "employee_id": row[7],
+        "employeeId": row[7],
         "bio": row[8],
         "language": row[9],
         "timezone": row[10],
-        "date_format": row[11],
+        "dateFormat": row[11],
         "currency": row[12]
     }
+    for row in rows
+]
 @app.post("/settings/profile")
 def add_profile(profile: Profile):
 
     conn = get_connection()
     cursor = conn.cursor()
 
-    cursor.execute(
-        """
+
+    cursor.execute("""
         INSERT INTO profile_settings
         (
             first_name,
@@ -433,59 +332,158 @@ def add_profile(profile: Profile):
         )
         VALUES
         (
-            %s, %s, %s, %s, %s, %s,
-            %s, %s, %s, %s, %s, %s
+            %s,%s,%s,%s,
+            %s,%s,%s,%s,
+            %s,%s,%s,%s
         )
         RETURNING id
-        """,
-        (
-            profile.first_name,
-            profile.last_name,
-            profile.email,
-            profile.phone,
-            profile.job_title,
-            profile.department,
-            profile.employee_id,
-            profile.bio,
-            profile.language,
-            profile.timezone,
-            profile.date_format,
-            profile.currency,
-        ),
-    )
+    """,
+    (
+        profile.firstName,
+        profile.lastName,
+        profile.email,
+        profile.phone,
+        profile.jobTitle,
+        profile.department,
+        profile.employeeId,
+        profile.bio,
+        profile.language,
+        profile.timezone,
+        profile.dateFormat,
+        profile.currency
+    ))
+
 
     profile_id = cursor.fetchone()[0]
 
     conn.commit()
 
+
     cursor.close()
     conn.close()
 
+
     return {
-        "message": "Profile created successfully",
-        "id": profile_id
+        "message":"Profile created successfully",
+        "id":profile_id
+    }
+@app.put("/settings/profile/{profile_id}")
+def update_profile(
+    profile_id:int,
+    profile:Profile
+):
+
+    conn=get_connection()
+    cursor=conn.cursor()
+
+
+    cursor.execute("""
+        UPDATE profile_settings
+        SET
+            first_name=%s,
+            last_name=%s,
+            email=%s,
+            phone=%s,
+            job_title=%s,
+            department=%s,
+            employee_id=%s,
+            bio=%s,
+            language=%s,
+            timezone=%s,
+            date_format=%s,
+            currency=%s
+        WHERE id=%s
+    """,
+    (
+        profile.firstName,
+        profile.lastName,
+        profile.email,
+        profile.phone,
+        profile.jobTitle,
+        profile.department,
+        profile.employeeId,
+        profile.bio,
+        profile.language,
+        profile.timezone,
+        profile.dateFormat,
+        profile.currency,
+        profile_id
+    ))
+
+
+    conn.commit()
+
+
+    if cursor.rowcount == 0:
+
+        cursor.close()
+        conn.close()
+
+        raise HTTPException(
+            status_code=404,
+            detail="Profile not found"
+        )
+
+
+    cursor.close()
+    conn.close()
+
+
+    return {
+        "message":"Profile updated successfully"
+    }
+@app.delete("/settings/profile/{profile_id}")
+def delete_profile(profile_id:int):
+
+    conn=get_connection()
+    cursor=conn.cursor()
+
+
+    cursor.execute(
+        """
+        DELETE FROM profile_settings
+        WHERE id=%s
+        """,
+        (profile_id,)
+    )
+
+
+    conn.commit()
+
+
+    if cursor.rowcount == 0:
+
+        cursor.close()
+        conn.close()
+
+        raise HTTPException(
+            status_code=404,
+            detail="Profile not found"
+        )
+
+
+    cursor.close()
+    conn.close()
+
+
+    return {
+        "message":"Profile deleted successfully"
     }
 class Organization(BaseModel):
 
     organization_name: str = Field(..., min_length=2)
 
-    organization_email: str
+    legal_entity_name: str
 
-    phone: Optional[str] = None
+    industry: str
 
-    website: Optional[str] = None
+    employees: str
 
-    industry: Optional[str] = None
+    headquarters: str
 
-    address: Optional[str] = None
+    website: str
 
-    city: Optional[str] = None
-
-    state: Optional[str] = None
-
-    country: Optional[str] = None
-
-    postal_code: Optional[str] = None
+    tax_id: str
 @app.get("/settings/organization")
 def get_organizations():
 
@@ -496,17 +494,14 @@ def get_organizations():
         SELECT
             id,
             organization_name,
-            organization_email,
-            phone,
-            website,
+            legal_entity_name,
             industry,
-            address,
-            city,
-            state,
-            country,
-            postal_code
+            employees,
+            headquarters,
+            website,
+            tax_id
         FROM organization_settings
-        ORDER BY id;
+        ORDER BY id
     """)
 
     rows = cursor.fetchall()
@@ -518,15 +513,12 @@ def get_organizations():
         {
             "id": row[0],
             "organization_name": row[1],
-            "organization_email": row[2],
-            "phone": row[3],
-            "website": row[4],
-            "industry": row[5],
-            "address": row[6],
-            "city": row[7],
-            "state": row[8],
-            "country": row[9],
-            "postal_code": row[10]
+            "legal_entity_name": row[2],
+            "industry": row[3],
+            "employees": row[4],
+            "headquarters": row[5],
+            "website": row[6],
+            "tax_id": row[7]
         }
         for row in rows
     ]
@@ -540,17 +532,14 @@ def get_organization(organization_id: int):
         SELECT
             id,
             organization_name,
-            organization_email,
-            phone,
-            website,
+            legal_entity_name,
             industry,
-            address,
-            city,
-            state,
-            country,
-            postal_code
+            employees,
+            headquarters,
+            website,
+            tax_id
         FROM organization_settings
-        WHERE id = %s
+        WHERE id=%s
     """, (organization_id,))
 
     row = cursor.fetchone()
@@ -567,15 +556,12 @@ def get_organization(organization_id: int):
     return {
         "id": row[0],
         "organization_name": row[1],
-        "organization_email": row[2],
-        "phone": row[3],
-        "website": row[4],
-        "industry": row[5],
-        "address": row[6],
-        "city": row[7],
-        "state": row[8],
-        "country": row[9],
-        "postal_code": row[10]
+        "legal_entity_name": row[2],
+        "industry": row[3],
+        "employees": row[4],
+        "headquarters": row[5],
+        "website": row[6],
+        "tax_id": row[7]
     }
 @app.post("/settings/organization")
 def add_organization(organization: Organization):
@@ -583,41 +569,32 @@ def add_organization(organization: Organization):
     conn = get_connection()
     cursor = conn.cursor()
 
-    cursor.execute(
-        """
+    cursor.execute("""
         INSERT INTO organization_settings
         (
             organization_name,
-            organization_email,
-            phone,
-            website,
+            legal_entity_name,
             industry,
-            address,
-            city,
-            state,
-            country,
-            postal_code
+            employees,
+            headquarters,
+            website,
+            tax_id
         )
         VALUES
         (
-            %s, %s, %s, %s, %s,
-            %s, %s, %s, %s, %s
+            %s,%s,%s,%s,%s,%s,%s
         )
         RETURNING id
-        """,
-        (
-            organization.organization_name,
-            organization.organization_email,
-            organization.phone,
-            organization.website,
-            organization.industry,
-            organization.address,
-            organization.city,
-            organization.state,
-            organization.country,
-            organization.postal_code,
-        ),
-    )
+    """,
+    (
+        organization.organization_name,
+        organization.legal_entity_name,
+        organization.industry,
+        organization.employees,
+        organization.headquarters,
+        organization.website,
+        organization.tax_id
+    ))
 
     organization_id = cursor.fetchone()[0]
 
@@ -639,42 +616,36 @@ def update_organization(
     conn = get_connection()
     cursor = conn.cursor()
 
-    cursor.execute(
-        """
+    cursor.execute("""
         UPDATE organization_settings
         SET
             organization_name=%s,
-            organization_email=%s,
-            phone=%s,
-            website=%s,
+            legal_entity_name=%s,
             industry=%s,
-            address=%s,
-            city=%s,
-            state=%s,
-            country=%s,
-            postal_code=%s
+            employees=%s,
+            headquarters=%s,
+            website=%s,
+            tax_id=%s
         WHERE id=%s
-        """,
-        (
-            organization.organization_name,
-            organization.organization_email,
-            organization.phone,
-            organization.website,
-            organization.industry,
-            organization.address,
-            organization.city,
-            organization.state,
-            organization.country,
-            organization.postal_code,
-            organization_id,
-        ),
-    )
+    """,
+    (
+        organization.organization_name,
+        organization.legal_entity_name,
+        organization.industry,
+        organization.employees,
+        organization.headquarters,
+        organization.website,
+        organization.tax_id,
+        organization_id
+    ))
 
     conn.commit()
 
     if cursor.rowcount == 0:
+
         cursor.close()
         conn.close()
+
         raise HTTPException(
             status_code=404,
             detail="Organization not found"
@@ -700,8 +671,10 @@ def delete_organization(organization_id: int):
     conn.commit()
 
     if cursor.rowcount == 0:
+
         cursor.close()
         conn.close()
+
         raise HTTPException(
             status_code=404,
             detail="Organization not found"
@@ -721,52 +694,50 @@ class Security(BaseModel):
 
     two_factor_enabled: bool = False
 
-    session_timeout: int
-
-    password_expiry_days: int
-
     login_alerts: bool = True
+
 @app.get("/settings/security")
 def get_security_settings():
 
     conn = get_connection()
     cursor = conn.cursor()
 
+
     cursor.execute("""
         SELECT
             id,
             current_password,
             new_password,
             two_factor_enabled,
-            session_timeout,
-            password_expiry_days,
             login_alerts
         FROM security_settings
         ORDER BY id;
     """)
 
+
     rows = cursor.fetchall()
+
 
     cursor.close()
     conn.close()
 
+
     return [
         {
             "id": row[0],
-            "current_password": row[1],
-            "new_password": row[2],
-            "two_factor_enabled": row[3],
-            "session_timeout": row[4],
-            "password_expiry_days": row[5],
-            "login_alerts": row[6]
+            "currentPassword": row[1],
+            "newPassword": row[2],
+            "twoFactor": row[3],
+            "sessionAlerts": row[4]
         }
         for row in rows
     ]
 @app.get("/settings/security/{security_id}")
-def get_security_setting(security_id: int):
+def get_security(security_id:int):
 
-    conn = get_connection()
-    cursor = conn.cursor()
+    conn=get_connection()
+    cursor=conn.cursor()
+
 
     cursor.execute("""
         SELECT
@@ -774,167 +745,180 @@ def get_security_setting(security_id: int):
             current_password,
             new_password,
             two_factor_enabled,
-            session_timeout,
-            password_expiry_days,
             login_alerts
         FROM security_settings
-        WHERE id = %s
-    """, (security_id,))
+        WHERE id=%s
+    """,(security_id,))
 
-    row = cursor.fetchone()
+
+    row=cursor.fetchone()
+
 
     cursor.close()
     conn.close()
 
+
     if not row:
         raise HTTPException(
             status_code=404,
-            detail="Security settings not found"
+            detail="Security not found"
         )
 
+
     return {
-        "id": row[0],
-        "current_password": row[1],
-        "new_password": row[2],
-        "two_factor_enabled": row[3],
-        "session_timeout": row[4],
-        "password_expiry_days": row[5],
-        "login_alerts": row[6]
+
+        "id":row[0],
+
+        "currentPassword":row[1],
+
+        "newPassword":row[2],
+
+        "twoFactor":row[3],
+
+        "sessionAlerts":row[4]
+
     }
 @app.post("/settings/security")
-def add_security_setting(security: Security):
+def add_security(security:Security):
 
-    conn = get_connection()
-    cursor = conn.cursor()
+    conn=get_connection()
+    cursor=conn.cursor()
 
-    cursor.execute(
-        """
+
+    cursor.execute("""
         INSERT INTO security_settings
         (
             current_password,
             new_password,
             two_factor_enabled,
-            session_timeout,
-            password_expiry_days,
             login_alerts
         )
         VALUES
-        (
-            %s, %s, %s, %s, %s, %s
-        )
+        (%s,%s,%s,%s)
         RETURNING id
-        """,
-        (
-            security.current_password,
-            security.new_password,
-            security.two_factor_enabled,
-            security.session_timeout,
-            security.password_expiry_days,
-            security.login_alerts,
-        ),
-    )
+    """,
+    (
+        security.current_password,
+        security.new_password,
+        security.two_factor_enabled,
+        security.login_alerts
+    ))
 
-    security_id = cursor.fetchone()[0]
+
+    security_id=cursor.fetchone()[0]
+
 
     conn.commit()
+
 
     cursor.close()
     conn.close()
 
+
     return {
-        "message": "Security settings created successfully",
-        "id": security_id
+
+        "message":"Security saved successfully",
+
+        "id":security_id
+
     }
 @app.put("/settings/security/{security_id}")
-def update_security_setting(
-    security_id: int,
-    security: Security
+def update_security(
+    security_id:int,
+    security:Security
 ):
 
-    conn = get_connection()
-    cursor = conn.cursor()
+    conn=get_connection()
+    cursor=conn.cursor()
 
-    cursor.execute(
-        """
+
+    cursor.execute("""
         UPDATE security_settings
         SET
             current_password=%s,
             new_password=%s,
             two_factor_enabled=%s,
-            session_timeout=%s,
-            password_expiry_days=%s,
             login_alerts=%s
         WHERE id=%s
-        """,
-        (
-            security.current_password,
-            security.new_password,
-            security.two_factor_enabled,
-            security.session_timeout,
-            security.password_expiry_days,
-            security.login_alerts,
-            security_id,
-        ),
-    )
+
+    """,
+    (
+        security.current_password,
+        security.new_password,
+        security.two_factor_enabled,
+        security.login_alerts,
+        security_id
+    ))
+
 
     conn.commit()
 
-    if cursor.rowcount == 0:
-        cursor.close()
-        conn.close()
+
+    if cursor.rowcount==0:
+
         raise HTTPException(
             status_code=404,
-            detail="Security settings not found"
+            detail="Security not found"
         )
+
 
     cursor.close()
     conn.close()
 
+
     return {
-        "message": "Security settings updated successfully"
+
+        "message":"Security updated successfully"
+
     }
 @app.delete("/settings/security/{security_id}")
-def delete_security_setting(security_id: int):
+def delete_security(security_id:int):
 
-    conn = get_connection()
-    cursor = conn.cursor()
+    conn=get_connection()
+    cursor=conn.cursor()
+
 
     cursor.execute(
-        "DELETE FROM security_settings WHERE id=%s",
+        """
+        DELETE FROM security_settings
+        WHERE id=%s
+        """,
         (security_id,)
     )
 
+
     conn.commit()
 
-    if cursor.rowcount == 0:
-        cursor.close()
-        conn.close()
+
+    if cursor.rowcount==0:
+
         raise HTTPException(
             status_code=404,
-            detail="Security settings not found"
+            detail="Security not found"
         )
+
 
     cursor.close()
     conn.close()
 
+
     return {
-        "message": "Security settings deleted successfully"
+
+        "message":"Security deleted successfully"
+
     }
 class Notification(BaseModel):
-
-    email_notifications: bool = True
-
-    sms_notifications: bool = False
-
-    push_notifications: bool = True
-
-    contract_reminders: bool = True
-
-    renewal_alerts: bool = True
-
-    compliance_alerts: bool = True
-
-    weekly_summary: bool = False
+    renewal: bool
+    obligation: bool
+    approval: bool
+    compliance: bool
+    activity: bool
+    security: bool
+    system: bool
+    inApp: bool
+    email: bool
+    slack: bool
+    sms: bool
 @app.get("/settings/notifications")
 def get_notifications():
 
@@ -944,15 +928,19 @@ def get_notifications():
     cursor.execute("""
         SELECT
             id,
-            email_notifications,
-            sms_notifications,
-            push_notifications,
-            contract_reminders,
-            renewal_alerts,
-            compliance_alerts,
-            weekly_summary
+            renewal,
+            obligation,
+            approval,
+            compliance,
+            activity,
+            security,
+            system,
+            in_app,
+            email,
+            slack,
+            sms
         FROM notification_settings
-        ORDER BY id;
+        ORDER BY id
     """)
 
     rows = cursor.fetchall()
@@ -963,13 +951,17 @@ def get_notifications():
     return [
         {
             "id": row[0],
-            "email_notifications": row[1],
-            "sms_notifications": row[2],
-            "push_notifications": row[3],
-            "contract_reminders": row[4],
-            "renewal_alerts": row[5],
-            "compliance_alerts": row[6],
-            "weekly_summary": row[7]
+            "renewal": row[1],
+            "obligation": row[2],
+            "approval": row[3],
+            "compliance": row[4],
+            "activity": row[5],
+            "security": row[6],
+            "system": row[7],
+            "inApp": row[8],
+            "email": row[9],
+            "slack": row[10],
+            "sms": row[11]
         }
         for row in rows
     ]
@@ -982,13 +974,17 @@ def get_notification(notification_id: int):
     cursor.execute("""
         SELECT
             id,
-            email_notifications,
-            sms_notifications,
-            push_notifications,
-            contract_reminders,
-            renewal_alerts,
-            compliance_alerts,
-            weekly_summary
+            renewal,
+            obligation,
+            approval,
+            compliance,
+            activity,
+            security,
+            system,
+            in_app,
+            email,
+            slack,
+            sms
         FROM notification_settings
         WHERE id=%s
     """, (notification_id,))
@@ -1006,13 +1002,17 @@ def get_notification(notification_id: int):
 
     return {
         "id": row[0],
-        "email_notifications": row[1],
-        "sms_notifications": row[2],
-        "push_notifications": row[3],
-        "contract_reminders": row[4],
-        "renewal_alerts": row[5],
-        "compliance_alerts": row[6],
-        "weekly_summary": row[7]
+        "renewal": row[1],
+        "obligation": row[2],
+        "approval": row[3],
+        "compliance": row[4],
+        "activity": row[5],
+        "security": row[6],
+        "system": row[7],
+        "inApp": row[8],
+        "email": row[9],
+        "slack": row[10],
+        "sms": row[11]
     }
 @app.post("/settings/notifications")
 def add_notification(notification: Notification):
@@ -1020,34 +1020,38 @@ def add_notification(notification: Notification):
     conn = get_connection()
     cursor = conn.cursor()
 
-    cursor.execute(
-        """
+    cursor.execute("""
         INSERT INTO notification_settings
         (
-            email_notifications,
-            sms_notifications,
-            push_notifications,
-            contract_reminders,
-            renewal_alerts,
-            compliance_alerts,
-            weekly_summary
+            renewal,
+            obligation,
+            approval,
+            compliance,
+            activity,
+            security,
+            system,
+            in_app,
+            email,
+            slack,
+            sms
         )
         VALUES
-        (
-            %s,%s,%s,%s,%s,%s,%s
-        )
+        (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
         RETURNING id
-        """,
-        (
-            notification.email_notifications,
-            notification.sms_notifications,
-            notification.push_notifications,
-            notification.contract_reminders,
-            notification.renewal_alerts,
-            notification.compliance_alerts,
-            notification.weekly_summary,
-        ),
-    )
+    """,
+    (
+        notification.renewal,
+        notification.obligation,
+        notification.approval,
+        notification.compliance,
+        notification.activity,
+        notification.security,
+        notification.system,
+        notification.inApp,
+        notification.email,
+        notification.slack,
+        notification.sms
+    ))
 
     notification_id = cursor.fetchone()[0]
 
@@ -1069,36 +1073,44 @@ def update_notification(
     conn = get_connection()
     cursor = conn.cursor()
 
-    cursor.execute(
-        """
+    cursor.execute("""
         UPDATE notification_settings
         SET
-            email_notifications=%s,
-            sms_notifications=%s,
-            push_notifications=%s,
-            contract_reminders=%s,
-            renewal_alerts=%s,
-            compliance_alerts=%s,
-            weekly_summary=%s
+            renewal=%s,
+            obligation=%s,
+            approval=%s,
+            compliance=%s,
+            activity=%s,
+            security=%s,
+            system=%s,
+            in_app=%s,
+            email=%s,
+            slack=%s,
+            sms=%s
         WHERE id=%s
-        """,
-        (
-            notification.email_notifications,
-            notification.sms_notifications,
-            notification.push_notifications,
-            notification.contract_reminders,
-            notification.renewal_alerts,
-            notification.compliance_alerts,
-            notification.weekly_summary,
-            notification_id,
-        ),
-    )
+    """,
+    (
+        notification.renewal,
+        notification.obligation,
+        notification.approval,
+        notification.compliance,
+        notification.activity,
+        notification.security,
+        notification.system,
+        notification.inApp,
+        notification.email,
+        notification.slack,
+        notification.sms,
+        notification_id
+    ))
 
     conn.commit()
 
     if cursor.rowcount == 0:
+
         cursor.close()
         conn.close()
+
         raise HTTPException(
             status_code=404,
             detail="Notification settings not found"
@@ -1124,8 +1136,10 @@ def delete_notification(notification_id: int):
     conn.commit()
 
     if cursor.rowcount == 0:
+
         cursor.close()
         conn.close()
+
         raise HTTPException(
             status_code=404,
             detail="Notification settings not found"
@@ -1138,16 +1152,14 @@ def delete_notification(notification_id: int):
         "message": "Notification settings deleted successfully"
     }
 class Appearance(BaseModel):
-
     theme: str
-
-    language: str
-
-    font_size: str
-
-    date_format: str
-
-    time_format: str
+    sidebarWidth: str
+    tableDensity: str
+    pageSize: str
+    stickyHeader: bool
+    avatars: bool
+    animations: bool
+    accent: str
 @app.get("/settings/appearance")
 def get_appearance_settings():
 
@@ -1158,10 +1170,13 @@ def get_appearance_settings():
         SELECT
             id,
             theme,
-            language,
-            font_size,
-            date_format,
-            time_format
+            sidebar_width,
+            table_density,
+            page_size,
+            sticky_header,
+            avatars,
+            animations,
+            accent
         FROM appearance_settings
         ORDER BY id;
     """)
@@ -1175,10 +1190,13 @@ def get_appearance_settings():
         {
             "id": row[0],
             "theme": row[1],
-            "language": row[2],
-            "font_size": row[3],
-            "date_format": row[4],
-            "time_format": row[5]
+            "sidebarWidth": row[2],
+            "tableDensity": row[3],
+            "pageSize": row[4],
+            "stickyHeader": row[5],
+            "avatars": row[6],
+            "animations": row[7],
+            "accent": row[8]
         }
         for row in rows
     ]
@@ -1192,10 +1210,13 @@ def get_appearance_setting(appearance_id: int):
         SELECT
             id,
             theme,
-            language,
-            font_size,
-            date_format,
-            time_format
+            sidebar_width,
+            table_density,
+            page_size,
+            sticky_header,
+            avatars,
+            animations,
+            accent
         FROM appearance_settings
         WHERE id=%s
     """, (appearance_id,))
@@ -1214,10 +1235,13 @@ def get_appearance_setting(appearance_id: int):
     return {
         "id": row[0],
         "theme": row[1],
-        "language": row[2],
-        "font_size": row[3],
-        "date_format": row[4],
-        "time_format": row[5]
+        "sidebarWidth": row[2],
+        "tableDensity": row[3],
+        "pageSize": row[4],
+        "stickyHeader": row[5],
+        "avatars": row[6],
+        "animations": row[7],
+        "accent": row[8]
     }
 @app.post("/settings/appearance")
 def add_appearance_setting(appearance: Appearance):
@@ -1230,23 +1254,29 @@ def add_appearance_setting(appearance: Appearance):
         INSERT INTO appearance_settings
         (
             theme,
-            language,
-            font_size,
-            date_format,
-            time_format
+            sidebar_width,
+            table_density,
+            page_size,
+            sticky_header,
+            avatars,
+            animations,
+            accent
         )
         VALUES
         (
-            %s,%s,%s,%s,%s
+            %s,%s,%s,%s,%s,%s,%s,%s
         )
         RETURNING id
         """,
         (
             appearance.theme,
-            appearance.language,
-            appearance.font_size,
-            appearance.date_format,
-            appearance.time_format,
+            appearance.sidebarWidth,
+            appearance.tableDensity,
+            appearance.pageSize,
+            appearance.stickyHeader,
+            appearance.avatars,
+            appearance.animations,
+            appearance.accent,
         ),
     )
 
@@ -1275,18 +1305,24 @@ def update_appearance_setting(
         UPDATE appearance_settings
         SET
             theme=%s,
-            language=%s,
-            font_size=%s,
-            date_format=%s,
-            time_format=%s
+            sidebar_width=%s,
+            table_density=%s,
+            page_size=%s,
+            sticky_header=%s,
+            avatars=%s,
+            animations=%s,
+            accent=%s
         WHERE id=%s
         """,
         (
             appearance.theme,
-            appearance.language,
-            appearance.font_size,
-            appearance.date_format,
-            appearance.time_format,
+            appearance.sidebarWidth,
+            appearance.tableDensity,
+            appearance.pageSize,
+            appearance.stickyHeader,
+            appearance.avatars,
+            appearance.animations,
+            appearance.accent,
             appearance_id,
         ),
     )
@@ -1335,6 +1371,272 @@ def delete_appearance_setting(appearance_id: int):
         "message": "Appearance settings deleted successfully"
     }
 
+
+# Pydantic Model
+
+class Integration(BaseModel):
+
+    name: str
+
+    icon: str
+
+    description: str
+
+    connected: bool
+
+    since: Optional[str] = None
+
+
+
+# GET ALL INTEGRATIONS
+
+@app.get("/settings/integrations")
+def get_integrations():
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT
+            id,
+            name,
+            icon,
+            description,
+            connected,
+            since
+        FROM integration_settings
+        ORDER BY id;
+    """)
+
+    rows = cursor.fetchall()
+
+    cursor.close()
+    conn.close()
+
+
+    return [
+        {
+            "id": row[0],
+            "name": row[1],
+            "icon": row[2],
+            "description": row[3],
+            "connected": row[4],
+            "since": row[5]
+        }
+        for row in rows
+    ]
+
+
+
+# GET SINGLE INTEGRATION
+
+@app.get("/settings/integrations/{integration_id}")
+def get_integration(integration_id:int):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+
+    cursor.execute("""
+        SELECT
+            id,
+            name,
+            icon,
+            description,
+            connected,
+            since
+        FROM integration_settings
+        WHERE id=%s
+    """,(integration_id,))
+
+
+    row = cursor.fetchone()
+
+
+    cursor.close()
+    conn.close()
+
+
+    if not row:
+
+        raise HTTPException(
+            status_code=404,
+            detail="Integration not found"
+        )
+
+
+    return {
+
+        "id": row[0],
+        "name": row[1],
+        "icon": row[2],
+        "description": row[3],
+        "connected": row[4],
+        "since": row[5]
+
+    }
+
+
+
+# CREATE INTEGRATION
+
+@app.post("/settings/integrations")
+def add_integration(integration: Integration):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+
+    cursor.execute("""
+        INSERT INTO integration_settings
+        (
+            name,
+            icon,
+            description,
+            connected,
+            since
+        )
+        VALUES
+        (
+            %s,%s,%s,%s,%s
+        )
+        RETURNING id
+    """,
+    (
+        integration.name,
+        integration.icon,
+        integration.description,
+        integration.connected,
+        integration.since
+    ))
+
+
+    integration_id = cursor.fetchone()[0]
+
+
+    conn.commit()
+
+
+    cursor.close()
+    conn.close()
+
+
+    return {
+
+        "message":"Integration created successfully",
+
+        "id":integration_id
+
+    }
+
+
+
+# UPDATE INTEGRATION
+
+@app.put("/settings/integrations/{integration_id}")
+def update_integration(
+    integration_id:int,
+    integration:Integration
+):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+
+    cursor.execute("""
+        UPDATE integration_settings
+        SET
+
+            name=%s,
+
+            icon=%s,
+
+            description=%s,
+
+            connected=%s,
+
+            since=%s,
+
+            updated_at=CURRENT_TIMESTAMP
+
+        WHERE id=%s
+
+    """,
+    (
+        integration.name,
+        integration.icon,
+        integration.description,
+        integration.connected,
+        integration.since,
+        integration_id
+    ))
+
+
+    conn.commit()
+
+
+    if cursor.rowcount == 0:
+
+        cursor.close()
+        conn.close()
+
+        raise HTTPException(
+            status_code=404,
+            detail="Integration not found"
+        )
+
+
+    cursor.close()
+    conn.close()
+
+
+    return {
+
+        "message":"Integration updated successfully"
+
+    }
+
+
+
+# DELETE INTEGRATION
+
+@app.delete("/settings/integrations/{integration_id}")
+def delete_integration(integration_id:int):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+
+    cursor.execute("""
+        DELETE FROM integration_settings
+        WHERE id=%s
+    """,
+    (integration_id,))
+
+
+    conn.commit()
+
+
+    if cursor.rowcount == 0:
+
+        cursor.close()
+        conn.close()
+
+        raise HTTPException(
+            status_code=404,
+            detail="Integration not found"
+        )
+
+
+    cursor.close()
+    conn.close()
+
+
+    return {
+
+        "message":"Integration deleted successfully"
+
+    }
 class Billing(BaseModel):
 
     billingName: str
@@ -1564,16 +1866,16 @@ def delete_billing_setting(billing_id: int):
         "message": "Billing settings deleted successfully"
     }
 class Compliance(BaseModel):
-
-    complianceMode: str
-
-    auditFrequency: str
-
-    retentionPeriod: str
-
-    autoArchive: bool
-
-    complianceOfficer: str
+    critical: str
+    warning: str
+    calculation: str
+    frequency: str
+    gdpr: bool
+    sox: bool
+    iso: bool
+    hipaa: bool
+    pci: bool
+    ccpa: bool
 @app.get("/settings/compliance")
 def get_compliance_settings():
 
@@ -1583,13 +1885,18 @@ def get_compliance_settings():
     cursor.execute("""
         SELECT
             id,
-            compliance_mode,
-            audit_frequency,
-            retention_period,
-            auto_archive,
-            compliance_officer
+            critical,
+            warning,
+            calculation,
+            frequency,
+            gdpr,
+            sox,
+            iso,
+            hipaa,
+            pci,
+            ccpa
         FROM compliance_settings
-        ORDER BY id
+        ORDER BY id;
     """)
 
     rows = cursor.fetchall()
@@ -1600,11 +1907,16 @@ def get_compliance_settings():
     return [
         {
             "id": row[0],
-            "complianceMode": row[1],
-            "auditFrequency": row[2],
-            "retentionPeriod": row[3],
-            "autoArchive": row[4],
-            "complianceOfficer": row[5],
+            "critical": row[1],
+            "warning": row[2],
+            "calculation": row[3],
+            "frequency": row[4],
+            "gdpr": row[5],
+            "sox": row[6],
+            "iso": row[7],
+            "hipaa": row[8],
+            "pci": row[9],
+            "ccpa": row[10],
         }
         for row in rows
     ]
@@ -1617,11 +1929,16 @@ def get_compliance_setting(compliance_id: int):
     cursor.execute("""
         SELECT
             id,
-            compliance_mode,
-            audit_frequency,
-            retention_period,
-            auto_archive,
-            compliance_officer
+            critical,
+            warning,
+            calculation,
+            frequency,
+            gdpr,
+            sox,
+            iso,
+            hipaa,
+            pci,
+            ccpa
         FROM compliance_settings
         WHERE id=%s
     """, (compliance_id,))
@@ -1639,11 +1956,16 @@ def get_compliance_setting(compliance_id: int):
 
     return {
         "id": row[0],
-        "complianceMode": row[1],
-        "auditFrequency": row[2],
-        "retentionPeriod": row[3],
-        "autoArchive": row[4],
-        "complianceOfficer": row[5],
+        "critical": row[1],
+        "warning": row[2],
+        "calculation": row[3],
+        "frequency": row[4],
+        "gdpr": row[5],
+        "sox": row[6],
+        "iso": row[7],
+        "hipaa": row[8],
+        "pci": row[9],
+        "ccpa": row[10],
     }
 @app.post("/settings/compliance")
 def add_compliance_setting(compliance: Compliance):
@@ -1654,22 +1976,32 @@ def add_compliance_setting(compliance: Compliance):
     cursor.execute("""
         INSERT INTO compliance_settings
         (
-            compliance_mode,
-            audit_frequency,
-            retention_period,
-            auto_archive,
-            compliance_officer
+            critical,
+            warning,
+            calculation,
+            frequency,
+            gdpr,
+            sox,
+            iso,
+            hipaa,
+            pci,
+            ccpa
         )
         VALUES
-        (%s,%s,%s,%s,%s)
+        (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
         RETURNING id
     """,
     (
-        compliance.complianceMode,
-        compliance.auditFrequency,
-        compliance.retentionPeriod,
-        compliance.autoArchive,
-        compliance.complianceOfficer,
+        compliance.critical,
+        compliance.warning,
+        compliance.calculation,
+        compliance.frequency,
+        compliance.gdpr,
+        compliance.sox,
+        compliance.iso,
+        compliance.hipaa,
+        compliance.pci,
+        compliance.ccpa,
     ))
 
     compliance_id = cursor.fetchone()[0]
@@ -1695,19 +2027,29 @@ def update_compliance_setting(
     cursor.execute("""
         UPDATE compliance_settings
         SET
-            compliance_mode=%s,
-            audit_frequency=%s,
-            retention_period=%s,
-            auto_archive=%s,
-            compliance_officer=%s
+            critical=%s,
+            warning=%s,
+            calculation=%s,
+            frequency=%s,
+            gdpr=%s,
+            sox=%s,
+            iso=%s,
+            hipaa=%s,
+            pci=%s,
+            ccpa=%s
         WHERE id=%s
     """,
     (
-        compliance.complianceMode,
-        compliance.auditFrequency,
-        compliance.retentionPeriod,
-        compliance.autoArchive,
-        compliance.complianceOfficer,
+        compliance.critical,
+        compliance.warning,
+        compliance.calculation,
+        compliance.frequency,
+        compliance.gdpr,
+        compliance.sox,
+        compliance.iso,
+        compliance.hipaa,
+        compliance.pci,
+        compliance.ccpa,
         compliance_id,
     ))
 
@@ -1755,18 +2097,17 @@ def delete_compliance_setting(compliance_id: int):
         "message": "Compliance settings deleted successfully"
     }
 class ContractDefaults(BaseModel):
-
-    defaultContractType: str
-
-    defaultDuration: str
-
-    renewalType: str
-
-    reminderDays: int
-
-    approvalRequired: bool
-
-    defaultOwner: str
+    category: str
+    status: str
+    law: str
+    numbering: str
+    renewal: str
+    reminder90: bool
+    reminder60: bool
+    reminder30: bool
+    reminder14: bool
+    autoArchive: bool
+    workflow: list[str]
 @app.get("/settings/contract-defaults")
 def get_contract_defaults():
 
@@ -1776,12 +2117,17 @@ def get_contract_defaults():
     cursor.execute("""
         SELECT
             id,
-            default_contract_type,
-            default_duration,
-            renewal_type,
-            reminder_days,
-            approval_required,
-            default_owner
+            category,
+            status,
+            law,
+            numbering,
+            renewal,
+            reminder90,
+            reminder60,
+            reminder30,
+            reminder14,
+            auto_archive,
+            workflow
         FROM contract_defaults
         ORDER BY id
     """)
@@ -1794,12 +2140,17 @@ def get_contract_defaults():
     return [
         {
             "id": row[0],
-            "defaultContractType": row[1],
-            "defaultDuration": row[2],
-            "renewalType": row[3],
-            "reminderDays": row[4],
-            "approvalRequired": row[5],
-            "defaultOwner": row[6]
+            "category": row[1],
+            "status": row[2],
+            "law": row[3],
+            "numbering": row[4],
+            "renewal": row[5],
+            "reminder90": row[6],
+            "reminder60": row[7],
+            "reminder30": row[8],
+            "reminder14": row[9],
+            "autoArchive": row[10],
+            "workflow": row[11]
         }
         for row in rows
     ]
@@ -1812,12 +2163,17 @@ def get_contract_default(default_id: int):
     cursor.execute("""
         SELECT
             id,
-            default_contract_type,
-            default_duration,
-            renewal_type,
-            reminder_days,
-            approval_required,
-            default_owner
+            category,
+            status,
+            law,
+            numbering,
+            renewal,
+            reminder90,
+            reminder60,
+            reminder30,
+            reminder14,
+            auto_archive,
+            workflow
         FROM contract_defaults
         WHERE id=%s
     """, (default_id,))
@@ -1835,12 +2191,17 @@ def get_contract_default(default_id: int):
 
     return {
         "id": row[0],
-        "defaultContractType": row[1],
-        "defaultDuration": row[2],
-        "renewalType": row[3],
-        "reminderDays": row[4],
-        "approvalRequired": row[5],
-        "defaultOwner": row[6]
+        "category": row[1],
+        "status": row[2],
+        "law": row[3],
+        "numbering": row[4],
+        "renewal": row[5],
+        "reminder90": row[6],
+        "reminder60": row[7],
+        "reminder30": row[8],
+        "reminder14": row[9],
+        "autoArchive": row[10],
+        "workflow": row[11]
     }
 @app.post("/settings/contract-defaults")
 def add_contract_default(defaults: ContractDefaults):
@@ -1851,24 +2212,34 @@ def add_contract_default(defaults: ContractDefaults):
     cursor.execute("""
         INSERT INTO contract_defaults
         (
-            default_contract_type,
-            default_duration,
-            renewal_type,
-            reminder_days,
-            approval_required,
-            default_owner
+            category,
+            status,
+            law,
+            numbering,
+            renewal,
+            reminder90,
+            reminder60,
+            reminder30,
+            reminder14,
+            auto_archive,
+            workflow
         )
         VALUES
-        (%s,%s,%s,%s,%s,%s)
+        (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
         RETURNING id
     """,
     (
-        defaults.defaultContractType,
-        defaults.defaultDuration,
-        defaults.renewalType,
-        defaults.reminderDays,
-        defaults.approvalRequired,
-        defaults.defaultOwner
+        defaults.category,
+        defaults.status,
+        defaults.law,
+        defaults.numbering,
+        defaults.renewal,
+        defaults.reminder90,
+        defaults.reminder60,
+        defaults.reminder30,
+        defaults.reminder14,
+        defaults.autoArchive,
+        json.dumps(defaults.workflow)
     ))
 
     default_id = cursor.fetchone()[0]
@@ -1894,21 +2265,31 @@ def update_contract_default(
     cursor.execute("""
         UPDATE contract_defaults
         SET
-            default_contract_type=%s,
-            default_duration=%s,
-            renewal_type=%s,
-            reminder_days=%s,
-            approval_required=%s,
-            default_owner=%s
+            category=%s,
+            status=%s,
+            law=%s,
+            numbering=%s,
+            renewal=%s,
+            reminder90=%s,
+            reminder60=%s,
+            reminder30=%s,
+            reminder14=%s,
+            auto_archive=%s,
+            workflow=%s
         WHERE id=%s
     """,
     (
-        defaults.defaultContractType,
-        defaults.defaultDuration,
-        defaults.renewalType,
-        defaults.reminderDays,
-        defaults.approvalRequired,
-        defaults.defaultOwner,
+        defaults.category,
+        defaults.status,
+        defaults.law,
+        defaults.numbering,
+        defaults.renewal,
+        defaults.reminder90,
+        defaults.reminder60,
+        defaults.reminder30,
+        defaults.reminder14,
+        defaults.autoArchive,
+        json.dumps(defaults.workflow),
         default_id
     ))
 
@@ -1917,7 +2298,6 @@ def update_contract_default(
     if cursor.rowcount == 0:
         cursor.close()
         conn.close()
-
         raise HTTPException(
             status_code=404,
             detail="Contract defaults not found"
