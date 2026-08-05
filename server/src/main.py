@@ -16,6 +16,7 @@ from .routers import risk as risk_router
 
 from .auth.security import create_token, get_current_user, hash_password, require_roles, verify_password
 from .database import create_user, find_user_by_email, initialize_database, initialize_notifications_table, list_users as list_database_users, update_user_password
+from .database.audit_logs import list_audit_logs as list_database_audit_logs
 from .database.notifications import create_notification as create_postgres_notification, list_notifications as list_postgres_notifications, mark_all_notifications_read, mark_notification_read as mark_postgres_notification_read
 from .database.obligations import list_obligations as list_postgres_obligations
 from .schemas import (
@@ -146,7 +147,7 @@ def me(current_user: dict[str, Any] = Depends(get_current_user)) -> dict[str, An
 
 
 @app.get("/api/users", response_model=list[UserPublic])
-def list_users(_: dict[str, Any] = Depends(require_roles(Role.administrator.value, Role.legal_manager.value))) -> list[dict[str, Any]]:
+def list_users(_: dict[str, Any] = Depends(get_current_user)) -> list[dict[str, Any]]:
     return [public_user(user) for user in list_database_users()]
 
 
@@ -406,40 +407,10 @@ def list_reports(_: dict[str, Any] = Depends(get_current_user)) -> list[dict[str
 
 
 @app.get("/api/audit-logs", response_model=list[APIRecord])
-def list_audit_logs(_: dict[str, Any] = Depends(require_roles(Role.administrator.value, Role.compliance_officer.value))) -> list[dict[str, Any]]:
-    return sorted(store.list("audit_logs"), key=lambda item: item["created_at"], reverse=True)
+def list_audit_logs(_: dict[str, Any] = Depends(get_current_user)) -> list[dict[str, Any]]:
+    return list_database_audit_logs()
 
 
 @app.get("/api/activities", response_model=list[APIRecord])
 def list_activities(_: dict[str, Any] = Depends(get_current_user)) -> list[dict[str, Any]]:
     return sorted(store.list("activities"), key=lambda item: item["created_at"], reverse=True)
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from app.database.database import Base
-from app.database.database import engine
-from app.routers import auth
-from app.routers import users
-# Import models so SQLAlchemy creates the tables
-from app.models.role import Role
-from app.models.user import User
-from app.routers import roles
-Base.metadata.create_all(bind=engine)
-app = FastAPI(
-    title="User Management API",
-    version="1.0.0"
-)
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-app.include_router(auth.router)
-app.include_router(users.router)
-app.include_router(roles.router)
-@app.get("/")
-def root():
-    return {
-        "message": "User Management API Running Successfully"
-    }

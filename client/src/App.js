@@ -6,6 +6,8 @@ import Home from './pages/Home'
 import Notifications from './pages/Notifications.js'
 import ComplianceDashboard from './pages/ComplianceDashboard'
 import ObligationTracker from './pages/ObligationTracker'
+import AuditLogs from './pages/AuditLogs'
+import UserManagement from './pages/UserManagement'
 import { Auth } from './features/authentication/Auth'
 
 function ProtectedDashboard() {
@@ -54,6 +56,14 @@ export default function App() {
         element: React.createElement(ProtectedObligationTracker),
       }),
       React.createElement(Route, {
+        path: '/audit-logs',
+        element: React.createElement(ProtectedAuditLogs),
+      }),
+      React.createElement(Route, {
+        path: '/users',
+        element: React.createElement(ProtectedUserManagement),
+      }),
+      React.createElement(Route, {
         path: '*',
         element: React.createElement(Navigate, {
           to: '/login',
@@ -79,29 +89,16 @@ function ProtectedObligationTracker() {
   return isAuthenticated() ? React.createElement(ObligationTracker) : React.createElement(Navigate, { to: '/login', replace: true })
 }
 
+function ProtectedAuditLogs() {
+  return isAuthenticated() ? React.createElement(AuditLogs) : React.createElement(Navigate, { to: '/login', replace: true })
+}
+
+function ProtectedUserManagement() {
+  return isAuthenticated() ? React.createElement(UserManagement) : React.createElement(Navigate, { to: '/login', replace: true })
+}
+
 function isAuthenticated() {
   return Boolean(window.localStorage.getItem('contractiq_token')
     || window.sessionStorage.getItem('contractiq_token')
     || window.localStorage.getItem('access_token'))
 }
-import "./App.css";
-
-import { BrowserRouter } from "react-router-dom";
-
-import AppRoutes from "./routes/AppRoutes";
-
-function App() {
-
-    return (
-
-        <BrowserRouter>
-
-            <AppRoutes />
-
-        </BrowserRouter>
-
-    );
-
-}
-
-export default App;

@@ -76,7 +76,10 @@ class UserPublic(BaseModel):
     id: str
     name: str
     email: str
-    role: Role
+    # Existing PostgreSQL records can contain organization-specific titles
+    # (for example, "Legal Director"), so public user responses must not be
+    # limited to only the roles accepted during registration.
+    role: str
     department: str | None = None
     is_active: bool = True
     created_at: datetime
