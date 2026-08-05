@@ -4,13 +4,19 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import './App.css'
 import Home from './pages/Home'
 import Reports from './pages/Reports'
+import Notifications from './pages/Notifications.js'
+import ComplianceDashboard from './pages/ComplianceDashboard'
+import ObligationTracker from './pages/ObligationTracker'
 import { Auth } from './features/authentication/Auth'
 
-function ProtectedRoute({ page }) {
-  const token = window.localStorage.getItem('contractiq_token')
+function isAuthenticated() {
+  return Boolean(window.localStorage.getItem('contractiq_token')
     || window.sessionStorage.getItem('contractiq_token')
-    || window.localStorage.getItem('access_token')
-  return token ? React.createElement(page) : React.createElement(Navigate, { to: '/login', replace: true })
+    || window.localStorage.getItem('access_token'))
+}
+
+function ProtectedRoute({ page }) {
+  return isAuthenticated() ? React.createElement(page) : React.createElement(Navigate, { to: '/login', replace: true })
 }
 
 export default function App() {
@@ -38,6 +44,22 @@ export default function App() {
       React.createElement(Route, {
         path: '/reports',
         element: React.createElement(ProtectedRoute, { page: Reports }),
+      }),
+      React.createElement(Route, {
+        path: '/notifications',
+        element: React.createElement(ProtectedRoute, { page: Notifications }),
+      }),
+      React.createElement(Route, {
+        path: '/compliance',
+        element: React.createElement(ProtectedRoute, { page: ComplianceDashboard }),
+      }),
+      React.createElement(Route, {
+        path: '/compliance-dashboard',
+        element: React.createElement(ProtectedRoute, { page: ComplianceDashboard }),
+      }),
+      React.createElement(Route, {
+        path: '/obligations',
+        element: React.createElement(ProtectedRoute, { page: ObligationTracker }),
       }),
       React.createElement(Route, {
         path: '*',

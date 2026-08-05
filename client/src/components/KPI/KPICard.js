@@ -1,22 +1,16 @@
-import "./KPICard.css";
-import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
-function KPICard({ title, value, badge, icon }) {
-	return /* @__PURE__ */ _jsxs("div", {
-		className: "kpi-card",
-		children: [
-			/* @__PURE__ */ _jsxs("div", {
-				className: "top",
-				children: [/* @__PURE__ */ _jsx("div", {
-					className: "icon",
-					children: icon
-				}), /* @__PURE__ */ _jsx("span", {
-					className: "badge",
-					children: badge
-				})]
-			}),
-			/* @__PURE__ */ _jsx("h2", { children: value }),
-			/* @__PURE__ */ _jsx("p", { children: title })
-		]
-	});
+import './KPICard.css'
+
+function KPICard({ title, value, badge, icon, iconBg, badgeBg, badgeColor }) {
+  return (
+    <div className="kpi-card">
+      <div className="top">
+        <div className="icon" style={iconBg ? { background: iconBg } : undefined}>{icon}</div>
+        <span className="badge" style={badgeBg || badgeColor ? { background: badgeBg, color: badgeColor } : undefined}>{badge}</span>
+      </div>
+      <h2>{value}</h2>
+      <p>{title}</p>
+    </div>
+  )
 }
-export default KPICard;
+
+export default KPICard

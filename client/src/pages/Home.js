@@ -56,7 +56,7 @@ export default function Home() {
       onToggle: toggleSidebar,
     }),
     React.createElement('div', { className: 'app-main' },
-      React.createElement(Navbar, { profile }),
+      React.createElement(Navbar, { profile, unreadCount: dashboard?.unread_notifications || 0 }),
       React.createElement(PageContainer, null,
         error ? React.createElement('div', { className: 'dashboard-error', role: 'alert' }, error) : null,
         !dashboard && !error ? React.createElement('div', { className: 'loading-state' }, 'Loading dashboard...') : null,

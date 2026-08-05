@@ -15,7 +15,9 @@ from .routers import report as report_router
 from .routers import risk as risk_router
 
 from .auth.security import create_token, get_current_user, hash_password, require_roles, verify_password
-from .database import create_user, find_user_by_email, initialize_database, list_users as list_database_users, update_user_password
+from .database import create_user, find_user_by_email, initialize_database, initialize_notifications_table, list_users as list_database_users, update_user_password
+from .database.notifications import create_notification as create_postgres_notification, list_notifications as list_postgres_notifications, mark_all_notifications_read, mark_notification_read as mark_postgres_notification_read
+from .database.obligations import list_obligations as list_postgres_obligations
 from .core_schemas import (
     APIRecord,
     ComplianceLevel,
@@ -58,6 +60,7 @@ app.add_middleware(
 @app.on_event("startup")
 def startup() -> None:
     initialize_database()
+    initialize_notifications_table()
     Base.metadata.create_all(bind=engine)
 
 app.include_router(dashboard_router)
@@ -226,7 +229,7 @@ def list_obligations(
     status_filter: ObligationStatus | None = Query(default=None, alias="status"),
     _: dict[str, Any] = Depends(get_current_user),
 ) -> list[dict[str, Any]]:
-    obligations = store.list("obligations")
+    obligations = list_postgres_obligations()
     if contract_id:
         obligations = [item for item in obligations if item["contract_id"] == contract_id]
     if status_filter:
@@ -355,12 +358,7 @@ def dashboard(current_user: dict[str, Any] = Depends(get_current_user)) -> dict[
 
 @app.get("/api/notifications", response_model=list[APIRecord])
 def list_notifications(current_user: dict[str, Any] = Depends(get_current_user)) -> list[dict[str, Any]]:
-    notifications = store.list("notifications")
-    if current_user["role"] != Role.administrator.value:
-        notifications = [
-            item for item in notifications if item.get("recipient_user_id") in {None, current_user["id"]}
-        ]
-    return notifications
+    return list_postgres_notifications(current_user["id"], current_user["role"] == Role.administrator.value)
 
 
 @app.post("/api/notifications", response_model=APIRecord, status_code=status.HTTP_201_CREATED)
@@ -368,18 +366,23 @@ def create_notification(
     payload: NotificationCreate,
     current_user: dict[str, Any] = Depends(require_roles(Role.administrator.value, Role.legal_manager.value, Role.compliance_officer.value)),
 ) -> dict[str, Any]:
-    notification = store.create("notifications", {**model_payload(payload), "read": False})
+    notification = create_postgres_notification(model_payload(payload))
     store.audit("created", "notification", notification["id"], current_user["id"])
     return notification
 
 
 @app.post("/api/notifications/{notification_id}/read", response_model=APIRecord)
 def mark_notification_read(notification_id: str, current_user: dict[str, Any] = Depends(get_current_user)) -> dict[str, Any]:
-    notification = ensure_record("notifications", notification_id)
-    if notification.get("recipient_user_id") not in {None, current_user["id"]} and current_user["role"] != Role.administrator.value:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Cannot update this notification")
-    updated = store.update("notifications", notification_id, {"read": True})
+    updated = mark_postgres_notification_read(notification_id, current_user["id"], current_user["role"] == Role.administrator.value)
+    if not updated:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Notification not found")
     return updated
+
+
+@app.post("/api/notifications/read-all")
+def mark_all_notifications_as_read(current_user: dict[str, Any] = Depends(get_current_user)) -> dict[str, int]:
+    updated_count = mark_all_notifications_read(current_user["id"], current_user["role"] == Role.administrator.value)
+    return {"updated_count": updated_count}
 
 
 @app.post("/api/reports", response_model=APIRecord, status_code=status.HTTP_201_CREATED)

@@ -19,3 +19,44 @@
 .activity-card { padding-left: 22px; padding-right: 22px; } .activity-title a { color: #145cf3; font-size: 13px; } .activity-list { display: grid; gap: 20px; padding-top: 9px; } .activity-item { display: flex; align-items: flex-start; gap: 12px; } .activity-icon { display: grid; place-items: center; flex: 0 0 31px; height: 31px; border-radius: 9px; color: #3178f3; background: #eaf2ff; font-size: 16px; } .activity-icon.warning { color: #e99200; background: #fff7df; } .activity-icon.alert { color: #f04d59; background: #fff0f1; } .activity-icon.success { color: #05af77; background: #e5fbf2; } .activity-item p { margin: 2px 0 0; color: #091c3d; font-size: 14px; } .activity-item small { display: block; margin-top: 7px; color: #8da1c1; font-size: 13px; }
 .deadlines-card { padding: 0; overflow: hidden; } .deadlines-heading { align-items: center; padding: 23px 22px 20px; margin: 0; } .secondary-button { border: 1px solid #d8e1ee; border-radius: 8px; padding: 8px 14px; background: #fff; color: #0d2144; font-size: 13px; } .table-scroll { overflow-x: auto; } table { width: 100%; min-width: 850px; border-collapse: collapse; } th { height: 47px; padding: 0 22px; border-top: 1px solid #dce4ef; border-bottom: 1px solid #dce4ef; color: #8da1c2; text-align: left; text-transform: uppercase; font-size: 13px; font-weight: 600; } td { padding: 14px 22px; border-bottom: 1px solid #e6ebf3; color: #0b1e3f; font-size: 13px; } tr:last-child td { border-bottom: 0; } .contract-code { color: #0b5dff; font-family: ui-monospace, monospace; font-size: 12px; } .assignee { display: flex; align-items: center; gap: 8px; color: #788fb3; } .assignee-avatar { display: grid; place-items: center; width: 27px; height: 27px; border-radius: 50%; background: #e3efff; color: #1262ed; font-size: 11px; } .tag { display: inline-block; min-width: 54px; padding: 4px 9px; border-radius: 99px; text-align: center; font-size: 12px; } .priority-critical, .status-overdue { border: 1px solid #ffb8bd; background: #fff5f5; color: #f02a32; } .priority-high, .status-in-progress { background: #fff8e5; color: #d77500; } .status-pending { background: #f1f6ff; color: #125fff; } .empty-state, .loading-state, .dashboard-error { padding: 28px; text-align: center; color: #7890b4; } .dashboard-error { margin-bottom: 20px; border-radius: 10px; background: #fff2f2; color: #ce3440; }
 @media (max-width: 1250px) { .sidebar { width: 230px; flex-basis: 230px; } .stat-cards { grid-template-columns: repeat(3, 1fr); } .overview-grid, .insight-grid { grid-template-columns: 1fr; } } @media (max-width: 800px) { .sidebar { width: 64px; flex-basis: 64px; } .brand { padding: 0 17px; } .brand > span:last-child, .nav-label, .nav-count, .sidebar-profile-copy, .profile-chevron, .collapse-button { display: none; } .sidebar-link { justify-content: center; padding: 0; } .sidebar-profile { display: block; padding: 18px 16px; } .navbar { padding: 0 17px; } .breadcrumb { font-size: 13px; } .search-box { display: none; } .page-container { padding: 18px; } } @media (max-width: 540px) { .stat-cards { grid-template-columns: 1fr; } .profile-copy, .header-chevron { display: none; } .primary-button { padding: 9px 11px; } .navbar-actions { gap: 9px; } .dashboard-card { padding: 18px; } .deadlines-card { padding: 0; } .chart-area { height: 240px; } }
+
+/* Keep navigation visible when wide page content is scrolled horizontally. */
+.sidebar {
+  position: fixed;
+  left: 0;
+  z-index: 20;
+}
+
+.app-main {
+  flex: 0 0 calc(100% - 264px);
+  width: calc(100% - 264px);
+  margin-left: 264px;
+}
+
+.sidebar.is-collapsed + .app-main {
+  flex-basis: calc(100% - 72px);
+  width: calc(100% - 72px);
+  margin-left: 72px;
+}
+
+@media (max-width: 1250px) {
+  .app-main {
+    flex-basis: calc(100% - 230px);
+    width: calc(100% - 230px);
+    margin-left: 230px;
+  }
+}
+
+@media (max-width: 800px) {
+  .app-main {
+    flex-basis: calc(100% - 64px);
+    width: calc(100% - 64px);
+    margin-left: 64px;
+  }
+
+  .sidebar.is-collapsed + .app-main {
+    flex-basis: calc(100% - 72px);
+    width: calc(100% - 72px);
+    margin-left: 72px;
+  }
+}

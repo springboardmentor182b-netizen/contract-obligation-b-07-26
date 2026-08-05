@@ -1,24 +1,24 @@
-import "./Header.css";
-import { exportPDF } from "../../utils/exportPDF";
-import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+import { Download } from 'lucide-react'
+import './Header.css'
+import { exportDashboard } from '../../api/headerApi'
+import { exportPDF } from '../../utils/exportPDF'
+
 function Header({ openModal, obligations }) {
-	return /* @__PURE__ */ _jsxs("div", {
-		className: "header",
-		children: [/* @__PURE__ */ _jsx("div", {
-			className: "header-left",
-			children: /* @__PURE__ */ _jsxs("div", { children: [/* @__PURE__ */ _jsx("h1", { children: "Obligation Tracker" }), /* @__PURE__ */ _jsx("p", { children: "Track and manage contractual obligations efficiently." })] })
-		}), /* @__PURE__ */ _jsxs("div", {
-			className: "header-right",
-			children: [/* @__PURE__ */ _jsx("button", {
-				className: "export-btn",
-				onClick: () => exportPDF(obligations),
-				children: "Export PDF"
-			}), /* @__PURE__ */ _jsx("button", {
-				className: "add-btn",
-				onClick: openModal,
-				children: "+ Add Obligation"
-			})]
-		})]
-	});
+  const isTracker = typeof openModal === 'function'
+  const handleExport = isTracker ? () => exportPDF(obligations || []) : exportDashboard
+
+  return (
+    <div className="header">
+      <div className="header-left">
+        <h1>{isTracker ? 'Obligation Tracker' : 'Compliance Monitoring'}</h1>
+        <p>{isTracker ? 'Track and manage contractual obligations efficiently.' : 'Track, monitor, and manage compliance across all obligations.'}</p>
+      </div>
+      <div className="header-right">
+        <button className="export-btn" onClick={handleExport}><Download className="export-icon" />Export {isTracker ? 'PDF' : 'Dashboard'}</button>
+        {isTracker && <button className="add-btn" onClick={openModal}>+ Add Obligation</button>}
+      </div>
+    </div>
+  )
 }
-export default Header;
+
+export default Header

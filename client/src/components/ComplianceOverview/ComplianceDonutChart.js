@@ -1,43 +1,122 @@
 import "./ComplianceDonutChart.css";
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
-import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
+
+import {
+    PieChart,
+    Pie,
+    Cell,
+    ResponsiveContainer,
+    Tooltip
+} from "recharts";
+
 function ComplianceDonutChart({ data = [] }) {
-	return /* @__PURE__ */ _jsxs("div", {
-		className: "status-card",
-		children: [/* @__PURE__ */ _jsx("h3", { children: "Status Distribution" }), /* @__PURE__ */ _jsxs("div", {
-			className: "status-body",
-			children: [/* @__PURE__ */ _jsx("div", {
-				className: "status-chart",
-				children: /* @__PURE__ */ _jsx(ResponsiveContainer, {
-					width: "100%",
-					height: 260,
-					children: /* @__PURE__ */ _jsxs(PieChart, { children: [/* @__PURE__ */ _jsx(Pie, {
-						data,
-						dataKey: "value",
-						nameKey: "name",
-						innerRadius: 60,
-						outerRadius: 95,
-						paddingAngle: 3,
-						children: data.map((item, index) => /* @__PURE__ */ _jsx(Cell, { fill: item.color }, index))
-					}), /* @__PURE__ */ _jsx(Tooltip, {})] })
-				})
-			}), /* @__PURE__ */ _jsx("div", {
-				className: "status-legend",
-				children: data.map((item, index) => /* @__PURE__ */ _jsxs("div", {
-					className: "legend-row",
-					children: [/* @__PURE__ */ _jsxs("div", {
-						className: "legend-left",
-						children: [/* @__PURE__ */ _jsx("span", {
-							className: "legend-dot",
-							style: { background: item.color }
-						}), /* @__PURE__ */ _jsx("span", { children: item.name })]
-					}), /* @__PURE__ */ _jsx("div", {
-						className: "legend-right",
-						children: /* @__PURE__ */ _jsx("span", { children: item.value })
-					})]
-				}, index))
-			})]
-		})]
-	});
+
+    return (
+
+        <div className="status-card">
+
+            <h3>Status Distribution</h3>
+
+            <div className="status-body">
+
+                {/* Donut Chart */}
+
+                <div className="status-chart">
+
+                        <ResponsiveContainer
+                        width="100%"
+                        height="100%"
+                    >
+
+                        <PieChart>
+
+                            <Pie
+                                data={data}
+                                dataKey="value"
+                                nameKey="name"
+                                cx="50%"
+                                cy="50%"
+                                innerRadius="54%"
+                                outerRadius="84%"
+                                paddingAngle={3}
+                            >
+
+                                {
+
+                                    data.map((item, index) => (
+
+                                        <Cell
+                                            key={index}
+                                            fill={item.color}
+                                        />
+
+                                    ))
+
+                                }
+
+                            </Pie>
+
+                            <Tooltip />
+
+                        </PieChart>
+
+                    </ResponsiveContainer>
+
+                </div>
+
+                {/* Legend */}
+
+                <div className="status-legend">
+
+                    {
+
+                        data.map((item, index) => (
+
+                            <div
+                                key={index}
+                                className="legend-row"
+                            >
+
+                                <div className="legend-left">
+
+                                    <span
+                                        className="legend-dot"
+                                        style={{
+                                            background: item.color
+                                        }}
+                                    />
+
+                                    <span>
+
+                                        {item.name}
+
+                                    </span>
+
+                                </div>
+
+                                <div className="legend-right">
+
+                                    <span>
+
+                                        {item.value}
+
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                        ))
+
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+    );
+
 }
+
 export default ComplianceDonutChart;
