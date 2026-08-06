@@ -6,7 +6,7 @@ from typing import Any
 
 from psycopg.rows import dict_row
 
-from .users import get_connection
+from .users import get_connection, CREATE_USERS_TABLE
 
 
 CREATE_NOTIFICATIONS_TABLE = """
@@ -41,6 +41,22 @@ NOTIFICATION_PROJECTION = """
 def initialize_notifications_table() -> None:
     with get_connection() as connection:
         with connection.cursor() as cursor:
+            # First ensure users table exists
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS users (
+                    user_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+                    full_name VARCHAR(100) NOT NULL,
+                    email VARCHAR(150) NOT NULL UNIQUE,
+                    password_hash TEXT NOT NULL,
+                    role TEXT NOT NULL,
+                    phone VARCHAR(15),
+                    department VARCHAR(100),
+                    status BOOLEAN NOT NULL DEFAULT TRUE,
+                    created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+                    updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+                );
+            """)
+            # Then create notifications table
             cursor.execute(CREATE_NOTIFICATIONS_TABLE)
 
 

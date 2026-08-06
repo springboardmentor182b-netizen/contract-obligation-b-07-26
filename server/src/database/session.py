@@ -19,7 +19,6 @@ def get_db():
         yield db
     finally:
         db.close()
-=======
 """PostgreSQL engine and request-scoped SQLAlchemy session."""
 
 from collections.abc import Generator

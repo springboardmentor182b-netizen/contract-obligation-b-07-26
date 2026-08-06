@@ -180,7 +180,7 @@ def seed_data() -> dict[str, list[dict[str, Any]]]:
                 "responsible_user_id": admin_id,
                 "due_date": "2026-09-30",
                 "status": ObligationStatus.pending.value,
-                "compliance_level": ComplianceLevel.pending.value,
+                "compliance_level": ComplianceLevel.medium.value,
                 "progress": 35,
                 "notes": "Awaiting department evidence pack.",
                 "created_at": timestamp,

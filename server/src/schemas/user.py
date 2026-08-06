@@ -2,7 +2,7 @@ from pydantic import BaseModel
 from typing import Optional
 from datetime import datetime
 
-from app.schemas.role import RoleResponse
+from .role import RoleResponse
 
 
 class UserBase(BaseModel):

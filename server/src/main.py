@@ -60,7 +60,7 @@ app.add_middleware(
 @app.on_event("startup")
 def startup() -> None:
     initialize_database()
-    initialize_notifications_table()
+    # initialize_notifications_table()  # Temporarily disabled due to foreign key constraint issue
     Base.metadata.create_all(bind=engine)
 
 app.include_router(dashboard_router)
