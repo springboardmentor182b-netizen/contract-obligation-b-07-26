@@ -67,6 +67,15 @@ class UserLogin(BaseModel):
     role: Role
 
 
+class UserUpdate(BaseModel):
+    name: str | None = Field(default=None, min_length=2)
+    email: str | None = Field(default=None, pattern=r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+    role: Role | None = None
+    department: str | None = None
+    is_active: bool | None = None
+    password: str | None = Field(default=None, min_length=8)
+
+
 class PasswordReset(BaseModel):
     email: str = Field(pattern=r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
     new_password: str = Field(min_length=8)
@@ -83,6 +92,7 @@ class UserPublic(BaseModel):
     department: str | None = None
     is_active: bool = True
     created_at: datetime
+    deleted_at: datetime | None = None
 
 
 class ContractCreate(BaseModel):

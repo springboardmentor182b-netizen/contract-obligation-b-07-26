@@ -15,7 +15,7 @@ from .routers import report as report_router
 from .routers import risk as risk_router
 
 from .auth.security import create_token, get_current_user, hash_password, require_roles, verify_password
-from .database import create_user, find_user_by_email, initialize_database, initialize_notifications_table, list_users as list_database_users, update_user_password
+from .database import create_user, delete_user, find_user_by_email, initialize_database, initialize_notifications_table, list_users as list_database_users, restore_user, update_user, update_user_password
 from .database.audit_logs import list_audit_logs as list_database_audit_logs
 from .database.notifications import create_notification as create_postgres_notification, list_notifications as list_postgres_notifications, mark_all_notifications_read, mark_notification_read as mark_postgres_notification_read
 from .database.obligations import list_obligations as list_postgres_obligations
@@ -40,6 +40,7 @@ from .schemas import (
     UserCreate,
     UserLogin,
     UserPublic,
+    UserUpdate,
 )
 from .storage import store
 from .database.session import Base, engine
@@ -148,6 +149,63 @@ def me(current_user: dict[str, Any] = Depends(get_current_user)) -> dict[str, An
 @app.get("/api/users", response_model=list[UserPublic])
 def list_users(_: dict[str, Any] = Depends(get_current_user)) -> list[dict[str, Any]]:
     return [public_user(user) for user in list_database_users()]
+
+
+@app.get("/api/users/deleted", response_model=list[UserPublic])
+def list_deleted_users(_: dict[str, Any] = Depends(get_current_user)) -> list[dict[str, Any]]:
+    return [public_user(user) for user in list_database_users(include_deleted=True) if user.get("deleted_at")]
+
+
+@app.get("/api/users/{user_id}/activities", response_model=list[APIRecord])
+def user_activity_history(
+    user_id: str,
+    _: dict[str, Any] = Depends(get_current_user),
+) -> list[dict[str, Any]]:
+    return [
+        activity
+        for activity in store.list("activities")
+        if activity.get("entity_type") == "user" and activity.get("entity_id") == user_id
+    ]
+
+
+@app.patch("/api/users/{user_id}", response_model=UserPublic)
+def update_managed_user(
+    user_id: str,
+    payload: UserUpdate,
+    current_user: dict[str, Any] = Depends(get_current_user),
+) -> dict[str, Any]:
+    data = model_payload(payload)
+    if "password" in data:
+        data["password_hash"] = hash_password(data.pop("password"))
+    user = update_user(user_id, data)
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    store.audit("updated", "user", user_id, current_user["id"])
+    return public_user(user)
+
+
+@app.delete("/api/users/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_managed_user(
+    user_id: str,
+    current_user: dict[str, Any] = Depends(get_current_user),
+) -> None:
+    if user_id == current_user["id"]:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="You cannot delete your own account")
+    if not delete_user(user_id):
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    store.audit("deleted", "user", user_id, current_user["id"])
+
+
+@app.post("/api/users/{user_id}/restore", response_model=UserPublic)
+def restore_managed_user(
+    user_id: str,
+    current_user: dict[str, Any] = Depends(get_current_user),
+) -> dict[str, Any]:
+    user = restore_user(user_id)
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Deleted user not found")
+    store.audit("restored", "user", user_id, current_user["id"])
+    return public_user(user)
 
 
 @app.get("/api/contracts", response_model=list[APIRecord])
