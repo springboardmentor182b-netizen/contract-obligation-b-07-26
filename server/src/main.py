@@ -56,7 +56,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 @app.on_event("startup")
 def startup() -> None:
     initialize_database()
@@ -413,28 +412,71 @@ def list_audit_logs(_: dict[str, Any] = Depends(require_roles(Role.administrator
 @app.get("/api/activities", response_model=list[APIRecord])
 def list_activities(_: dict[str, Any] = Depends(get_current_user)) -> list[dict[str, Any]]:
     return sorted(store.list("activities"), key=lambda item: item["created_at"], reverse=True)
+
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.database.database import Base
-from app.database.database import engine
-from app.routers import auth
-from app.routers import users
-# Import models so SQLAlchemy creates the tables
-from app.models.role import Role
-from app.models.user import User
-from app.routers import roles
-Base.metadata.create_all(bind=engine)
+
+from app.config.database import Base, engine
+
+Import Models
+from app.models import compliance
+from app.models import audit
+from app.models import report
+from app.models import history
+from app.models import risk
+from app.models import missed_obligation
+
+
+Import Routes
+from app.routes import compliance
+from app.routes import audit
+from app.routes import report
+from app.routes import history
+from app.routes import risk
+from app.routes import missed_obligation
+from app.routes import header
+from app.routes import kpi
+
 app = FastAPI(
-    title="User Management API",
+    title="Compliance Monitoring API",
     version="1.0.0"
 )
+
+
+
+origins = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+Base.metadata.create_all(bind=engine)
+
+
+app.include_router(compliance.router)
+app.include_router(audit.router)
+app.include_router(report.router)
+app.include_router(history.router)
+app.include_router(risk.router)
+app.include_router(missed_obligation.router)
+app.include_router(header.router)
+app.include_router(kpi.router)
+
+@app.get("/")
+def home():
+    return {
+        "message": "Compliance Monitoring API Running Successfully"
+    }
+=======
 app.include_router(auth.router)
 app.include_router(users.router)
 app.include_router(roles.router)

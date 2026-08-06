@@ -76,3 +76,4 @@ __pycache__/
 *.py[cod]
 server/data/
 server/venv/
+node_modules
