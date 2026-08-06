@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import os
 from dotenv import load_dotenv
 from sqlalchemy import create_engine
@@ -45,4 +44,3 @@ def get_db() -> Generator[Session, None, None]:
         yield database
     finally:
         database.close()
->>>>>>> origin/main-group-A
