@@ -7,6 +7,7 @@ import Profile from "../pages/Profile/Profile";
 import ResetPassword from "../pages/ResetPassword/ResetPassword";
 import ContractRepository from "../pages/ContractRepository";
 import Home from "../pages/Home";
+import Reports from "../pages/Reports";
 import Notifications from "../pages/Notifications";
 import ComplianceDashboard from "../pages/ComplianceDashboard";
 import ObligationTracker from "../pages/ObligationTracker";
@@ -67,6 +68,14 @@ function AppRoutes(){
                 element={
                     <ProtectedRoute>
                         <ObligationTracker />
+                    </ProtectedRoute>
+                } 
+            />
+            <Route 
+                path="/reports" 
+                element={
+                    <ProtectedRoute>
+                        <Reports />
                     </ProtectedRoute>
                 } 
             />
