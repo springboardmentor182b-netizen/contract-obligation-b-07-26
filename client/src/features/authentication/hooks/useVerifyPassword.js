@@ -1,39 +1,67 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
-const useVerifyPassword = () => {
-  const [isValid, setIsValid] = useState(false);
-  const [errors, setErrors] = useState([]);
+/**
+ * Custom hook to verify password strength
+ * @param {string} password - Password to validate
+ * @returns {Object} - Password validation state
+ */
+export const useVerifyPassword = (password) => {
+  const [passwordStrength, setPasswordStrength] = useState({
+    hasMinLength: false,
+    hasUpperCase: false,
+    hasLowerCase: false,
+    hasNumber: false,
+    hasSpecialChar: false,
+    isValid: false
+  });
 
-  const verifyPassword = (password, confirmPassword) => {
-    const newErrors = [];
+  useEffect(() => {
+    const strength = {
+      hasMinLength: password.length >= 8,
+      hasUpperCase: /[A-Z]/.test(password),
+      hasLowerCase: /[a-z]/.test(password),
+      hasNumber: /[0-9]/.test(password),
+      hasSpecialChar: /[!@#$%^&*(),.?":{}|<>]/.test(password)
+    };
 
-    if (password.length < 8) {
-      newErrors.push('Password must be at least 8 characters');
-    }
+    strength.isValid = Object.values(strength).every(v => v);
 
-    if (!/[A-Z]/.test(password)) {
-      newErrors.push('Password must contain at least one uppercase letter');
-    }
+    setPasswordStrength(strength);
+  }, [password]);
 
-    if (!/[a-z]/.test(password)) {
-      newErrors.push('Password must contain at least one lowercase letter');
-    }
-
-    if (!/[0-9]/.test(password)) {
-      newErrors.push('Password must contain at least one number');
-    }
-
-    if (password !== confirmPassword) {
-      newErrors.push('Passwords do not match');
-    }
-
-    setErrors(newErrors);
-    setIsValid(newErrors.length === 0);
-
-    return newErrors.length === 0;
-  };
-
-  return { verifyPassword, isValid, errors };
+  return passwordStrength;
 };
 
-export default useVerifyPassword;
+/**
+ * Validate password meets all requirements
+ * @param {string} password - Password to validate
+ * @returns {Object} - Validation result
+ */
+export const validatePassword = (password) => {
+  const hasMinLength = password.length >= 8;
+  const hasUpperCase = /[A-Z]/.test(password);
+  const hasLowerCase = /[a-z]/.test(password);
+  const hasNumber = /[0-9]/.test(password);
+  const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+  const isValid = hasMinLength && hasUpperCase && hasLowerCase && hasNumber && hasSpecialChar;
+
+  let errorMessage = '';
+  if (!isValid) {
+    if (!hasMinLength) errorMessage = 'Password must be at least 8 characters';
+    else if (!hasUpperCase) errorMessage = 'Password must contain uppercase letter (A-Z)';
+    else if (!hasLowerCase) errorMessage = 'Password must contain lowercase letter (a-z)';
+    else if (!hasNumber) errorMessage = 'Password must contain number (0-9)';
+    else if (!hasSpecialChar) errorMessage = 'Password must contain special character (!@#$%...)';
+  }
+
+  return {
+    isValid,
+    errorMessage,
+    hasMinLength,
+    hasUpperCase,
+    hasLowerCase,
+    hasNumber,
+    hasSpecialChar
+  };
+};

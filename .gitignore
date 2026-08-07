@@ -28,3 +28,9 @@ __pycache__/
 *.pyc
 .env
 *.db
+
+client/node_modules/
+server/venv/
+__pycache__/
+*.pyc
+.env

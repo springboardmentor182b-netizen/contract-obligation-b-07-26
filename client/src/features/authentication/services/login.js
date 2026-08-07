@@ -1,12 +1,15 @@
 import axios from 'axios';
 
-export const login = async (credentials) => {
-  try {
-    const response = await axios.post('/login', credentials);
-    return response.data;
-  } catch (error) {
-    throw error.response?.data || error;
-  }
+/**
+ * Login user with email and password
+ * @param {string} email - User email
+ * @param {string} password - User password
+ * @returns {Promise} - Login response with token and user data
+ */
+export const login = async (email, password) => {
+  const response = await axios.post('/api/auth/login', {
+    email,
+    password
+  });
+  return response.data;
 };
-
-export default login;

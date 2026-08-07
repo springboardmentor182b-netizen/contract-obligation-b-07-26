@@ -1,52 +1,42 @@
-from pydantic import BaseModel, EmailStr, Field
+"""
+Authentication Pydantic Models
+"""
+
+from pydantic import BaseModel, EmailStr, validator
 from typing import Optional
-from datetime import datetime
-from src.entities.user import UserRole
 
-class UserBase(BaseModel):
+
+class UserRegister(BaseModel):
+    firstName: str
+    lastName: str
     email: EmailStr
-    first_name: str
-    last_name: str
+    password: str  # No validation - accept any password!
+    role: Optional[str] = "Employee"
+    department: Optional[str] = None
 
-class UserCreate(UserBase):
-    password: str = Field(..., min_length=8)
 
 class UserLogin(BaseModel):
     email: EmailStr
     password: str
 
-class UserResponse(UserBase):
-    id: int
-    role: UserRole
-    is_active: bool
-    created_at: datetime
-    
-    class Config:
-        from_attributes = True
-
-class UserUpdate(BaseModel):
-    first_name: Optional[str] = None
-    last_name: Optional[str] = None
-    email: Optional[EmailStr] = None
-
-class UserRoleUpdate(BaseModel):
-    role: UserRole
-
-class Token(BaseModel):
-    access_token: str
-    token_type: str
-    user: UserResponse
-
-class TokenData(BaseModel):
-    email: Optional[str] = None
 
 class ForgotPasswordRequest(BaseModel):
     email: EmailStr
 
+
+class VerifyOTPRequest(BaseModel):
+    email: EmailStr
+    otp: str
+
+
 class ResetPasswordRequest(BaseModel):
     email: EmailStr
-    reset_code: str
-    new_password: str = Field(..., min_length=8)
+    otp: str
+    newPassword: str  # No validation - accept any password!
+    confirmPassword: str
 
-class ResetPasswordResponse(BaseModel):
+
+class Token(BaseModel):
     message: str
+    token: str
+    user: dict
