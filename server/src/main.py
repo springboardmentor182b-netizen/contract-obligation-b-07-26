@@ -15,7 +15,8 @@ from .routers import report as report_router
 from .routers import risk as risk_router
 
 from .auth.security import create_token, get_current_user, hash_password, require_roles, verify_password
-from .database import create_user, find_user_by_email, initialize_database, initialize_notifications_table, list_users as list_database_users, update_user_password
+from .database import create_user, delete_user, find_user_by_email, initialize_database, initialize_notifications_table, list_users as list_database_users, restore_user, update_user, update_user_password
+from .database.audit_logs import list_audit_logs as list_database_audit_logs
 from .database.notifications import create_notification as create_postgres_notification, list_notifications as list_postgres_notifications, mark_all_notifications_read, mark_notification_read as mark_postgres_notification_read
 from .database.obligations import list_obligations as list_postgres_obligations
 from .schemas import (
@@ -39,6 +40,7 @@ from .schemas import (
     UserCreate,
     UserLogin,
     UserPublic,
+    UserUpdate,
 )
 from .storage import store
 from .database.session import Base, engine
@@ -145,8 +147,65 @@ def me(current_user: dict[str, Any] = Depends(get_current_user)) -> dict[str, An
 
 
 @app.get("/api/users", response_model=list[UserPublic])
-def list_users(_: dict[str, Any] = Depends(require_roles(Role.administrator.value, Role.legal_manager.value))) -> list[dict[str, Any]]:
+def list_users(_: dict[str, Any] = Depends(get_current_user)) -> list[dict[str, Any]]:
     return [public_user(user) for user in list_database_users()]
+
+
+@app.get("/api/users/deleted", response_model=list[UserPublic])
+def list_deleted_users(_: dict[str, Any] = Depends(get_current_user)) -> list[dict[str, Any]]:
+    return [public_user(user) for user in list_database_users(include_deleted=True) if user.get("deleted_at")]
+
+
+@app.get("/api/users/{user_id}/activities", response_model=list[APIRecord])
+def user_activity_history(
+    user_id: str,
+    _: dict[str, Any] = Depends(get_current_user),
+) -> list[dict[str, Any]]:
+    return [
+        activity
+        for activity in store.list("activities")
+        if activity.get("entity_type") == "user" and activity.get("entity_id") == user_id
+    ]
+
+
+@app.patch("/api/users/{user_id}", response_model=UserPublic)
+def update_managed_user(
+    user_id: str,
+    payload: UserUpdate,
+    current_user: dict[str, Any] = Depends(get_current_user),
+) -> dict[str, Any]:
+    data = model_payload(payload)
+    if "password" in data:
+        data["password_hash"] = hash_password(data.pop("password"))
+    user = update_user(user_id, data)
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    store.audit("updated", "user", user_id, current_user["id"])
+    return public_user(user)
+
+
+@app.delete("/api/users/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_managed_user(
+    user_id: str,
+    current_user: dict[str, Any] = Depends(get_current_user),
+) -> None:
+    if user_id == current_user["id"]:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="You cannot delete your own account")
+    if not delete_user(user_id):
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    store.audit("deleted", "user", user_id, current_user["id"])
+
+
+@app.post("/api/users/{user_id}/restore", response_model=UserPublic)
+def restore_managed_user(
+    user_id: str,
+    current_user: dict[str, Any] = Depends(get_current_user),
+) -> dict[str, Any]:
+    user = restore_user(user_id)
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Deleted user not found")
+    store.audit("restored", "user", user_id, current_user["id"])
+    return public_user(user)
 
 
 @app.get("/api/contracts", response_model=list[APIRecord])
@@ -405,83 +464,10 @@ def list_reports(_: dict[str, Any] = Depends(get_current_user)) -> list[dict[str
 
 
 @app.get("/api/audit-logs", response_model=list[APIRecord])
-def list_audit_logs(_: dict[str, Any] = Depends(require_roles(Role.administrator.value, Role.compliance_officer.value))) -> list[dict[str, Any]]:
-    return sorted(store.list("audit_logs"), key=lambda item: item["created_at"], reverse=True)
+def list_audit_logs(_: dict[str, Any] = Depends(get_current_user)) -> list[dict[str, Any]]:
+    return list_database_audit_logs()
 
 
 @app.get("/api/activities", response_model=list[APIRecord])
 def list_activities(_: dict[str, Any] = Depends(get_current_user)) -> list[dict[str, Any]]:
     return sorted(store.list("activities"), key=lambda item: item["created_at"], reverse=True)
-
-
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-
-from app.config.database import Base, engine
-
-Import Models
-from app.models import compliance
-from app.models import audit
-from app.models import report
-from app.models import history
-from app.models import risk
-from app.models import missed_obligation
-
-
-Import Routes
-from app.routes import compliance
-from app.routes import audit
-from app.routes import report
-from app.routes import history
-from app.routes import risk
-from app.routes import missed_obligation
-from app.routes import header
-from app.routes import kpi
-
-app = FastAPI(
-    title="Compliance Monitoring API",
-    version="1.0.0"
-)
-
-
-
-origins = [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-]
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-
-Base.metadata.create_all(bind=engine)
-
-
-app.include_router(compliance.router)
-app.include_router(audit.router)
-app.include_router(report.router)
-app.include_router(history.router)
-app.include_router(risk.router)
-app.include_router(missed_obligation.router)
-app.include_router(header.router)
-app.include_router(kpi.router)
-
-@app.get("/")
-def home():
-    return {
-        "message": "Compliance Monitoring API Running Successfully"
-    }
-=======
-app.include_router(auth.router)
-app.include_router(users.router)
-app.include_router(roles.router)
-@app.get("/")
-def root():
-    return {
-        "message": "User Management API Running Successfully"
-    }
