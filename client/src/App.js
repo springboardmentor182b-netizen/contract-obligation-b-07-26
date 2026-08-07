@@ -3,6 +3,7 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 
 import './App.css'
 import Home from './pages/Home'
+import Reports from './pages/Reports'
 import Notifications from './pages/Notifications.js'
 import ComplianceDashboard from './pages/ComplianceDashboard'
 import ObligationTracker from './pages/ObligationTracker'
@@ -10,11 +11,14 @@ import AuditLogs from './pages/AuditLogs'
 import UserManagement from './pages/UserManagement'
 import { Auth } from './features/authentication/Auth'
 
-function ProtectedDashboard() {
-  const token = window.localStorage.getItem('contractiq_token')
+function isAuthenticated() {
+  return Boolean(window.localStorage.getItem('contractiq_token')
     || window.sessionStorage.getItem('contractiq_token')
-    || window.localStorage.getItem('access_token')
-  return token ? React.createElement(Home) : React.createElement(Navigate, { to: '/login', replace: true })
+    || window.localStorage.getItem('access_token'))
+}
+
+function ProtectedRoute({ page }) {
+  return isAuthenticated() ? React.createElement(page) : React.createElement(Navigate, { to: '/login', replace: true })
 }
 
 export default function App() {
@@ -37,23 +41,27 @@ export default function App() {
       }),
       React.createElement(Route, {
         path: '/dashboard',
-        element: React.createElement(ProtectedDashboard),
+        element: React.createElement(ProtectedRoute, { page: Home }),
+      }),
+      React.createElement(Route, {
+        path: '/reports',
+        element: React.createElement(ProtectedRoute, { page: Reports }),
       }),
       React.createElement(Route, {
         path: '/notifications',
-        element: React.createElement(ProtectedNotifications),
+        element: React.createElement(ProtectedRoute, { page: Notifications }),
       }),
       React.createElement(Route, {
         path: '/compliance',
-        element: React.createElement(ProtectedComplianceDashboard),
+        element: React.createElement(ProtectedRoute, { page: ComplianceDashboard }),
       }),
       React.createElement(Route, {
         path: '/compliance-dashboard',
-        element: React.createElement(ProtectedComplianceDashboard),
+        element: React.createElement(ProtectedRoute, { page: ComplianceDashboard }),
       }),
       React.createElement(Route, {
         path: '/obligations',
-        element: React.createElement(ProtectedObligationTracker),
+        element: React.createElement(ProtectedRoute, { page: ObligationTracker }),
       }),
       React.createElement(Route, {
         path: '/audit-logs',
@@ -73,6 +81,7 @@ export default function App() {
     ),
   )
 }
+
 
 function ProtectedNotifications() {
   const token = window.localStorage.getItem('contractiq_token')
@@ -102,3 +111,4 @@ function isAuthenticated() {
     || window.sessionStorage.getItem('contractiq_token')
     || window.localStorage.getItem('access_token'))
 }
+

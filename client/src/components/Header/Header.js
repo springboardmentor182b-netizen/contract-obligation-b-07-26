@@ -21,4 +21,7 @@ function Header({ openModal, obligations }) {
   )
 }
 
+export default Header;
+
 export default Header
+
