@@ -4,11 +4,13 @@ import {
     getObligations,
     deleteObligation,
     updateObligation
-} from "../../api/api";
+} from "../../api";
 import EditObligationModal from "../EditObligationModal";
 import Loader from "../Loader/Loader";
 
 function ObligationTable({
+
+    obligations: propObligations,
 
     search,
 
@@ -18,19 +20,21 @@ function ObligationTable({
 
 }) {
 
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
 
-    const [obligations, setObligations] = useState([]);
+    const [obligations, setObligations] = useState(propObligations || []);
 
     const [isEditOpen, setIsEditOpen] = useState(false);
 
     const [selectedObligation, setSelectedObligation] = useState(null);
 
     useEffect(() => {
-
-        loadData();
-
-    }, []);
+        if (propObligations) {
+            setObligations(propObligations);
+        } else {
+            loadData();
+        }
+    }, [propObligations]);
 
     function loadData() {
 
@@ -48,7 +52,7 @@ function ObligationTable({
 
             .catch((error) => {
 
-                console.log(error);
+                console.error("Error loading obligations:", error);
 
                 setLoading(false);
 
@@ -120,33 +124,25 @@ Status : ${item.status}`
 
     const filteredObligations = obligations
 
-        .filter((item) =>
+        .filter((item) => {
+            const searchLower = search.toLowerCase();
+            const title = (item.title || '').toLowerCase();
+            const department = (item.department || '').toLowerCase();
+            const owner = (item.owner || '').toLowerCase();
+            return title.includes(searchLower) || 
+                   department.includes(searchLower) || 
+                   owner.includes(searchLower);
+        })
 
-            (item.title || '')
-                .toLowerCase()
-                .includes(search.toLowerCase())
+        .filter((item) => {
+            if (!status) return true;
+            return String(item.status || '').toLowerCase() === status.toLowerCase();
+        })
 
-        )
-
-        .filter((item) =>
-
-            status === ""
-
-                ? true
-
-                : item.status === status
-
-        )
-
-        .filter((item) =>
-
-            priority === ""
-
-                ? true
-
-                : item.priority === priority
-
-        );
+        .filter((item) => {
+            if (!priority) return true;
+            return String(item.priority || '').toLowerCase() === priority.toLowerCase();
+        });
 
     return (
 

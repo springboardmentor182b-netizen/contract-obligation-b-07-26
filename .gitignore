@@ -4,12 +4,15 @@
 !.env.example
 server/.env
 client/.env
+client/.env.local
 
 # Python virtual environments
 venv/
 .venv/
 env/
 ENV/
+server/venv/
+server/env/
 
 # Python generated files
 __pycache__/
@@ -21,6 +24,9 @@ __pycache__/
 .coverage
 coverage.xml
 htmlcov/
+server/__pycache__/
+server/.pytest_cache/
+server/.mypy_cache/
 
 # Node dependencies and generated files
 node_modules/
@@ -56,11 +62,14 @@ temp/
 # Runtime logs
 *.log
 logs/
+server/*.log
 
 # PostgreSQL exports/backups
 *.backup
 *.dump
 *.sql.gz
+server/*.db
+server/*.sqlite3
 
 # Python build artifacts
 build/
@@ -72,8 +81,4 @@ dist/
 test-results/
 playwright-report/
 coverage/
-__pycache__/
-*.py[cod]
 server/data/
-server/venv/
-node_modules

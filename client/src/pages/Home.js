@@ -48,25 +48,35 @@ export default function Home() {
     })
   }
 
-  return React.createElement('div', { className: 'app-shell' },
-    React.createElement(Sidebar, {
-      profile,
-      stats: dashboard?.stats,
-      collapsed: sidebarCollapsed,
-      onToggle: toggleSidebar,
-    }),
-    React.createElement('div', { className: 'app-main' },
-      React.createElement(Navbar, { profile, unreadCount: dashboard?.unread_notifications || 0 }),
-      React.createElement(PageContainer, null,
-        error ? React.createElement('div', { className: 'dashboard-error', role: 'alert' }, error) : null,
-        !dashboard && !error ? React.createElement('div', { className: 'loading-state' }, 'Loading dashboard...') : null,
-        dashboard ? React.createElement(React.Fragment, null,
-          React.createElement(StatCards, { stats: dashboard.stats }),
-          React.createElement('section', { className: 'dashboard-grid overview-grid' }, React.createElement(ContractVolumeChart, { data: dashboard.contracts }), React.createElement(ComplianceChart, { data: dashboard.compliance })),
-          React.createElement('section', { className: 'dashboard-grid insight-grid' }, React.createElement(RenewalTrend, { data: dashboard.renewals }), React.createElement(RecentActivity, { activities: dashboard.activities })),
-          React.createElement(UpcomingDeadlines, { deadlines: dashboard.deadlines }),
-        ) : null,
-      ),
-    ),
+  return (
+    <div className="app-shell">
+      <Sidebar
+        profile={profile}
+        stats={dashboard?.stats}
+        collapsed={sidebarCollapsed}
+        onToggle={toggleSidebar}
+      />
+      <div className="app-main">
+        <Navbar profile={profile} unreadCount={dashboard?.unread_notifications || 0} />
+        <PageContainer>
+          {error ? <div className="dashboard-error" role="alert">{error}</div> : null}
+          {!dashboard && !error ? <div className="loading-state">Loading dashboard...</div> : null}
+          {dashboard ? (
+            <>
+              <StatCards stats={dashboard.stats} />
+              <section className="dashboard-grid overview-grid">
+                <ContractVolumeChart data={dashboard.contracts} />
+                <ComplianceChart data={dashboard.compliance} />
+              </section>
+              <section className="dashboard-grid insight-grid">
+                <RenewalTrend data={dashboard.renewals} />
+                <RecentActivity activities={dashboard.activities} />
+              </section>
+              <UpcomingDeadlines deadlines={dashboard.deadlines} />
+            </>
+          ) : null}
+        </PageContainer>
+      </div>
+    </div>
   )
 }

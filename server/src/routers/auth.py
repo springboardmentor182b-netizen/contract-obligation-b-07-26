@@ -1,179 +1,56 @@
-from fastapi import APIRouter
-from fastapi import Depends
-from fastapi import HTTPException
+from datetime import timedelta
 
+from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
-from app.database.database import get_db
-
-from app.schemas.user import UserCreate
-from app.schemas.auth import (
-    LoginRequest,
-    ForgotPasswordRequest,
-    ResetPasswordRequest
+from src.database.session import get_db
+from src.services.user_service import get_user_by_email
+from src.auth.utils import (
+    verify_password,
+    create_access_token,
+    ACCESS_TOKEN_EXPIRE_MINUTES,
 )
-
-from app.services.auth_service import (
-    register_user,
-    login_user,
-    forgot_password,
-    reset_password
-)
+from src.auth.dependencies import get_current_active_user
+from src.models.user import User
 
 router = APIRouter()
 
 
-# --------------------------------
-# Register
-# --------------------------------
-
-@router.post("/register")
-
-def register(
-
-    user: UserCreate,
-
-    db: Session = Depends(get_db)
-
-):
-
-    new_user = register_user(
-
-        db,
-
-        user
-
-    )
-
-    if not new_user:
-
-        raise HTTPException(
-
-            status_code=400,
-
-            detail="Email already exists."
-
-        )
-
-    return {
-
-        "message": "User registered successfully.",
-
-        "user": new_user
-
-    }
-
-
-# --------------------------------
-# Login
-# --------------------------------
-
 @router.post("/login")
-
-def login(
-
-    login: LoginRequest,
-
-    db: Session = Depends(get_db)
-
+def login_for_access_token(
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    db: Session = Depends(get_db),
 ):
+    user = get_user_by_email(db, email=form_data.username)
 
-    result = login_user(
-
-        db,
-
-        login
-
-    )
-
-    if not result:
-
+    if not user or not verify_password(form_data.password, user.hashed_password):
         raise HTTPException(
-
-            status_code=401,
-
-            detail="Invalid email or password."
-
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect email or password",
+            headers={"WWW-Authenticate": "Bearer"},
         )
 
-    return result
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
 
-
-# --------------------------------
-# Forgot Password
-# --------------------------------
-
-@router.post("/forgot-password")
-
-def forgot(
-
-    request: ForgotPasswordRequest,
-
-    db: Session = Depends(get_db)
-
-):
-
-    user = forgot_password(
-
-        db,
-
-        request.email
-
+    access_token = create_access_token(
+        data={"sub": user.email},
+        expires_delta=access_token_expires,
     )
-
-    if not user:
-
-        raise HTTPException(
-
-            status_code=404,
-
-            detail="User not found."
-
-        )
 
     return {
-
-        "message": "User verified."
-
+        "access_token": access_token,
+        "token_type": "bearer",
     }
 
 
-# --------------------------------
-# Reset Password
-# --------------------------------
-
-@router.post("/reset-password")
-
-def reset(
-
-    request: ResetPasswordRequest,
-
-    db: Session = Depends(get_db)
-
+@router.get("/me")
+def get_current_logged_in_user(
+    current_user: User = Depends(get_current_active_user),
 ):
-
-    success = reset_password(
-
-        db,
-
-        request.email,
-
-        request.new_password
-
-    )
-
-    if not success:
-
-        raise HTTPException(
-
-            status_code=404,
-
-            detail="User not found."
-
-        )
-
     return {
-
-        "message": "Password reset successful."
-
+        "id": current_user.id,
+        "full_name": current_user.full_name,
+        "email": current_user.email,
+        "role": current_user.role,
     }

@@ -19,7 +19,7 @@ function SearchFilters({
 
                 <input
                     type="text"
-                    placeholder="Search by Title..."
+                    placeholder="Search by Title, Department, or Owner..."
                     className="search-box"
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}

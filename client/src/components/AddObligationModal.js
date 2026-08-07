@@ -1,6 +1,6 @@
 import { useState } from "react";
 import "./AddObligationModal.css";
-import { createObligation as addObligation } from "../api/api";
+import { createObligation } from "../api/api";
 import { toast } from "react-toastify";
 function AddObligationModal({ isOpen, onClose }) {
 
@@ -28,21 +28,13 @@ function AddObligationModal({ isOpen, onClose }) {
     e.preventDefault();
 
     try {
-
-        await addObligation({
-
+        await createObligation({
             title: formData.obligationName,
-
             department: formData.contract,
-
             owner: formData.owner,
-
             due_date: formData.dueDate,
-
             priority: formData.priority,
-
             status: formData.status
-
         });
 
         toast.success("Obligation Added Successfully!");
