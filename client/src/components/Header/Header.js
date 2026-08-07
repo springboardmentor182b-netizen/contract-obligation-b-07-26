@@ -31,9 +31,3 @@ function Header({ openModal, obligations }) {
 }
 
 export default Header;
-<<<<<<< HEAD
-=======
-
-export default Header
-
->>>>>>> origin/main-group-A
