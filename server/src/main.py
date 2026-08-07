@@ -2,15 +2,31 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from src.database.session import engine, Base
-from src.routers import auth, contracts, users, obligation_routers, dashboard_routers
+from src.routers import (
+    auth,
+    audit as audit_router,
+    compliance as compliance_router,
+    contracts,
+    dashboard_routers,
+    header,
+    history as history_router,
+    kpi,
+    missed_obligation as missed_obligation_router,
+    obligation_routers,
+    report as report_router,
+    risk as risk_router,
+    users,
+)
 from src.dashboard.router import router as dashboard_router
 from src.models import audit, compliance, history, missed_obligation, report, risk  # noqa: F401
-from src.routers import audit as audit_router
-from src.routers import compliance as compliance_router
-from src.routers import header, history as history_router, kpi, missed_obligation as missed_obligation_router
-from src.routers import report as report_router
-from src.routers import risk as risk_router
-from src.database import create_user, find_user_by_email, initialize_database, initialize_notifications_table, list_users as list_database_users, update_user_password
+from src.database import (
+    create_user,
+    find_user_by_email,
+    initialize_database,
+    initialize_notifications_table,
+    list_users as list_database_users,
+    update_user_password,
+)
 
 app = FastAPI(
     title="ContractIQ: Contract Obligation Tracking API",
@@ -51,12 +67,6 @@ app.add_middleware(
         "http://127.0.0.1:5186",
         "http://localhost:5187",
         "http://127.0.0.1:5187",
-        "http://localhost:5188",
-        "http://127.0.0.1:5188",
-        "http://localhost:5189",
-        "http://127.0.0.1:5189",
-        "http://localhost:5190",
-        "http://127.0.0.1:5190",
     ],
     allow_credentials=True,
     allow_methods=["*"],
