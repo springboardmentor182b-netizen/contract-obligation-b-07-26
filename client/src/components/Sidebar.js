@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import {
   FiGrid,
   FiFileText,
-  FiFolder,
   FiCheckSquare,
   FiRefreshCw,
   FiShield,
@@ -23,7 +22,6 @@ import './Sidebar.css';
 const menuItems = [
   { id: 'dashboard', label: 'Dashboard', icon: FiGrid },
   { id: 'contracts', label: 'Contracts', icon: FiFileText, active: true, badge: '84' },
-  { id: 'repository', label: 'Repository', icon: FiFolder },
   { id: 'obligations', label: 'Obligations', icon: FiCheckSquare, badge: '12' },
   { id: 'renewals', label: 'Renewals', icon: FiRefreshCw, badge: '5' },
   { id: 'compliance', label: 'Compliance', icon: FiShield, badge: '7' },
