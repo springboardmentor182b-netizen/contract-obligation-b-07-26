@@ -30,9 +30,9 @@ def dashboard_kpis(
 
     return get_dashboard_kpis(db)
 
-@router.get("/deadlines")
+@router.get("/upcoming-deadlines")
 
-def deadlines(
+def upcoming_deadlines(
 
     db: Session = Depends(get_db)
 
