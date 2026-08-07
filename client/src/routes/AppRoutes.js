@@ -10,6 +10,8 @@ import Home from "../pages/Home";
 import Notifications from "../pages/Notifications";
 import ComplianceDashboard from "../pages/ComplianceDashboard";
 import ObligationTracker from "../pages/ObligationTracker";
+import AuditLogs from "../pages/AuditLogs";
+import UserManagement from "../pages/UserManagement";
 
 function ProtectedRoute({ children }) {
   const token = window.localStorage.getItem('access_token')
@@ -65,6 +67,22 @@ function AppRoutes(){
                 element={
                     <ProtectedRoute>
                         <ObligationTracker />
+                    </ProtectedRoute>
+                } 
+            />
+            <Route 
+                path="/audit-logs" 
+                element={
+                    <ProtectedRoute>
+                        <AuditLogs />
+                    </ProtectedRoute>
+                } 
+            />
+            <Route 
+                path="/users" 
+                element={
+                    <ProtectedRoute>
+                        <UserManagement />
                     </ProtectedRoute>
                 } 
             />
