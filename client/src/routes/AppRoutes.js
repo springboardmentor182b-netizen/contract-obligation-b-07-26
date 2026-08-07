@@ -10,36 +10,31 @@ import Home from "../pages/Home";
 import Notifications from "../pages/Notifications";
 import ComplianceDashboard from "../pages/ComplianceDashboard";
 import ObligationTracker from "../pages/ObligationTracker";
-import { Auth } from "../features/authentication/Auth";
 
 function ProtectedRoute({ children }) {
-  const token = window.localStorage.getItem('contractiq_token')
-    || window.sessionStorage.getItem('contractiq_token')
-    || window.localStorage.getItem('access_token');
+  const token = window.localStorage.getItem('access_token')
+    || window.localStorage.getItem('contractiq_token')
+    || window.sessionStorage.getItem('contractiq_token');
   return token ? children : <Navigate to="/login" replace />;
 }
 
 function AppRoutes(){
     return(
         <Routes>
-            <Route path="/" element={<Navigate to="/login" />} />
-            <Route path="/login" element={<Auth />} />
+            <Route path="/" element={<ContractRepository />} />
+            <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route 
                 path="/dashboard" 
                 element={
                     <ProtectedRoute>
-                        <Dashboard />
+                        <Home />
                     </ProtectedRoute>
                 } 
             />
             <Route 
                 path="/repository" 
-                element={
-                    <ProtectedRoute>
-                        <ContractRepository />
-                    </ProtectedRoute>
-                } 
+                element={<ContractRepository />} 
             />
             <Route 
                 path="/notifications" 
@@ -85,7 +80,7 @@ function AppRoutes(){
                 path="/reset-password" 
                 element={<ResetPassword />} 
             />
-            <Route path="*" element={<Navigate to="/login" replace />} />
+            <Route path="*" element={<ContractRepository />} />
         </Routes>
     );
 }

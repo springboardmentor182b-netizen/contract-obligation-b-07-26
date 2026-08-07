@@ -21,14 +21,19 @@ async function get(path, params = {}) {
       url.searchParams.set(k, v);
     }
   });
+  console.log(`GET Request: ${url.toString()}`);
   const res = await fetch(url.toString(), {
     headers: getAuthHeader()
   });
+  console.log(`Response Status: ${res.status} ${res.statusText}`);
   if (!res.ok) {
     const err = await res.json().catch(() => ({ detail: res.statusText }));
+    console.error('API Error:', err);
     throw new Error(err.detail ?? 'Request failed');
   }
-  return res.json();
+  const data = await res.json();
+  console.log('Response Data:', data);
+  return data;
 }
 
 /** Perform a POST request and return parsed JSON. */
@@ -114,6 +119,44 @@ export function updateContract(id, contractData) {
  */
 export function deleteContract(id) {
   return del(`${BASE}/contracts/${id}`);
+}
+
+/**
+ * Export contracts to CSV.
+ */
+export function exportContractsCSV(params = {}) {
+  const url = new URL(`${BASE}/contracts/export/csv`, window.location.origin);
+  Object.entries(params).forEach(([k, v]) => {
+    if (v !== null && v !== undefined && v !== '') {
+      url.searchParams.set(k, v);
+    }
+  });
+  
+  return fetch(url.toString(), {
+    headers: getAuthHeader()
+  }).then(res => {
+    if (!res.ok) throw new Error('Export failed');
+    return res.blob();
+  });
+}
+
+/**
+ * Export contracts to Excel.
+ */
+export function exportContractsExcel(params = {}) {
+  const url = new URL(`${BASE}/contracts/export/excel`, window.location.origin);
+  Object.entries(params).forEach(([k, v]) => {
+    if (v !== null && v !== undefined && v !== '') {
+      url.searchParams.set(k, v);
+    }
+  });
+  
+  return fetch(url.toString(), {
+    headers: getAuthHeader()
+  }).then(res => {
+    if (!res.ok) throw new Error('Export failed');
+    return res.blob();
+  });
 }
 
 // ── Authentication ─────────────────────────────────────────────────────────────

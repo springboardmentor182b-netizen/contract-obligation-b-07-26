@@ -1,8 +1,11 @@
 from sqlalchemy.orm import Session
+from datetime import date
 from src.models.contract import Contract
 from src.schemas.contract import ContractCreate, ContractUpdate
 
-def get_contracts(db: Session, skip: int = 0, limit: int = 100, status: str = None, category: str = None, search: str = None):
+def get_contracts(db: Session, skip: int = 0, limit: int = 100, status: str = None, category: str = None, search: str = None, 
+                 department: str = None, expiry_from: date = None, expiry_to: date = None, 
+                 value_min: float = None, value_max: float = None):
     query = db.query(Contract)
     
     if status:
@@ -11,6 +14,9 @@ def get_contracts(db: Session, skip: int = 0, limit: int = 100, status: str = No
     if category:
         query = query.filter(Contract.category == category)
     
+    if department:
+        query = query.filter(Contract.department == department)
+    
     if search:
         search_pattern = f"%{search}%"
         query = query.filter(
@@ -18,6 +24,18 @@ def get_contracts(db: Session, skip: int = 0, limit: int = 100, status: str = No
             (Contract.party.ilike(search_pattern)) |
             (Contract.contract_id.ilike(search_pattern))
         )
+    
+    if expiry_from:
+        query = query.filter(Contract.expiry >= expiry_from)
+    
+    if expiry_to:
+        query = query.filter(Contract.expiry <= expiry_to)
+    
+    if value_min:
+        query = query.filter(Contract.value >= value_min)
+    
+    if value_max:
+        query = query.filter(Contract.value <= value_max)
     
     return query.offset(skip).limit(limit).all()
 

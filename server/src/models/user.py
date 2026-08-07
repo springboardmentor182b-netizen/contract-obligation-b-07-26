@@ -1,5 +1,4 @@
 from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey
-from sqlalchemy.orm import relationship
 from datetime import datetime
 from src.database.session import Base
 
@@ -19,11 +18,8 @@ class User(Base):
     phone = Column(String, nullable=True)
     department = Column(String, nullable=True)
     designation = Column(String, nullable=True)
-    role_id = Column(Integer, ForeignKey("roles.role_id"), nullable=True)
+    role_id = Column(Integer, nullable=True)
     password = Column(String, nullable=True)
     last_login = Column(DateTime, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    
-    # Relationship
-    role = relationship("Role", back_populates="users", foreign_keys=[role_id])

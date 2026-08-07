@@ -25,7 +25,9 @@ const ContractRepository = () => {
     setLoading(true);
     setError(null);
     try {
+      console.log('Fetching contracts with filters:', { status: statusFilter !== "All" ? statusFilter : null, category: categoryFilter !== "All" ? categoryFilter : null, search: searchTerm });
       const data = await fetchContracts({ status: statusFilter !== "All" ? statusFilter : null, category: categoryFilter !== "All" ? categoryFilter : null, search: searchTerm });
+      console.log('Received contracts data:', data);
       setContracts(data);
     } catch (error) {
       console.error("Failed to fetch contracts:", error);
@@ -91,7 +93,7 @@ const ContractRepository = () => {
         <Navbar onNewContract={() => setShowModal(true)} />
 
         <main className="main-content">
-          <ContractHeader />
+          <ContractHeader filters={{ status: statusFilter !== "All" ? statusFilter : null, category: categoryFilter !== "All" ? categoryFilter : null, search: searchTerm }} />
 
           <StatusTabs
             selectedStatus={statusFilter}
@@ -103,7 +105,22 @@ const ContractRepository = () => {
             setSelectedCategory={setCategoryFilter}
           />
 
-          <div className="table-container-wrapper">
+      <div className="table-container-wrapper">
+            <div className="search-input-wrapper" style={{ marginBottom: '16px' }}>
+              <input
+                type="text"
+                placeholder="Search contracts..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '10px 16px',
+                  border: '1px solid #ddd',
+                  borderRadius: '6px',
+                  fontSize: '14px'
+                }}
+              />
+            </div>
             {error && (
               <div className="error-message" style={{ color: 'red', padding: '10px', marginBottom: '10px', backgroundColor: '#fee', border: '1px solid #fcc', borderRadius: '4px' }}>
                 {error}
@@ -114,8 +131,6 @@ const ContractRepository = () => {
             ) : (
               <ContractTable
                 contracts={contracts}
-                searchTerm={searchTerm}
-                setSearchTerm={setSearchTerm}
                 onEdit={handleEditContract}
                 onDelete={handleDeleteContract}
               />

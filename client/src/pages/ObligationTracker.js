@@ -236,6 +236,7 @@ useEffect(() => {
                 <div className="left-content">
 
                     <ObligationTable
+                        obligations={obligations}
                         search={search}
                         status={status}
                         priority={priority}

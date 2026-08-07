@@ -1,32 +1,18 @@
 import React from "react";
 import { FiEdit2, FiMoreHorizontal, FiTrash2 } from "react-icons/fi";
 import StatusBadge from "./StatusBadge";
-import SearchBar from "./SearchBar";
 import "./ContractTable.css";
 
 const ContractTable = ({
   contracts,
-  searchTerm,
-  setSearchTerm,
   onEdit,
   onDelete,
 }) => {
-  const filteredData = contracts.filter((contract) => {
-    const matchesSearch =
-      contract.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      contract.party.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      contract.contract_id.toLowerCase().includes(searchTerm.toLowerCase());
-
-    return matchesSearch;
-  });
+  // Backend handles filtering, so we just display the contracts as received
+  const displayData = contracts;
 
   return (
     <div className="table-container">
-      <SearchBar
-        searchTerm={searchTerm}
-        setSearchTerm={setSearchTerm}
-      />
-
       <div className="table-responsive">
         <table className="contract-table">
           <thead>
@@ -43,8 +29,8 @@ const ContractTable = ({
           </thead>
 
           <tbody>
-            {filteredData.length > 0 ? (
-              filteredData.map((row) => (
+            {displayData.length > 0 ? (
+              displayData.map((row) => (
                 <tr key={row.id}>
                   <td>
                     <div className="contract-name">{row.name}</div>
