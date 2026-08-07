@@ -24,36 +24,14 @@ function ComplianceOverview() {
     const [error, setError] = useState("");
 
     useEffect(() => {
-
-        loadCompliance();
-
+        getCompliance()
+            .then(setComplianceData)
+            .catch((err) => {
+                console.log(err);
+                setError("Unable to load compliance data.");
+            })
+            .finally(() => setLoading(false));
     }, []);
-
-    const loadCompliance = async () => {
-
-        try {
-
-            const data = await getCompliance();
-
-            setComplianceData(data);
-
-        }
-
-        catch (err) {
-
-            console.log(err);
-
-            setError("Unable to load compliance data.");
-
-        }
-
-        finally {
-
-            setLoading(false);
-
-        }
-
-    };
 
     // ===========================
     // Calculations

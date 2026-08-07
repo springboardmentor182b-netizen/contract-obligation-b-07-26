@@ -26,36 +26,14 @@ function MissedObligations() {
     const [error, setError] = useState("");
 
     useEffect(() => {
-
-        loadObligations();
-
+        getMissedObligations()
+            .then(setObligations)
+            .catch((err) => {
+                console.log(err);
+                setError("Unable to load missed obligations.");
+            })
+            .finally(() => setLoading(false));
     }, []);
-
-    const loadObligations = async () => {
-
-        try {
-
-            const data = await getMissedObligations();
-
-            setObligations(data);
-
-        }
-
-        catch (err) {
-
-            console.log(err);
-
-            setError("Unable to load missed obligations.");
-
-        }
-
-        finally {
-
-            setLoading(false);
-
-        }
-
-    };
 
     // ===========================
     // KPI Calculations

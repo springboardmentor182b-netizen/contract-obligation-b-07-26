@@ -1,20 +1,24 @@
+"""PostgreSQL engine and request-scoped SQLAlchemy session."""
+
+from collections.abc import Generator
+
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, declarative_base
+from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
+
 from src.config import DATABASE_URL
 
-engine = create_engine(DATABASE_URL)
 
-SessionLocal = sessionmaker(
-    autocommit=False,
-    autoflush=False,
-    bind=engine
-)
+class Base(DeclarativeBase):
+    """Base class for dashboard ORM entities."""
 
-Base = declarative_base()
 
-def get_db():
-    db = SessionLocal()
+engine = create_engine(DATABASE_URL, pool_pre_ping=True)
+SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False, expire_on_commit=False)
+
+
+def get_db() -> Generator[Session, None, None]:
+    database = SessionLocal()
     try:
-        yield db
+        yield database
     finally:
-        db.close()
+        database.close()

@@ -10,8 +10,8 @@ export async function login(apiBaseUrl, credentials) {
   })
 
   if (!response.ok) {
-    const error = await response.json().catch(() => ({ detail: 'Invalid login credentials' }));
-    throw new Error(error.detail || 'Invalid login credentials');
+    const error = await response.json().catch(() => null);
+    throw new Error(error?.detail || 'Invalid login credentials');
   }
 
   return response.json()

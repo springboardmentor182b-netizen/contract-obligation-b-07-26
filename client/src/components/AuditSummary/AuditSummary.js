@@ -24,36 +24,14 @@ function AuditSummary() {
     const [error, setError] = useState("");
 
     useEffect(() => {
-
-        loadAudits();
-
+        getAudits()
+            .then(setAuditData)
+            .catch((err) => {
+                console.log(err);
+                setError("Unable to load audit data.");
+            })
+            .finally(() => setLoading(false));
     }, []);
-
-    const loadAudits = async () => {
-
-        try {
-
-            const data = await getAudits();
-
-            setAuditData(data);
-
-        }
-
-        catch (err) {
-
-            console.log(err);
-
-            setError("Unable to load audit data.");
-
-        }
-
-        finally {
-
-            setLoading(false);
-
-        }
-
-    };
 
     // ==========================
     // KPI Calculations

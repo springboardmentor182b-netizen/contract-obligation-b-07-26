@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 
-from app.models.report import Report
-from app.schemas.report import ReportCreate
+from ..models.report import Report
+from ..feature_schemas.report import ReportCreate
 
 
 def get_all_reports(db: Session):

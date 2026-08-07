@@ -1,18 +1,33 @@
-from pathlib import Path
+"""Application configuration loaded from server/.env."""
+
 import os
+from pathlib import Path
+
+from dotenv import load_dotenv
 
 
 BASE_DIR = Path(__file__).resolve().parents[1]
+load_dotenv(BASE_DIR / ".env")
 
+APP_NAME = os.getenv("APP_NAME", "ContractIQ API")
+
+DATABASE_URL = os.getenv("DATABASE_URL")
+if not DATABASE_URL:
+    raise RuntimeError(
+        "DATABASE_URL is not configured. Add it to server/.env."
+    )
+
+TOKEN_SECRET = os.getenv(
+    "TOKEN_SECRET",
+    "replace-this-secret-in-production",
+)
+TOKEN_TTL_SECONDS = int(os.getenv("TOKEN_TTL_SECONDS", "28800"))
+
+# Retained for teammate modules that still use the legacy JSON store.
 DATA_DIR = BASE_DIR / "data"
 DATA_FILE = DATA_DIR / "contractiq.json"
 
-APP_NAME = "ContractIQ API"
-
-TOKEN_SECRET = "replace-this-secret-in-production"
-TOKEN_TTL_SECONDS = 60 * 60 * 8
-
-DATABASE_URL = os.getenv(
-    "DATABASE_URL",
-    "postgresql://postgres:Pragna%40123@localhost:5432/contract_management",
-)
+# Additional config from other branch
+SECRET_KEY = os.getenv("SECRET_KEY", TOKEN_SECRET)
+ALGORITHM = os.getenv("ALGORITHM", "HS256")
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", str(TOKEN_TTL_SECONDS // 60)))

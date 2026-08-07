@@ -1,14 +1,18 @@
 import React, { useEffect, useState } from "react";
-import { getObligations, get } from "../api";
+import { getObligations } from "../api/api";
 import "./ObligationTracker.css";
 import Header from "../components/Header/Header";
 import KPICard from "../components/KPI/KPICard";
 import SearchFilters from "../components/SearchFilters/SearchFilters";
 import ObligationTable from "../components/Table/ObligationTable";
 import Calendar from "../components/Calendar/Calendar";
-import UpcomingDeadlines from "../components/UpcomingDeadlines/UpcomingDeadlines";
+import UpcomingDeadlines from "../components/Dashboard/UpcomingDeadlines";
 import WeeklyChart from "../components/Charts/WeeklyChart";
 import AddObligationModal from "../components/AddObligationModal";
+import Navbar from "../layout/Navbar";
+import PageContainer from "../layout/PageContainer";
+import Sidebar from "../layout/Sidebar";
+import { getDashboard, getProfile } from "../features/dashboard/services/dashboardApi";
 
 import {
     DocumentTextIcon,
@@ -22,6 +26,12 @@ import {
 
 function ObligationTracker() {
 const [obligations, setObligations] = useState([]);
+
+    const [profile, setProfile] = useState(null);
+    const [dashboard, setDashboard] = useState(null);
+    const [sidebarCollapsed, setSidebarCollapsed] = useState(
+        () => localStorage.getItem('contractiq_sidebar_collapsed') === 'true',
+    );
 
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -49,7 +59,29 @@ useEffect(() => {
 
         .then((data) => {
 
-            setObligations(data);
+            const rows = Array.isArray(data) ? data : [];
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const statusCount = (status) => rows.filter(
+                (item) => String(item.status || '').toLowerCase() === status,
+            ).length;
+            const compliantCount = rows.filter(
+                (item) => String(item.compliance_level || item.priority || '').toLowerCase() === 'compliant',
+            ).length;
+
+            setObligations(rows);
+            setKpis({
+                total: rows.length,
+                in_progress: statusCount('in progress'),
+                pending: statusCount('pending'),
+                completed: statusCount('completed'),
+                overdue: rows.filter((item) => {
+                    const dueDate = item.due_date ? new Date(item.due_date) : null;
+                    return dueDate && dueDate < today && String(item.status || '').toLowerCase() !== 'completed';
+                }).length,
+                risk: rows.filter((item) => /high|risk|delayed|non-compliant/i.test(String(item.compliance_level || item.priority || ''))).length,
+                compliance: rows.length ? Math.round((compliantCount / rows.length) * 100) : 0,
+            });
 
         })
 
@@ -58,17 +90,12 @@ useEffect(() => {
 }, []);
 
     useEffect(() => {
-
-        get('/dashboard/kpis')
-
-            .then((data) => {
-
-                setKpis(data);
-
+        Promise.all([getProfile(), getDashboard()])
+            .then(([user, dashboardData]) => {
+                setProfile(user);
+                setDashboard(dashboardData);
             })
-
             .catch((error) => console.log(error));
-
     }, []);
 
     const openModal = () => {
@@ -83,9 +110,51 @@ useEffect(() => {
 
     };
 
+    const toggleSidebar = () => {
+        setSidebarCollapsed((current) => {
+            const next = !current;
+            localStorage.setItem('contractiq_sidebar_collapsed', String(next));
+            return next;
+        });
+    };
+
+    const upcomingDeadlines = obligations
+        .filter((item) => item.due_date && new Date(`${item.due_date}T00:00:00`) >= new Date(new Date().setHours(0, 0, 0, 0)))
+        .sort((left, right) => new Date(left.due_date) - new Date(right.due_date))
+        .slice(0, 6)
+        .map((item) => ({
+            id: item.id,
+            contract_number: item.contract_number || '—',
+            obligation: item.title,
+            due_date: item.due_date,
+            assignee: item.owner || 'Unassigned',
+            assignee_initials: String(item.owner || 'U').split(' ').map((part) => part[0]).join('').slice(0, 2).toUpperCase(),
+            priority: item.priority || item.compliance_level || 'Normal',
+            status: item.status || 'Pending',
+        }));
+
     return (
 
-        <div className="tracker-page">
+        <div className="app-shell">
+
+            <Sidebar
+                profile={profile}
+                stats={dashboard?.stats}
+                collapsed={sidebarCollapsed}
+                onToggle={toggleSidebar}
+            />
+
+            <div className="app-main">
+
+                <Navbar
+                    profile={profile}
+                    pageTitle="Obligations"
+                    unreadCount={dashboard?.unread_notifications || 0}
+                />
+
+                <PageContainer>
+
+                    <div className="tracker-page">
 
             <Header
 
@@ -101,7 +170,7 @@ useEffect(() => {
                     title="Total"
                     value={kpis.total}
                     badge="+5"
-                    icon={<DocumentTextIcon className="kpi-icon" />}
+                    icon={null}
                 />
 
                 <KPICard
@@ -176,7 +245,7 @@ useEffect(() => {
 
                         <div className="chart-section">
 
-                            <WeeklyChart />
+                            <WeeklyChart obligations={obligations} />
 
                         </div>
 
@@ -186,9 +255,9 @@ useEffect(() => {
 
                 <div className="right-content">
 
-                    <Calendar />
+                    <Calendar obligations={obligations} />
 
-                    <UpcomingDeadlines />
+                    <UpcomingDeadlines deadlines={upcomingDeadlines} compact />
 
                 </div>
 
@@ -201,6 +270,12 @@ useEffect(() => {
                 onClose={closeModal}
 
             />
+
+                    </div>
+
+                </PageContainer>
+
+            </div>
 
         </div>
 

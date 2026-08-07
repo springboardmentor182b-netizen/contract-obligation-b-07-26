@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, Date
-from app.config.database import Base
+from ..database.session import Base
 
 
 class History(Base):

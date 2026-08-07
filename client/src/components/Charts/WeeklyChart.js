@@ -1,6 +1,5 @@
 import "./WeeklyChart.css";
-import { useEffect, useState } from "react";
-import BASE_URL from "../../api/api";
+import { useMemo } from "react";
 import {
   ResponsiveContainer,
   LineChart,
@@ -12,33 +11,41 @@ import {
   Legend
 } from "recharts";
 
-function WeeklyChart() {
+function WeeklyChart({ obligations = [] }) {
 
-  const [data, setData] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const data = useMemo(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
-useEffect(() => {
+    const toDateKey = (value) => {
+      if (!value) return null;
+      const text = String(value).slice(0, 10);
+      if (/^\d{4}-\d{2}-\d{2}$/.test(text)) return text;
 
-    fetch(`${BASE_URL}/dashboard/weekly-chart`)
-      .then((response) => response.json())
-      .then((result) => {
-        setData(result);
-        setLoading(false);
-      })
-      .catch((error) => {
-        console.error(error);
-        setLoading(false);
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return null;
+      return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+    };
+
+    return Array.from({ length: 7 }, (_, index) => {
+      const day = new Date(today);
+      day.setDate(today.getDate() - 6 + index);
+      const dateKey = `${day.getFullYear()}-${String(day.getMonth() + 1).padStart(2, '0')}-${String(day.getDate()).padStart(2, '0')}`;
+      const dueToday = obligations.filter((item) => toDateKey(item.due_date) === dateKey);
+      const completedToday = obligations.filter((item) => {
+        if (String(item.status || '').toLowerCase() !== 'completed') return false;
+
+        // Older records may not have a completion date, so use their due date as a fallback.
+        return toDateKey(item.completion_date || item.due_date) === dateKey;
       });
 
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="weekly-card">
-        <h3>Loading Weekly Chart...</h3>
-      </div>
-    );
-  }
+      return {
+        day: day.toLocaleDateString(undefined, { weekday: 'short', day: 'numeric' }),
+        due: dueToday.length,
+        completed: completedToday.length,
+      };
+    });
+  }, [obligations]);
 
   return (
 
@@ -48,7 +55,7 @@ useEffect(() => {
 
         <h3>Weekly Performance</h3>
 
-        <p>This Week</p>
+        <p>Last 7 days</p>
 
       </div>
 
@@ -74,22 +81,22 @@ useEffect(() => {
 
             <Line
               type="monotone"
-              dataKey="completed"
-              stroke="#2563EB"
-              strokeWidth={3}
-              dot={{ r: 5 }}
-              activeDot={{ r: 8 }}
-              name="Completed"
-            />
-
-            <Line
-              type="monotone"
-              dataKey="pending"
+              dataKey="due"
               stroke="#F59E0B"
               strokeWidth={3}
               dot={{ r: 5 }}
               activeDot={{ r: 8 }}
-              name="Pending"
+              name="Due"
+            />
+
+            <Line
+              type="monotone"
+              dataKey="completed"
+              stroke="#16A34A"
+              strokeWidth={3}
+              dot={{ r: 5 }}
+              activeDot={{ r: 8 }}
+              name="Completed"
             />
 
           </LineChart>

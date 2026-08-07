@@ -2,8 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from src.database.session import get_db
-
-from src.schemas.obligation import ObligationCreate, ObligationResponse
+from src.feature_schemas.obligation import ObligationCreate, ObligationResponse
 from src.services.obligation_service import (
     create_obligation,
     get_all_obligations,
@@ -11,6 +10,7 @@ from src.services.obligation_service import (
     delete_obligation as delete_obligation_service,
     update_obligation
 )
+from src.models.obligation import Obligation
 
 router = APIRouter(
     tags=["Obligations"]

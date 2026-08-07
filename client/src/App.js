@@ -1,13 +1,14 @@
 import React from 'react';
-import ContractRepository from './pages/ContractRepository';
+import { BrowserRouter } from "react-router-dom";
+import AppRoutes from "./routes/AppRoutes";
 import './App.css';
 
 function App() {
-  return (
-    <div className="app-container">
-      <ContractRepository />
-    </div>
-  );
+    return (
+        <BrowserRouter>
+            <AppRoutes />
+        </BrowserRouter>
+    );
 }
 
 export default App;

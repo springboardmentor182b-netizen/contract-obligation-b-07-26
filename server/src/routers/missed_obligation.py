@@ -2,14 +2,14 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
 
-from app.config.database import get_db
+from ..database.session import get_db
 
-from app.schemas.missed_obligation import (
+from ..feature_schemas.missed_obligation import (
     MissedObligationCreate,
     MissedObligationResponse
 )
 
-from app.services import missed_obligation_service
+from ..services import missed_obligation_service
 
 router = APIRouter(
     prefix="/missed-obligations",

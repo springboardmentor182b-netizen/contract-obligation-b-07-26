@@ -3,8 +3,14 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from src.database.session import engine, Base
 from src.routers import auth, contracts, users, obligation_routers, dashboard_routers
-
-Base.metadata.create_all(bind=engine)
+from src.dashboard.router import router as dashboard_router
+from src.models import audit, compliance, history, missed_obligation, report, risk  # noqa: F401
+from src.routers import audit as audit_router
+from src.routers import compliance as compliance_router
+from src.routers import header, history as history_router, kpi, missed_obligation as missed_obligation_router
+from src.routers import report as report_router
+from src.routers import risk as risk_router
+from src.database import create_user, find_user_by_email, initialize_database, initialize_notifications_table, list_users as list_database_users, update_user_password
 
 app = FastAPI(
     title="ContractIQ: Contract Obligation Tracking API",
@@ -23,11 +29,25 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.on_event("startup")
+def startup() -> None:
+    Base.metadata.create_all(bind=engine)
+
+# Include routers from both branches
 app.include_router(auth.router, prefix="/api/auth", tags=["auth"])
 app.include_router(users.router, prefix="/api/users", tags=["users"])
 app.include_router(contracts.router, prefix="/api/contracts", tags=["contracts"])
 app.include_router(obligation_routers.router, prefix="/api/obligations", tags=["obligations"])
 app.include_router(dashboard_routers.router, prefix="/api/dashboard", tags=["dashboard"])
+app.include_router(dashboard_router)
+app.include_router(kpi.router)
+app.include_router(header.router)
+app.include_router(compliance_router.router)
+app.include_router(audit_router.router)
+app.include_router(report_router.router)
+app.include_router(history_router.router)
+app.include_router(risk_router.router)
+app.include_router(missed_obligation_router.router)
 
 @app.get("/")
 def read_root():

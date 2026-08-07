@@ -32,7 +32,7 @@ function ObligationTable({
 
     }, []);
 
-    const loadData = () => {
+    function loadData() {
 
         setLoading(true);
 
@@ -54,7 +54,7 @@ function ObligationTable({
 
             });
 
-    };
+    }
 
     const handleView = (item) => {
 
@@ -122,7 +122,7 @@ Status : ${item.status}`
 
         .filter((item) =>
 
-            item.title
+            (item.title || '')
                 .toLowerCase()
                 .includes(search.toLowerCase())
 
@@ -206,11 +206,11 @@ Status : ${item.status}`
 
                         (
 
-                            filteredObligations.map((item) => (
+                            filteredObligations.map((item, index) => (
 
                                 <tr key={item.id}>
 
-                                    <td>{item.id}</td>
+                                    <td><span className="obligation-code">OBL-{String(index + 1).padStart(3, '0')}</span></td>
 
                                     <td>{item.title}</td>
 
@@ -222,9 +222,9 @@ Status : ${item.status}`
 
                                     <td>
 
-                                        <span className={item.priority.toLowerCase()}>
+                                        <span className={String(item.priority || item.compliance_level || "Normal").toLowerCase()}>
 
-                                            {item.priority}
+                                            {item.priority || item.compliance_level || "Normal"}
 
                                         </span>
 
@@ -232,9 +232,9 @@ Status : ${item.status}`
 
                                     <td>
 
-                                        <span className={item.status.toLowerCase().replace(" ", "-")}>
+                                        <span className={String(item.status || "Pending").toLowerCase().replace(" ", "-")}>
 
-                                            {item.status}
+                                            {item.status || "Pending"}
 
                                         </span>
 
@@ -301,6 +301,8 @@ Status : ${item.status}`
             </table>
 
             <EditObligationModal
+
+                key={selectedObligation?.id ?? "new"}
 
                 isOpen={isEditOpen}
 

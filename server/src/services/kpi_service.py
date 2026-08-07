@@ -1,11 +1,11 @@
 from sqlalchemy.orm import Session
 
-from app.models.compliance import Compliance
-from app.models.report import Report
-from app.models.audit import Audit
-from app.models.risk import Risk
-from app.models.history import History
-from app.models.missed_obligation import MissedObligation
+from ..models.compliance import Compliance
+from ..models.report import Report
+from ..models.audit import Audit
+from ..models.risk import Risk
+from ..models.history import History
+from ..models.missed_obligation import MissedObligation
 
 
 def get_dashboard_kpis(db: Session):

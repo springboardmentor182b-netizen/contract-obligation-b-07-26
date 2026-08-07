@@ -8,6 +8,8 @@
 
     box-shadow:0 3px 12px rgba(0,0,0,.05);
 
+    overflow-x:auto;
+
 }
 
 .table-card h2{
@@ -23,6 +25,30 @@ table{
     width:100%;
 
     border-collapse:collapse;
+
+}
+
+.table-card table{
+
+    min-width:900px;
+
+}
+
+.table-card td:last-child{
+
+    white-space:nowrap;
+
+}
+
+.obligation-code{
+
+    color:#2563EB;
+
+    font-family:ui-monospace, SFMono-Regular, Menlo, monospace;
+
+    font-size:13px;
+
+    font-weight:700;
 
 }
 
