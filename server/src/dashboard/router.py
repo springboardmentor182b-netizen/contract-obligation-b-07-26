@@ -9,7 +9,7 @@ from . import service
 router = APIRouter(prefix="/api", tags=["Dashboard"])
 
 
-@router.get("/dashboard")
+@router.get("/dashboard/overview")
 def dashboard(db: Session = Depends(get_db)) -> dict:
     return {"stats": service.get_stats(db), "contracts": service.get_contract_volume(db), "compliance": service.get_compliance(db), "renewals": service.get_renewal_trend(db), "activities": service.get_activities(db), "deadlines": service.get_deadlines(db)}
 

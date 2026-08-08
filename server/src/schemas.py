@@ -184,6 +184,10 @@ class NotificationCreate(BaseModel):
 class ReportCreate(BaseModel):
     name: str
     report_type: str
+    department: str | None = None
+    status: str = "Generated"
+    value: float = Field(default=0, ge=0)
+    due_date: date | None = None
     filters: dict[str, Any] = Field(default_factory=dict)
 
 

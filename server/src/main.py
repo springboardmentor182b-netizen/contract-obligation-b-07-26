@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import date, datetime, timedelta
 from typing import Any
 
-from fastapi import Depends, FastAPI, HTTPException, Query, status
+from fastapi import APIRouter, Depends, FastAPI, HTTPException, Query, Response, status
 from fastapi.middleware.cors import CORSMiddleware
 from psycopg.rows import dict_row
 
@@ -17,10 +17,11 @@ from .routers import risk as risk_router
 from .routers import settings
 
 from .auth.security import create_token, get_current_user, hash_password, require_roles, verify_password
-from .database import create_user, delete_user, find_user_by_email, initialize_database, initialize_notifications_table, list_users as list_database_users, restore_user, update_user, update_user_password
+from .database import create_report as create_postgres_report, create_user, delete_report as delete_postgres_report, delete_user, find_user_by_email, get_report as get_postgres_report, initialize_database, initialize_notifications_table, initialize_reports_table, list_reports as list_postgres_reports, list_users as list_database_users, restore_user, update_user, update_user_password
 from .database.audit_logs import list_audit_logs as list_database_audit_logs
 from .database.notifications import create_notification as create_postgres_notification, list_notifications as list_postgres_notifications, mark_all_notifications_read, mark_notification_read as mark_postgres_notification_read
 from .database.obligations import list_obligations as list_postgres_obligations
+from .database.session import Base, engine
 from .database.users import get_connection
 from .database.session import Base, engine
 from .schemas import (
@@ -53,6 +54,7 @@ app = FastAPI(
     version="1.0.0",
     description="Backend API for contracts, obligations, renewals, compliance, notifications, reports, audit logs, and settings.",
 )
+api_router = APIRouter()
 
 app.add_middleware(
     CORSMiddleware,
@@ -65,19 +67,9 @@ app.add_middleware(
 @app.on_event("startup")
 def startup() -> None:
     initialize_database()
-    # initialize_notifications_table()  # Temporarily disabled due to foreign key constraint issue
+    initialize_notifications_table()
+    initialize_reports_table()
     Base.metadata.create_all(bind=engine)
-
-app.include_router(dashboard_router)
-app.include_router(kpi.router)
-app.include_router(header.router)
-app.include_router(compliance_router.router)
-app.include_router(audit_router.router)
-app.include_router(report_router.router)
-app.include_router(history_router.router)
-app.include_router(risk_router.router)
-app.include_router(missed_obligation_router.router)
-app.include_router(settings.router, prefix="/api/settings", tags=["settings"])
 
 def public_user(user: dict[str, Any]) -> dict[str, Any]:
     return {key: value for key, value in user.items() if key != "password_hash"}
@@ -98,18 +90,18 @@ def parse_date(value: str | None) -> date | None:
     if isinstance(value, date):
         return value
     return date.fromisoformat(value) if value else None
-@app.get("/")
+@api_router.get("/")
 def home():
     return {
         "message": "Contract Obligation Tracking API"
     }
 
-@app.get("/health")
+@api_router.get("/health")
 def health() -> dict[str, str]:
     return {"status": "ok", "service": "contractiq-api"}
 
 
-@app.post("/api/auth/register", response_model=UserPublic, status_code=status.HTTP_201_CREATED)
+@api_router.post("/api/auth/register", response_model=UserPublic, status_code=status.HTTP_201_CREATED)
 def register(payload: UserCreate) -> dict[str, Any]:
     if find_user_by_email(payload.email):
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email is already registered")
@@ -127,7 +119,7 @@ def register(payload: UserCreate) -> dict[str, Any]:
     return public_user(user)
 
 
-@app.post("/api/auth/login", response_model=TokenResponse)
+@api_router.post("/api/auth/login", response_model=TokenResponse)
 def login(payload: UserLogin) -> dict[str, str]:
     user = find_user_by_email(payload.email)
     if not user or not verify_password(payload.password, user["password_hash"]):
@@ -138,7 +130,7 @@ def login(payload: UserLogin) -> dict[str, str]:
     return {"access_token": create_token(user), "token_type": "bearer"}
 
 
-@app.post("/api/auth/forgot-password")
+@api_router.post("/api/auth/forgot-password")
 def forgot_password(payload: PasswordReset) -> dict[str, str]:
     if not find_user_by_email(payload.email):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No account found for this email")
@@ -148,22 +140,22 @@ def forgot_password(payload: PasswordReset) -> dict[str, str]:
     return {"message": "Password reset successful. You can sign in with the new password."}
 
 
-@app.get("/api/auth/me", response_model=UserPublic)
+@api_router.get("/api/auth/me", response_model=UserPublic)
 def me(current_user: dict[str, Any] = Depends(get_current_user)) -> dict[str, Any]:
     return public_user(current_user)
 
 
-@app.get("/api/users", response_model=list[UserPublic])
+@api_router.get("/api/users", response_model=list[UserPublic])
 def list_users(_: dict[str, Any] = Depends(get_current_user)) -> list[dict[str, Any]]:
     return [public_user(user) for user in list_database_users()]
 
 
-@app.get("/api/users/deleted", response_model=list[UserPublic])
+@api_router.get("/api/users/deleted", response_model=list[UserPublic])
 def list_deleted_users(_: dict[str, Any] = Depends(get_current_user)) -> list[dict[str, Any]]:
     return [public_user(user) for user in list_database_users(include_deleted=True) if user.get("deleted_at")]
 
 
-@app.get("/api/users/{user_id}/activities", response_model=list[APIRecord])
+@api_router.get("/api/users/{user_id}/activities", response_model=list[APIRecord])
 def user_activity_history(
     user_id: str,
     _: dict[str, Any] = Depends(get_current_user),
@@ -175,7 +167,7 @@ def user_activity_history(
     ]
 
 
-@app.patch("/api/users/{user_id}", response_model=UserPublic)
+@api_router.patch("/api/users/{user_id}", response_model=UserPublic)
 def update_managed_user(
     user_id: str,
     payload: UserUpdate,
@@ -191,7 +183,7 @@ def update_managed_user(
     return public_user(user)
 
 
-@app.delete("/api/users/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
+@api_router.delete("/api/users/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_managed_user(
     user_id: str,
     current_user: dict[str, Any] = Depends(get_current_user),
@@ -203,7 +195,7 @@ def delete_managed_user(
     store.audit("deleted", "user", user_id, current_user["id"])
 
 
-@app.post("/api/users/{user_id}/restore", response_model=UserPublic)
+@api_router.post("/api/users/{user_id}/restore", response_model=UserPublic)
 def restore_managed_user(
     user_id: str,
     current_user: dict[str, Any] = Depends(get_current_user),
@@ -215,7 +207,7 @@ def restore_managed_user(
     return public_user(user)
 
 
-@app.get("/api/contracts")
+@api_router.get("/api/contracts")
 def list_contracts(
     search: str | None = Query(default=None),
     status_filter: ContractStatus | None = Query(default=None, alias="status"),
@@ -259,7 +251,7 @@ def list_contracts(
             return [dict(item) for item in cursor.fetchall()]
 
 
-@app.post("/api/contracts", status_code=status.HTTP_201_CREATED)
+@api_router.post("/api/contracts", status_code=status.HTTP_201_CREATED)
 def create_contract(payload: ContractCreate, current_user: dict[str, Any] = Depends(get_current_user)) -> dict[str, Any]:
     data = model_payload(payload)
     with get_connection() as connection:
@@ -287,7 +279,7 @@ def create_contract(payload: ContractCreate, current_user: dict[str, Any] = Depe
             return dict(cursor.fetchone())
 
 
-@app.get("/api/contracts/stats/summary")
+@api_router.get("/api/contracts/stats/summary")
 def contract_stats(_: dict[str, Any] = Depends(get_current_user)) -> dict[str, int]:
     with get_connection() as connection:
         with connection.cursor(row_factory=dict_row) as cursor:
@@ -305,7 +297,7 @@ def contract_stats(_: dict[str, Any] = Depends(get_current_user)) -> dict[str, i
     }
 
 
-@app.get("/api/contracts/{contract_id}")
+@api_router.get("/api/contracts/{contract_id}")
 def get_contract(contract_id: str, _: dict[str, Any] = Depends(get_current_user)) -> dict[str, Any]:
     contracts = list_contracts(None, None, None, {})
     contract = next((item for item in contracts if item["id"] == contract_id), None)
@@ -314,7 +306,7 @@ def get_contract(contract_id: str, _: dict[str, Any] = Depends(get_current_user)
     return contract
 
 
-@app.patch("/api/contracts/{contract_id}")
+@api_router.patch("/api/contracts/{contract_id}")
 def update_contract(
     contract_id: str,
     payload: ContractUpdate,
@@ -348,7 +340,7 @@ def update_contract(
     return dict(contract)
 
 
-@app.delete("/api/contracts/{contract_id}", status_code=status.HTTP_204_NO_CONTENT)
+@api_router.delete("/api/contracts/{contract_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_contract(contract_id: str, _: dict[str, Any] = Depends(get_current_user)) -> None:
     with get_connection() as connection:
         with connection.cursor() as cursor:
@@ -357,7 +349,7 @@ def delete_contract(contract_id: str, _: dict[str, Any] = Depends(get_current_us
                 raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Contract not found")
 
 
-@app.post("/api/contracts/{contract_id}/archive", response_model=APIRecord)
+@api_router.post("/api/contracts/{contract_id}/archive", response_model=APIRecord)
 def archive_contract(contract_id: str, current_user: dict[str, Any] = Depends(get_current_user)) -> dict[str, Any]:
     contract = store.update("contracts", contract_id, {"status": ContractStatus.archived.value})
     if not contract:
@@ -366,7 +358,7 @@ def archive_contract(contract_id: str, current_user: dict[str, Any] = Depends(ge
     return contract
 
 
-@app.post("/api/contract-versions", response_model=APIRecord, status_code=status.HTTP_201_CREATED)
+@api_router.post("/api/contract-versions", response_model=APIRecord, status_code=status.HTTP_201_CREATED)
 def create_contract_version(
     payload: ContractVersionCreate,
     current_user: dict[str, Any] = Depends(get_current_user),
@@ -377,7 +369,7 @@ def create_contract_version(
     return version
 
 
-@app.get("/api/obligations", response_model=list[APIRecord])
+@api_router.get("/api/obligations", response_model=list[APIRecord])
 def list_obligations(
     contract_id: str | None = None,
     status_filter: ObligationStatus | None = Query(default=None, alias="status"),
@@ -391,7 +383,7 @@ def list_obligations(
     return obligations
 
 
-@app.post("/api/obligations", response_model=APIRecord, status_code=status.HTTP_201_CREATED)
+@api_router.post("/api/obligations", response_model=APIRecord, status_code=status.HTTP_201_CREATED)
 def create_obligation(payload: ObligationCreate, current_user: dict[str, Any] = Depends(get_current_user)) -> dict[str, Any]:
     ensure_record("contracts", payload.contract_id)
     obligation = store.create("obligations", model_payload(payload))
@@ -399,7 +391,7 @@ def create_obligation(payload: ObligationCreate, current_user: dict[str, Any] = 
     return obligation
 
 
-@app.patch("/api/obligations/{obligation_id}", response_model=APIRecord)
+@api_router.patch("/api/obligations/{obligation_id}", response_model=APIRecord)
 def update_obligation(
     obligation_id: str,
     payload: ObligationUpdate,
@@ -412,7 +404,7 @@ def update_obligation(
     return obligation
 
 
-@app.get("/api/renewals")
+@api_router.get("/api/renewals")
 def list_renewals(
     status_filter: RenewalStatus | None = Query(default=None, alias="status"),
     _: dict[str, Any] = Depends(get_current_user),
@@ -440,7 +432,7 @@ def list_renewals(
             return [dict(item) for item in cursor.fetchall()]
 
 
-@app.post("/api/renewals", response_model=APIRecord, status_code=status.HTTP_201_CREATED)
+@api_router.post("/api/renewals", response_model=APIRecord, status_code=status.HTTP_201_CREATED)
 def create_renewal(payload: RenewalCreate, current_user: dict[str, Any] = Depends(get_current_user)) -> dict[str, Any]:
     ensure_record("contracts", payload.contract_id)
     renewal = store.create("renewals", model_payload(payload))
@@ -448,7 +440,7 @@ def create_renewal(payload: RenewalCreate, current_user: dict[str, Any] = Depend
     return renewal
 
 
-@app.patch("/api/renewals/{renewal_id}", response_model=APIRecord)
+@api_router.patch("/api/renewals/{renewal_id}", response_model=APIRecord)
 def update_renewal(
     renewal_id: str,
     payload: RenewalUpdate,
@@ -461,7 +453,7 @@ def update_renewal(
     return renewal
 
 
-@app.get("/api/compliance/summary")
+@api_router.get("/api/compliance/summary")
 def compliance_summary(_: dict[str, Any] = Depends(get_current_user)) -> dict[str, Any]:
     obligations = list_postgres_obligations()
     by_level = {level.value: 0 for level in ComplianceLevel}
@@ -486,7 +478,7 @@ def postgres_records(query: str) -> list[dict[str, Any]]:
             return [dict(item) for item in cursor.fetchall()]
 
 
-@app.get("/api/compliance/")
+@api_router.get("/api/compliance/")
 def list_compliance_records(_: dict[str, Any] = Depends(get_current_user)) -> list[dict[str, Any]]:
     return postgres_records(
         """
@@ -520,7 +512,7 @@ def list_compliance_records(_: dict[str, Any] = Depends(get_current_user)) -> li
     )
 
 
-@app.get("/api/dashboard/kpis")
+@api_router.get("/api/dashboard/kpis")
 def dashboard_kpis(_: dict[str, Any] = Depends(get_current_user)) -> dict[str, Any]:
     with get_connection() as connection:
         with connection.cursor(row_factory=dict_row) as cursor:
@@ -549,7 +541,7 @@ def dashboard_kpis(_: dict[str, Any] = Depends(get_current_user)) -> dict[str, A
     }
 
 
-@app.get("/api/missed-obligations/")
+@api_router.get("/api/missed-obligations/")
 def list_missed_obligations(_: dict[str, Any] = Depends(get_current_user)) -> list[dict[str, Any]]:
     return postgres_records(
         """SELECT id, obligation_name, contract, department, owner, due_date, missed_days, priority, status
@@ -557,22 +549,22 @@ def list_missed_obligations(_: dict[str, Any] = Depends(get_current_user)) -> li
     )
 
 
-@app.get("/api/risk/")
+@api_router.get("/api/risk/")
 def list_risks(_: dict[str, Any] = Depends(get_current_user)) -> list[dict[str, Any]]:
     return postgres_records("SELECT id, risk_name, department, severity, status, owner FROM risk ORDER BY id DESC")
 
 
-@app.get("/api/audit/")
+@api_router.get("/api/audit/")
 def list_compliance_audits(_: dict[str, Any] = Depends(get_current_user)) -> list[dict[str, Any]]:
     return postgres_records("SELECT id, audit_name, department, severity, status, audit_date FROM audit ORDER BY audit_date DESC NULLS LAST, id DESC")
 
 
-@app.get("/api/history/")
+@api_router.get("/api/history/")
 def list_compliance_history(_: dict[str, Any] = Depends(get_current_user)) -> list[dict[str, Any]]:
     return postgres_records("SELECT id, activity, department, status, activity_date FROM history ORDER BY activity_date DESC NULLS LAST, id DESC")
 
 
-@app.get("/api/report/")
+@api_router.get("/api/report/")
 def list_compliance_reports(_: dict[str, Any] = Depends(get_current_user)) -> list[dict[str, Any]]:
     return postgres_records("SELECT id, title, department, status, file_size, generated_date FROM report ORDER BY generated_date DESC NULLS LAST, id DESC")
 
@@ -606,7 +598,7 @@ def role_dashboard(role: str) -> dict[str, Any]:
     return dashboards.get(role, dashboards[Role.employee.value])
 
 
-@app.get("/api/dashboard")
+@api_router.get("/api/dashboard")
 def dashboard(current_user: dict[str, Any] = Depends(get_current_user)) -> dict[str, Any]:
     # Dashboard data is read from PostgreSQL.  This ensures the records
     # inserted through pgAdmin/psql are the same records shown after login.
@@ -773,12 +765,12 @@ def dashboard(current_user: dict[str, Any] = Depends(get_current_user)) -> dict[
     }
 
 
-@app.get("/api/notifications", response_model=list[APIRecord])
+@api_router.get("/api/notifications", response_model=list[APIRecord])
 def list_notifications(current_user: dict[str, Any] = Depends(get_current_user)) -> list[dict[str, Any]]:
     return list_postgres_notifications(current_user["id"], current_user["role"] == Role.administrator.value)
 
 
-@app.post("/api/notifications", response_model=APIRecord, status_code=status.HTTP_201_CREATED)
+@api_router.post("/api/notifications", response_model=APIRecord, status_code=status.HTTP_201_CREATED)
 def create_notification(
     payload: NotificationCreate,
     current_user: dict[str, Any] = Depends(require_roles(Role.administrator.value, Role.legal_manager.value, Role.compliance_officer.value)),
@@ -788,7 +780,7 @@ def create_notification(
     return notification
 
 
-@app.post("/api/notifications/{notification_id}/read", response_model=APIRecord)
+@api_router.post("/api/notifications/{notification_id}/read", response_model=APIRecord)
 def mark_notification_read(notification_id: str, current_user: dict[str, Any] = Depends(get_current_user)) -> dict[str, Any]:
     updated = mark_postgres_notification_read(notification_id, current_user["id"], current_user["role"] == Role.administrator.value)
     if not updated:
@@ -796,37 +788,74 @@ def mark_notification_read(notification_id: str, current_user: dict[str, Any] = 
     return updated
 
 
-@app.post("/api/notifications/read-all")
+@api_router.post("/api/notifications/read-all")
 def mark_all_notifications_as_read(current_user: dict[str, Any] = Depends(get_current_user)) -> dict[str, int]:
     updated_count = mark_all_notifications_read(current_user["id"], current_user["role"] == Role.administrator.value)
     return {"updated_count": updated_count}
 
 
-@app.post("/api/reports", response_model=APIRecord, status_code=status.HTTP_201_CREATED)
+@api_router.post("/api/reports", response_model=APIRecord, status_code=status.HTTP_201_CREATED)
 def create_report(payload: ReportCreate, current_user: dict[str, Any] = Depends(get_current_user)) -> dict[str, Any]:
-    report = store.create(
-        "reports",
-        {
-            **model_payload(payload),
-            "generated_by": current_user["id"],
-            "generated_at": datetime.utcnow().isoformat(),
-            "download_url": None,
-        },
-    )
+    report = create_postgres_report(model_payload(payload), current_user["id"])
     store.audit("generated", "report", report["id"], current_user["id"])
     return report
 
 
-@app.get("/api/reports", response_model=list[APIRecord])
+@api_router.get("/api/reports", response_model=list[APIRecord])
 def list_reports(_: dict[str, Any] = Depends(get_current_user)) -> list[dict[str, Any]]:
-    return store.list("reports")
+    return list_postgres_reports()
 
 
-@app.get("/api/audit-logs", response_model=list[APIRecord])
+@api_router.get("/api/reports/export/csv")
+def export_reports_csv(_: dict[str, Any] = Depends(get_current_user)) -> Response:
+    reports = list_postgres_reports()
+    header = "Name,Type,Department,Status,Value,Due date,Generated at"
+
+    def csv_value(value: Any) -> str:
+        text = str(value or "")
+        return '"' + text.replace('"', '""') + '"'
+
+    rows = [
+        ",".join([
+            csv_value(report.get("name")),
+            csv_value(report.get("report_type")),
+            csv_value(report.get("department")),
+            csv_value(report.get("status")),
+            csv_value(report.get("value")),
+            csv_value(report.get("due_date")),
+            csv_value(report.get("generated_at")),
+        ])
+        for report in reports
+    ]
+    return Response(
+        content="\n".join([header, *rows]),
+        media_type="text/csv",
+        headers={"Content-Disposition": "attachment; filename=contractiq-reports.csv"},
+    )
+
+
+@api_router.delete("/api/reports/{report_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_report(report_id: str, current_user: dict[str, Any] = Depends(get_current_user)) -> None:
+    report = get_postgres_report(report_id)
+    if not report:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Report not found")
+    if report.get("generated_by") != current_user["id"] and current_user["role"] not in {
+        Role.administrator.value,
+        Role.legal_manager.value,
+    }:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient permissions to delete this report")
+    delete_postgres_report(report_id)
+    store.audit("deleted", "report", report_id, current_user["id"])
+
+
+@api_router.get("/api/audit-logs", response_model=list[APIRecord])
 def list_audit_logs(_: dict[str, Any] = Depends(get_current_user)) -> list[dict[str, Any]]:
     return list_database_audit_logs()
 
 
-@app.get("/api/activities", response_model=list[APIRecord])
+@api_router.get("/api/activities", response_model=list[APIRecord])
 def list_activities(_: dict[str, Any] = Depends(get_current_user)) -> list[dict[str, Any]]:
     return sorted(store.list("activities"), key=lambda item: item["created_at"], reverse=True)
+
+
+app.include_router(api_router)
