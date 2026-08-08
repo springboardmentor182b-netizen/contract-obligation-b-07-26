@@ -69,12 +69,6 @@ function ComplianceDashboard() {
         });
     };
 
-    if (loading) {
-
-        return <h2>Loading Dashboard...</h2>;
-
-    }
-
     const kpiCards = [
 
         {
@@ -213,6 +207,8 @@ function ComplianceDashboard() {
                     <div className="dashboard-page">
 
             <Header />
+
+            {loading && <p className="compliance-loading-note">Loading compliance metrics…</p>}
 
             <div className="kpi-row">
 

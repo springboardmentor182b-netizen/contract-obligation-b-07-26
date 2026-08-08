@@ -1,0 +1,89 @@
+.status-flow {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 16px;
+  overflow-x: auto;
+  padding: 2px 0 10px;
+}
+
+.status-flow::-webkit-scrollbar {
+  display: none;
+}
+
+.status-node {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  cursor: pointer;
+  min-height: 46px;
+  padding: 6px 17px 6px 8px;
+  border-radius: 999px;
+  background: #ffffff;
+  border: 1px solid #e6e9ef;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, .10);
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.status-node:hover {
+  box-shadow: var(--shadow-md);
+  border-color: #d1d5db;
+}
+
+.status-count {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.status-label {
+  font-size: 0.94rem;
+  font-weight: 700;
+  color: #14213d;
+  padding-right: 2px;
+}
+
+.status-arrow {
+  color: #d7dde8;
+  display: flex;
+  align-items: center;
+  font-size: 1.18rem;
+}
+
+.status-count-all { background: #ecfdf3; color: #078a55; }
+
+.status-count-draft {
+  background-color: #f1f4f8;
+  color: #64748b;
+}
+
+.status-count-review {
+  background-color: #fff7df;
+  color: #d97706;
+}
+
+.status-count-approved {
+  background-color: #eaf2ff;
+  color: #2563eb;
+}
+
+.status-count-active {
+  background-color: #e8fbf2;
+  color: #08965b;
+}
+
+.status-count-expired {
+  background-color: #fff1e9;
+  color: #ea580c;
+}
+
+.status-count-terminated {
+  background-color: #fff0f1;
+  color: #e5484d;
+}

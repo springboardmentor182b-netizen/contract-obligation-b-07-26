@@ -2,13 +2,13 @@ import api from "../utils/axios";
 
 // Get All Risks
 export const getRisks = async () => {
-    const response = await api.get("/risk/");
+    const response = await api.get("/api/risk/");
     return response.data;
 };
 
 // Get Risk By ID
 export const getRiskById = async (id) => {
-    const response = await api.get(`/risk/${id}`);
+    const response = await api.get(`/api/risk/${id}`);
     return response.data;
 };
 

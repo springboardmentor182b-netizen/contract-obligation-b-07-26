@@ -27,8 +27,45 @@ const Appearance = () => {
   const [accentColor, setAccentColor] = useState('#3b82f6');
   const [compactMode, setCompactMode] = useState(false);
   const [language, setLanguage] = useState('en');
-  const [dateFormat, setDateFormat] = useState('MMM D, YYYY');
+  const [dateFormat, setDateFormat] = useState('DD/MM/YYYY');
   const [saved, setSaved] = useState(false);
+
+  const DATE_FORMATS = [
+    { value: 'DD/MM/YYYY', label: 'DD/MM/YYYY', example: '05/08/2026' },
+    { value: 'MM/DD/YYYY', label: 'MM/DD/YYYY', example: '08/05/2026' },
+    { value: 'YYYY-MM-DD', label: 'YYYY-MM-DD', example: '2026-08-05' },
+    { value: 'D MMMM YYYY', label: 'D MMMM YYYY', example: '5 August 2026' },
+    { value: 'MMM D, YYYY', label: 'MMM D, YYYY', example: 'Aug 5, 2026' },
+  ];
+
+  const getCurrentDatePreview = () => {
+    const today = new Date();
+    const format = DATE_FORMATS.find(f => f.value === dateFormat);
+    if (!format) return '';
+    
+    const day = String(today.getDate()).padStart(2, '0');
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const year = today.getFullYear();
+    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
+                       'July', 'August', 'September', 'October', 'November', 'December'];
+    const shortMonthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
+                           'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    
+    switch (dateFormat) {
+      case 'DD/MM/YYYY':
+        return `${day}/${month}/${year}`;
+      case 'MM/DD/YYYY':
+        return `${month}/${day}/${year}`;
+      case 'YYYY-MM-DD':
+        return `${year}-${month}-${day}`;
+      case 'D MMMM YYYY':
+        return `${today.getDate()} ${monthNames[today.getMonth()]} ${year}`;
+      case 'MMM D, YYYY':
+        return `${shortMonthNames[today.getMonth()]} ${today.getDate()}, ${year}`;
+      default:
+        return `${day}/${month}/${year}`;
+    }
+  };
 
   const handleSave = () => {
     setSaved(true);
@@ -212,27 +249,33 @@ const Appearance = () => {
           />
         </div>
 
-        <div className="appearance-select-row">
+        <div className="appearance-date-format-section">
           <SettingsRow
             icon={<FiCalendar />}
             iconBg="#f0fdf4"
             iconColor="#16a34a"
             title="Date Format"
             subtitle="How dates are displayed throughout the app"
-            action={
-              <select
-                className="settings-select appearance-inline-select"
-                value={dateFormat}
-                onChange={(e) => setDateFormat(e.target.value)}
-              >
-                <option value="MMM D, YYYY">Aug 5, 2026</option>
-                <option value="DD/MM/YYYY">05/08/2026</option>
-                <option value="MM/DD/YYYY">08/05/2026</option>
-                <option value="YYYY-MM-DD">2026-08-05</option>
-                <option value="D MMMM YYYY">5 August 2026</option>
-              </select>
-            }
           />
+          <div className="appearance-date-format-grid">
+            {DATE_FORMATS.map((format) => (
+              <button
+                key={format.value}
+                className={`appearance-date-format-card ${dateFormat === format.value ? 'appearance-date-format-card--active' : ''}`}
+                onClick={() => setDateFormat(format.value)}
+              >
+                <div className="appearance-date-format-label">{format.label}</div>
+                <div className="appearance-date-format-example">{format.example}</div>
+                {dateFormat === format.value && (
+                  <div className="appearance-date-format-check">✓</div>
+                )}
+              </button>
+            ))}
+          </div>
+          <div className="appearance-date-preview">
+            <span className="appearance-date-preview-label">Current date preview:</span>
+            <span className="appearance-date-preview-value">{getCurrentDatePreview()}</span>
+          </div>
         </div>
 
         <div className="settings-form-actions">

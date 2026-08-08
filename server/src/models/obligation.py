@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, Date
-from ..database.session import Base
+from src.database.session import Base
 
 class Obligation(Base):
 

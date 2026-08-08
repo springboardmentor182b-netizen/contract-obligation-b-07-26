@@ -2,7 +2,10 @@ import "./ComplianceScore.css";
 
 function ComplianceScore({ score = 0 }) {
 
-    const percentage = Math.round(score);
+    const numericScore = Number(score);
+    const percentage = Number.isFinite(numericScore)
+        ? Math.max(0, Math.min(100, Math.round(numericScore)))
+        : 0;
 
     const radius = 95;
     const stroke = 12;

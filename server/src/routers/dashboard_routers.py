@@ -6,22 +6,18 @@ from sqlalchemy import func
 
 from datetime import date, timedelta
 
-from ..database.session import get_db
+from src.database.session import get_db
 
-from ..services.dashboard_service import get_dashboard_kpis
+from src.services.dashboard_service import get_dashboard_kpis
 
-from ..services.dashboard_service import get_upcoming_deadlines
+from src.services.dashboard_service import get_upcoming_deadlines
 
-from ..services.dashboard_service import get_calendar_events
+from src.services.dashboard_service import get_calendar_events
 
-from ..services.dashboard_service import get_weekly_chart
+from src.services.dashboard_service import get_weekly_chart
 
 router = APIRouter(
-
-    prefix="/dashboard",
-
     tags=["Dashboard"]
-
 )
 
 @router.get("/kpis")
@@ -34,9 +30,9 @@ def dashboard_kpis(
 
     return get_dashboard_kpis(db)
 
-@router.get("/deadlines")
+@router.get("/upcoming-deadlines")
 
-def deadlines(
+def upcoming_deadlines(
 
     db: Session = Depends(get_db)
 

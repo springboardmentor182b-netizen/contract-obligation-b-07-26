@@ -2,13 +2,13 @@ import api from "../utils/axios";
 
 // Get All Missed Obligations
 export const getMissedObligations = async () => {
-    const response = await api.get("/missed-obligations/");
+    const response = await api.get("/api/missed-obligations/");
     return response.data;
 };
 
 // Get Missed Obligation By ID
 export const getMissedObligationById = async (id) => {
-    const response = await api.get(`/missed-obligations/${id}`);
+    const response = await api.get(`/api/missed-obligations/${id}`);
     return response.data;
 };
 

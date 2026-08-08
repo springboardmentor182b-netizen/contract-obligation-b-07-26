@@ -1,0 +1,23 @@
+/* Contracts-only extension of the shared navbar design. */
+.contracts-navbar .contract-import-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.contracts-navbar .contract-import-input {
+  display: none;
+}
+
+.contracts-navbar .primary-button::before {
+  content: '+';
+  margin-right: 6px;
+  font-size: 17px;
+  line-height: 0;
+}
+
+@media (max-width: 800px) {
+  .contracts-navbar .contract-import-button {
+    display: none;
+  }
+}

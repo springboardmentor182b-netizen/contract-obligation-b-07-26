@@ -4,7 +4,7 @@ from datetime import date, datetime
 from enum import Enum
 
 # Re-export from other schema files
-from .auth import LoginRequest, Token, TokenData, ForgotPasswordRequest, ResetPasswordRequest
+from .auth import Token, TokenData
 from .role import RoleBase, RoleCreate, RoleUpdate, RoleResponse
 from .settings import (
     SettingsProfileBase, SettingsProfileCreate, SettingsProfileUpdate, SettingsProfileResponse,
@@ -14,6 +14,7 @@ from .settings import (
     SettingsOrganizationBase, SettingsOrganizationUpdate, SettingsOrganizationResponse
 )
 from .user import UserBase, UserCreate, UserUpdate, UserResponse
+from .contract import ContractBase, ContractCreate, ContractUpdate, ContractResponse
 
 # Additional schemas needed by main.py
 class Role(str, Enum):
@@ -64,26 +65,6 @@ class APIRecord(BaseModel):
     class Config:
         from_attributes = True
 
-class ContractCreate(BaseModel):
-    title: str
-    counterparty: str
-    status: ContractStatus = ContractStatus.pending
-    category: str
-    value: float
-    start_date: date
-    end_date: date
-    owner_id: Optional[str] = None
-
-class ContractUpdate(BaseModel):
-    title: Optional[str] = None
-    counterparty: Optional[str] = None
-    status: Optional[ContractStatus] = None
-    category: Optional[str] = None
-    value: Optional[float] = None
-    start_date: Optional[date] = None
-    end_date: Optional[date] = None
-    owner_id: Optional[str] = None
-
 class ContractVersionCreate(BaseModel):
     contract_id: str
     version_number: int
@@ -131,7 +112,7 @@ class NotificationCreate(BaseModel):
     type: str = "info"
     read: bool = False
 
-class UserCreate(BaseModel):
+class UserCreateWithRole(BaseModel):
     name: str
     email: EmailStr
     password: str
@@ -163,3 +144,28 @@ class PasswordReset(BaseModel):
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
+
+class UserUpdate(BaseModel):
+    name: Optional[str] = None
+    email: Optional[EmailStr] = None
+    role: Optional[str] = None
+    department: Optional[str] = None
+    password: Optional[str] = None
+    is_active: Optional[bool] = None
+
+__all__ = [
+    "UserBase", "UserCreate", "UserUpdate", "UserResponse",
+    "ContractBase", "ContractCreate", "ContractUpdate", "ContractResponse",
+    "Token", "TokenData",
+    "LoginRequest", "ForgotPasswordRequest", "ResetPasswordRequest",
+    "RoleBase", "RoleCreate", "RoleUpdate", "RoleResponse",
+    "SettingsProfileBase", "SettingsProfileCreate", "SettingsProfileUpdate", "SettingsProfileResponse",
+    "SettingsSecurityBase", "SettingsSecurityUpdate", "SettingsSecurityResponse",
+    "SettingsNotificationsBase", "SettingsNotificationsUpdate", "SettingsNotificationsResponse",
+    "SettingsAppearanceBase", "SettingsAppearanceUpdate", "SettingsAppearanceResponse",
+    "SettingsOrganizationBase", "SettingsOrganizationUpdate", "SettingsOrganizationResponse",
+    "Role", "ContractStatus", "ObligationStatus", "RenewalStatus", "ComplianceLevel",
+    "APIRecord", "ContractVersionCreate", "ObligationCreate", "ObligationUpdate",
+    "RenewalCreate", "RenewalUpdate", "ReportCreate", "NotificationCreate",
+    "UserCreateWithRole", "UserLogin", "UserPublic", "PasswordReset", "TokenResponse", "UserUpdate",
+]

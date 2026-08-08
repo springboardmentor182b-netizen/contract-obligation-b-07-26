@@ -67,6 +67,15 @@ class UserLogin(BaseModel):
     role: Role
 
 
+class UserUpdate(BaseModel):
+    name: str | None = Field(default=None, min_length=2)
+    email: str | None = Field(default=None, pattern=r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+    role: Role | None = None
+    department: str | None = None
+    is_active: bool | None = None
+    password: str | None = Field(default=None, min_length=8)
+
+
 class PasswordReset(BaseModel):
     email: str = Field(pattern=r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
     new_password: str = Field(min_length=8)
@@ -76,14 +85,19 @@ class UserPublic(BaseModel):
     id: str
     name: str
     email: str
-    role: Role
+    # Existing PostgreSQL records can contain organization-specific titles
+    # (for example, "Legal Director"), so public user responses must not be
+    # limited to only the roles accepted during registration.
+    role: str
     department: str | None = None
     is_active: bool = True
     created_at: datetime
+    deleted_at: datetime | None = None
 
 
 class ContractCreate(BaseModel):
     title: str = Field(min_length=2)
+    contract_number: str | None = None
     category: str
     counterparty: str
     owner_id: str | None = None
@@ -98,6 +112,7 @@ class ContractCreate(BaseModel):
 
 class ContractUpdate(BaseModel):
     title: str | None = None
+    contract_number: str | None = None
     category: str | None = None
     counterparty: str | None = None
     owner_id: str | None = None

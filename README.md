@@ -1,117 +1,117 @@
-# contract-obligation-b-07-26
-## ContractIQ – Settings Module
+# 📄 ContractIQ - Contract Repository & Settings Module
 
-## Overview
+A modern Contract Repository and Management System built using **React (Vite)** for the frontend and **FastAPI** for the backend.
 
-The Settings Module provides users with a centralized interface to manage their account and application preferences within the ContractIQ platform.
-
-This module was developed as an independent feature in a separate branch to allow seamless integration into the main ContractIQ application.
+The application helps organizations manage contracts throughout their lifecycle, including creating, searching, filtering, and organizing contracts efficiently. Includes a comprehensive Settings Module for user and application preferences.
 
 ---
 
-## Features
+## 🚀 Features
 
-### Profile
-- View profile information
-- Edit personal details
-- Update:
-  - First Name
-  - Last Name
-  - Email
-  - Phone Number
-  - Job Title
-  - Department
-  - Timezone
+### Contract Repository
+- 📋 View all contracts in a responsive table
+- ➕ Create new contracts using a modal form
+- 🔍 Search contracts by ID, Name, or Party
+- 📂 Filter contracts by Category
+- 📌 Filter contracts by Status
+- 🏷️ Status badges with different colors
+- 📱 Responsive UI
+- ⚡ FastAPI backend
+- ⚛️ React + Vite frontend
 
-### Security
-- Change Password
-- Two-Factor Authentication (UI)
-- Active Session Management (UI)
-
-### Notifications
-- Email notification preferences
-- Push notification preferences
-- Reminder settings
-
-### Integrations
-- Connected applications
-- External service management
-
-### Organization
-- Organization information
-- Company details
-- Business settings
-
-### Appearance
-- Theme selection
-- Language selection
-- Display preferences
+### Settings Module
+- 👤 **Profile Management**: View and edit personal details, contact information, job title, department, timezone
+- 🔒 **Security**: Change password, Two-Factor Authentication (UI), Active Session Management (UI)
+- 🔔 **Notifications**: Email notification preferences, Push notification preferences, Reminder settings
+- 🔗 **Integrations**: Connected applications, External service management
+- 🏢 **Organization**: Organization information, Company details, Business settings
+- 🎨 **Appearance**: Theme selection, Language selection, Display preferences
 
 ---
 
-## Technologies Used
+## 🛠️ Tech Stack
 
 ### Frontend
-
 - React
+- Vite
 - React Router
+- React Icons
 - Axios
 - React Hook Form
 - React Toastify
-- CSS Modules
+- CSS3
 
 ### Backend
-
 - FastAPI
 - Python
-- REST APIs
+- Uvicorn
+- PostgreSQL
+- SQLAlchemy
+- Pydantic
 
 ---
 
-## Folder Structure
+# 📁 Project Structure
 
 ```
-settings_module/
-
-client/
-    src/
-        components/
-        pages/
-        services/
-        styles/
-
-server/
-    src/
-        models/
-        routers/
-        schemas/
-        services/
+contract-obligation-b-07-26/
+│
+├── client/
+│   ├── src/
+│   │   ├── api/
+│   │   ├── components/
+│   │   │   ├── Settings/
+│   │   │   ├── Layout/
+│   │   │   └── ...
+│   │   ├── context/
+│   │   ├── pages/
+│   │   │   ├── Settings/
+│   │   │   └── ...
+│   │   ├── routes/
+│   │   └── ...
+│   ├── public/
+│   └── package.json
+│
+├── server/
+│   ├── src/
+│   │   ├── models/
+│   │   │   └── settings.py
+│   │   ├── routers/
+│   │   │   └── settings.py
+│   │   ├── schemas/
+│   │   │   └── settings.py
+│   │   ├── services/
+│   │   │   └── settings_service.py
+│   │   └── ...
+│   ├── requirements.txt
+│   └── main.py
+│
+├── .gitignore
+└── README.md
 ```
 
 ---
 
 ## API Endpoints
 
-### Get Profile
+### Settings Module Endpoints
 
+### Get Profile
 ```
 GET /api/settings/profile
 ```
 
 ### Update Profile
-
 ```
 PUT /api/settings/profile
 ```
 
 ### Change Password
-
 ```
 PUT /api/settings/password
 ```
 
 ### Notification Preferences
-
 ```
 GET /api/settings/notifications
 PUT /api/settings/notifications
@@ -119,56 +119,28 @@ PUT /api/settings/notifications
 
 ---
 
-## Validation
+# ⚙️ Installation
 
-The module validates:
-
-- Required fields
-- Email format
-- Phone number
-- Password confirmation
-- Empty input prevention
-
----
-
-## User Experience
-
-- Loading indicators
-- Toast notifications
-- Responsive layout
-- Sidebar navigation
-- Top navigation bar
-- Form validation
-- Success/Error messages
-
----
-
-## Running the Project
-
-### Backend
+## Clone Repository
 
 ```bash
-cd server
-py -m uvicorn src.main:app --reload
-```
-
-Runs at:
-
-```
-http://127.0.0.1:8000
+git clone <your-repository-url>
+cd contract-obligation-b-07-26
 ```
 
 ---
 
-### Frontend
+## Frontend Setup
 
 ```bash
 cd client
+
 npm install
+
 npm run dev
 ```
 
-Runs at:
+Frontend runs at:
 
 ```
 http://localhost:5173
@@ -176,8 +148,62 @@ http://localhost:5173
 
 ---
 
-## Future Improvements
+## Backend Setup
 
+Create virtual environment
+
+```bash
+cd server
+
+python -m venv venv
+```
+
+Activate it
+
+### Windows
+
+```bash
+venv\Scripts\activate
+```
+
+### Linux / Mac
+
+```bash
+source venv/bin/activate
+```
+
+Install dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+Run FastAPI
+
+```bash
+uvicorn src.main:app --reload
+```
+
+Backend runs at:
+
+```
+http://127.0.0.1:8000
+```
+
+---
+
+## � Future Enhancements
+
+### Contract Repository
+- Database Integration
+- Authentication & Authorization
+- Contract Editing
+- Delete Contracts
+- Import / Export Contracts
+- File Upload Support
+- Dashboard Analytics
+
+### Settings Module
 - Profile photo upload
 - Dark mode
 - Role-based settings
@@ -188,16 +214,8 @@ http://localhost:5173
 
 ---
 
-## Branch
-
-```
-Group-A-feature/Settings-Module
-```
-
----
-
-## Author
+## 👩‍💻 Author
 
 **Pragna Sree**
 
-ContractIQ – Settings Module
+Built as part of a Contract Management project using React and FastAPI.
