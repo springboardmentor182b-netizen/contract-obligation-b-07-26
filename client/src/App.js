@@ -7,6 +7,7 @@ import Notifications from './pages/Notifications.js'
 import ComplianceDashboard from './pages/ComplianceDashboard'
 import ObligationTracker from './pages/ObligationTracker'
 import AuditLogs from './pages/AuditLogs'
+import Reports from './pages/Reports'
 import UserManagement from './pages/UserManagement'
 import ContractRepository from './pages/ContractRepository'
 import { Auth } from './features/authentication/Auth'
@@ -69,6 +70,10 @@ export default function App() {
         element: React.createElement(ProtectedAuditLogs),
       }),
       React.createElement(Route, {
+        path: '/reports',
+        element: React.createElement(ProtectedReports),
+      }),
+      React.createElement(Route, {
         path: '/users',
         element: React.createElement(ProtectedUserManagement),
       }),
@@ -104,6 +109,10 @@ function ProtectedObligationTracker() {
 
 function ProtectedAuditLogs() {
   return isAuthenticated() ? React.createElement(AuditLogs) : React.createElement(Navigate, { to: '/login', replace: true })
+}
+
+function ProtectedReports() {
+  return isAuthenticated() ? React.createElement(Reports) : React.createElement(Navigate, { to: '/login', replace: true })
 }
 
 function ProtectedUserManagement() {

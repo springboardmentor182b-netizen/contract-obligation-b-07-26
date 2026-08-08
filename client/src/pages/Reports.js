@@ -4,8 +4,17 @@ import Navbar from '../layout/Navbar'
 import PageContainer from '../layout/PageContainer'
 import Sidebar from '../layout/Sidebar'
 import { getDashboard, getProfile } from '../features/dashboard/services/dashboardApi'
-import apiClient from '../utils/axios'
+import { createReport, deleteReport, exportReports, getReports } from '../api/reportApi'
 import './Reports.css'
+
+const emptyReport = {
+  name: '',
+  report_type: 'Compliance report',
+  department: '',
+  status: 'Generated',
+  value: '',
+  due_date: '',
+}
 
 const statusBreakdownConfig = [
   { label: 'Generated', color: '#2563eb', keys: ['generated', 'approved', 'completed'] },
@@ -93,6 +102,11 @@ export default function Reports() {
   const [reports, setReports] = useState([])
   const [reportsStatus, setReportsStatus] = useState('loading')
   const [error, setError] = useState('')
+  const [showAll, setShowAll] = useState(false)
+  const [showCreateForm, setShowCreateForm] = useState(false)
+  const [reportForm, setReportForm] = useState(emptyReport)
+  const [isSaving, setIsSaving] = useState(false)
+  const [isExporting, setIsExporting] = useState(false)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(
     () => localStorage.getItem('contractiq_sidebar_collapsed') === 'true',
   )
@@ -105,17 +119,17 @@ export default function Reports() {
       setError('')
 
       try {
-        const [dashboardData, profileData, reportsResponse] = await Promise.all([
+        const [dashboardResult, profileResult, reportsData] = await Promise.all([
           getDashboard(),
           getProfile(),
-          apiClient.get('/api/reports'),
+          getReports(),
         ])
 
         if (!active) return
 
-        setDashboard(dashboardData)
-        setProfile(profileData)
-        setReports(Array.isArray(reportsResponse.data) ? reportsResponse.data : [])
+        setDashboard(dashboardResult)
+        setProfile(profileResult)
+        setReports(Array.isArray(reportsData) ? reportsData : [])
         setReportsStatus('success')
       } catch (requestError) {
         if (!active) return
@@ -134,6 +148,7 @@ export default function Reports() {
   }, [])
 
   const metrics = useMemo(() => buildMetrics(reports), [reports])
+  const visibleReports = showAll ? reports : reports.slice(0, 5)
 
   const statusBreakdown = useMemo(() => {
     const counts = statusBreakdownConfig.map((statusItem) => {
@@ -156,6 +171,71 @@ export default function Reports() {
     })
   }
 
+  async function refreshReports() {
+    setReportsStatus('loading')
+    setError('')
+    try {
+      const data = await getReports()
+      setReports(Array.isArray(data) ? data : [])
+      setReportsStatus('success')
+    } catch (requestError) {
+      setReportsStatus('error')
+      setError(requestError.response?.data?.detail || requestError.message || 'Unable to load reports.')
+    }
+  }
+
+  async function handleCreateReport(event) {
+    event.preventDefault()
+    setIsSaving(true)
+    setError('')
+    try {
+      const createdReport = await createReport({
+        ...reportForm,
+        value: Number(reportForm.value || 0),
+        due_date: reportForm.due_date || null,
+      })
+      setReports((currentReports) => [createdReport, ...currentReports])
+      setReportForm(emptyReport)
+      setShowCreateForm(false)
+      setReportsStatus('success')
+    } catch (requestError) {
+      setError(requestError.response?.data?.detail || requestError.message || 'Unable to create the report.')
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  async function handleDeleteReport(id) {
+    if (!window.confirm('Delete this report? This cannot be undone.')) return
+    setError('')
+    try {
+      await deleteReport(id)
+      setReports((currentReports) => currentReports.filter((report) => report.id !== id))
+    } catch (requestError) {
+      setError(requestError.response?.data?.detail || requestError.message || 'Unable to delete the report.')
+    }
+  }
+
+  async function handleExportReports() {
+    setIsExporting(true)
+    setError('')
+    try {
+      const reportFile = await exportReports()
+      const url = window.URL.createObjectURL(reportFile)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = 'contractiq-reports.csv'
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+      window.URL.revokeObjectURL(url)
+    } catch (requestError) {
+      setError(requestError.response?.data?.detail || requestError.message || 'Unable to export reports.')
+    } finally {
+      setIsExporting(false)
+    }
+  }
+
   return (
     <div className="app-shell">
       <Sidebar
@@ -173,8 +253,10 @@ export default function Reports() {
               <p>{`Welcome back${profile?.name ? `, ${profile.name}` : ''}. Here's your reporting activity today.`}</p>
             </div>
             <div className="reports-actions">
-              <button className="report-outline-button" type="button">Export Report</button>
-              <button className="report-primary-button" type="button">+ New Report</button>
+              <button className="report-outline-button" type="button" onClick={handleExportReports} disabled={isExporting}>
+                {isExporting ? 'Exporting...' : 'Export CSV'}
+              </button>
+              <button className="report-primary-button" type="button" onClick={() => setShowCreateForm(true)}>+ New Report</button>
             </div>
           </div>
 
@@ -194,7 +276,9 @@ export default function Reports() {
           <section className="reports-card">
             <div className="reports-section-heading">
               <h3>Recent Reports</h3>
-              <button type="button">View all -&gt;</button>
+              <button type="button" onClick={() => setShowAll((currentValue) => !currentValue)}>
+                {showAll ? 'Show recent' : 'View all'} -&gt;
+              </button>
             </div>
             <div className="reports-table">
               <div className="reports-table-row reports-table-head">
@@ -203,8 +287,9 @@ export default function Reports() {
                 <span>Status</span>
                 <span>Size / Value</span>
                 <span>Generated</span>
+                <span>Action</span>
               </div>
-              {reports.map((item) => (
+              {visibleReports.map((item) => (
                 <div className="reports-table-row" key={item.id}>
                   <span>
                     <strong>{item.name || item.title || 'Untitled report'}</strong>
@@ -214,6 +299,7 @@ export default function Reports() {
                   <span>{item.status ? <em>{item.status}</em> : '-'}</span>
                   <span><strong>{item.file_size || formatCurrency(reportAmount(item))}</strong></span>
                   <span>{formatDate(reportDate(item))}</span>
+                  <span><button className="report-delete-button" type="button" onClick={() => handleDeleteReport(item.id)}>Delete</button></span>
                 </div>
               ))}
             </div>
@@ -239,6 +325,26 @@ export default function Reports() {
               ))}
             </div>
           </section>
+
+          {showCreateForm ? (
+            <div className="report-modal-backdrop" role="presentation" onMouseDown={() => !isSaving && setShowCreateForm(false)}>
+              <form className="report-modal" onSubmit={handleCreateReport} onMouseDown={(event) => event.stopPropagation()}>
+                <div className="report-modal-heading">
+                  <div><h3>New Report</h3><p>Create a report record for your dashboard.</p></div>
+                  <button type="button" className="report-close-button" onClick={() => setShowCreateForm(false)} aria-label="Close">×</button>
+                </div>
+                <label>Report name<input required value={reportForm.name} onChange={(event) => setReportForm({ ...reportForm, name: event.target.value })} placeholder="Quarterly compliance report" /></label>
+                <div className="report-form-grid">
+                  <label>Report type<input required value={reportForm.report_type} onChange={(event) => setReportForm({ ...reportForm, report_type: event.target.value })} /></label>
+                  <label>Department<input value={reportForm.department} onChange={(event) => setReportForm({ ...reportForm, department: event.target.value })} placeholder="Legal" /></label>
+                  <label>Status<select value={reportForm.status} onChange={(event) => setReportForm({ ...reportForm, status: event.target.value })}><option>Generated</option><option>Under Review</option><option>Draft</option><option>Expired</option><option>Terminated</option></select></label>
+                  <label>Value<input type="number" min="0" value={reportForm.value} onChange={(event) => setReportForm({ ...reportForm, value: event.target.value })} placeholder="0" /></label>
+                  <label>Due date<input type="date" value={reportForm.due_date} onChange={(event) => setReportForm({ ...reportForm, due_date: event.target.value })} /></label>
+                </div>
+                <div className="report-modal-actions"><button type="button" className="report-outline-button" onClick={() => setShowCreateForm(false)} disabled={isSaving}>Cancel</button><button className="report-primary-button" disabled={isSaving}>{isSaving ? 'Creating...' : 'Create Report'}</button></div>
+              </form>
+            </div>
+          ) : null}
         </PageContainer>
       </div>
     </div>

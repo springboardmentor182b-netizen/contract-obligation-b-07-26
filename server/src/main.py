@@ -3,12 +3,12 @@ from __future__ import annotations
 from datetime import date, datetime, timedelta
 from typing import Any
 
-from fastapi import Depends, FastAPI, HTTPException, Query, status
+from fastapi import Depends, FastAPI, HTTPException, Query, Response, status
 from fastapi.middleware.cors import CORSMiddleware
 from psycopg.rows import dict_row
 
 from .auth.security import create_token, get_current_user, hash_password, require_roles, verify_password
-from .database import create_user, delete_user, find_user_by_email, initialize_database, initialize_notifications_table, list_users as list_database_users, restore_user, update_user, update_user_password
+from .database import create_report as create_postgres_report, create_user, delete_report as delete_postgres_report, find_user_by_email, get_report as get_postgres_report, initialize_database, initialize_notifications_table, initialize_reports_table, list_reports as list_postgres_reports, list_users as list_database_users, restore_user, update_user, update_user_password
 from .database.audit_logs import list_audit_logs as list_database_audit_logs
 from .database.notifications import create_notification as create_postgres_notification, list_notifications as list_postgres_notifications, mark_all_notifications_read, mark_notification_read as mark_postgres_notification_read
 from .database.obligations import list_obligations as list_postgres_obligations
@@ -55,6 +55,7 @@ app.add_middleware(
 def startup() -> None:
     initialize_database()
     initialize_notifications_table()
+    initialize_reports_table()
 
 def public_user(user: dict[str, Any]) -> dict[str, Any]:
     return {key: value for key, value in user.items() if key != "password_hash"}
@@ -781,22 +782,56 @@ def mark_all_notifications_as_read(current_user: dict[str, Any] = Depends(get_cu
 
 @app.post("/api/reports", response_model=APIRecord, status_code=status.HTTP_201_CREATED)
 def create_report(payload: ReportCreate, current_user: dict[str, Any] = Depends(get_current_user)) -> dict[str, Any]:
-    report = store.create(
-        "reports",
-        {
-            **model_payload(payload),
-            "generated_by": current_user["id"],
-            "generated_at": datetime.utcnow().isoformat(),
-            "download_url": None,
-        },
-    )
+    report = create_postgres_report(model_payload(payload), current_user["id"])
     store.audit("generated", "report", report["id"], current_user["id"])
     return report
 
 
 @app.get("/api/reports", response_model=list[APIRecord])
 def list_reports(_: dict[str, Any] = Depends(get_current_user)) -> list[dict[str, Any]]:
-    return store.list("reports")
+    return list_postgres_reports()
+
+
+@app.get("/api/reports/export/csv")
+def export_reports_csv(_: dict[str, Any] = Depends(get_current_user)) -> Response:
+    reports = list_postgres_reports()
+    header = "Name,Type,Department,Status,Value,Due date,Generated at"
+
+    def csv_value(value: Any) -> str:
+        text = str(value or "")
+        return '"' + text.replace('"', '""') + '"'
+
+    rows = [
+        ",".join([
+            csv_value(report.get("name")),
+            csv_value(report.get("report_type")),
+            csv_value(report.get("department")),
+            csv_value(report.get("status")),
+            csv_value(report.get("value")),
+            csv_value(report.get("due_date")),
+            csv_value(report.get("generated_at")),
+        ])
+        for report in reports
+    ]
+    return Response(
+        content="\n".join([header, *rows]),
+        media_type="text/csv",
+        headers={"Content-Disposition": "attachment; filename=contractiq-reports.csv"},
+    )
+
+
+@app.delete("/api/reports/{report_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_report(report_id: str, current_user: dict[str, Any] = Depends(get_current_user)) -> None:
+    report = get_postgres_report(report_id)
+    if not report:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Report not found")
+    if report.get("generated_by") != current_user["id"] and current_user["role"] not in {
+        Role.administrator.value,
+        Role.legal_manager.value,
+    }:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient permissions to delete this report")
+    delete_postgres_report(report_id)
+    store.audit("deleted", "report", report_id, current_user["id"])
 
 
 @app.get("/api/audit-logs", response_model=list[APIRecord])

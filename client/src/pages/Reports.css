@@ -265,7 +265,7 @@
 
 .reports-table-row {
   display: grid;
-  grid-template-columns: minmax(220px, 1.7fr) 1fr 0.8fr 0.9fr 1fr;
+  grid-template-columns: minmax(190px, 1.7fr) 1fr 0.8fr 0.9fr 1fr auto;
   gap: 18px;
   align-items: center;
   border-top: 1px solid #e7edf6;
@@ -311,6 +311,52 @@
   color: #8ca0c4;
   font-weight: 700;
 }
+
+.report-delete-button {
+  border: 0;
+  background: transparent;
+  color: #dc2626;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 800;
+}
+
+.report-modal-backdrop {
+  position: fixed;
+  z-index: 20;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: rgba(15, 23, 42, 0.5);
+}
+
+.report-modal {
+  width: min(620px, 100%);
+  display: grid;
+  gap: 16px;
+  padding: 24px;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.3);
+}
+
+.report-modal-heading,
+.report-modal-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.report-modal h3,
+.report-modal p { margin: 0; }
+.report-modal p { margin-top: 5px; color: #64748b; }
+.report-close-button { border: 0; background: transparent; color: #475569; cursor: pointer; font-size: 28px; }
+.report-modal label { display: grid; gap: 6px; color: #334155; font-size: 14px; font-weight: 700; }
+.report-modal input, .report-modal select { min-height: 40px; box-sizing: border-box; border: 1px solid #cbd5e1; border-radius: 7px; padding: 8px 10px; font: inherit; }
+.report-form-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.report-modal-actions { justify-content: flex-end; margin-top: 4px; }
 
 .reports-status-card h3 {
   margin-bottom: 18px;
@@ -365,4 +411,6 @@
     gap: 8px;
     padding: 14px 0;
   }
+
+  .report-form-grid { grid-template-columns: 1fr; }
 }
