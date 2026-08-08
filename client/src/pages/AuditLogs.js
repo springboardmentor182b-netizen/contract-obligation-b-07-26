@@ -50,14 +50,15 @@ export default function AuditLogs() {
 
   useEffect(() => {
     let active = true
-    Promise.all([getAuditLogs(), getProfile(), getDashboard()])
-      .then(([items, user, dashboardData]) => {
+    getAuditLogs()
+      .then((items) => {
         if (!active) return
         setLogs(Array.isArray(items) ? items : [])
-        setProfile(user)
-        setDashboard(dashboardData)
       })
       .catch((requestError) => active && setError(requestError.message || 'Unable to load audit logs.'))
+    Promise.all([getProfile(), getDashboard()])
+      .then(([user, dashboardData]) => { if (active) { setProfile(user); setDashboard(dashboardData) } })
+      .catch(() => {})
     return () => { active = false }
   }, [])
 

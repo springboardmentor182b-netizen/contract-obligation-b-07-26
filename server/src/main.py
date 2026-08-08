@@ -17,13 +17,12 @@ from .routers import risk as risk_router
 from .routers import settings
 
 from .auth.security import create_token, get_current_user, hash_password, require_roles, verify_password
-from .database import create_report as create_postgres_report, create_user, delete_report as delete_postgres_report, delete_user, find_user_by_email, get_report as get_postgres_report, initialize_database, initialize_notifications_table, initialize_reports_table, list_reports as list_postgres_reports, list_users as list_database_users, restore_user, update_user, update_user_password
+from .database import create_report as create_postgres_report, create_user, delete_report as delete_postgres_report, delete_user, find_user_by_email, get_preferences, get_report as get_postgres_report, initialize_database, initialize_notifications_table, initialize_reports_table, initialize_settings_table, list_reports as list_postgres_reports, list_users as list_database_users, restore_user, update_preferences, update_user, update_user_password
 from .database.audit_logs import list_audit_logs as list_database_audit_logs
 from .database.notifications import create_notification as create_postgres_notification, list_notifications as list_postgres_notifications, mark_all_notifications_read, mark_notification_read as mark_postgres_notification_read
 from .database.obligations import list_obligations as list_postgres_obligations
 from .database.session import Base, engine
 from .database.users import get_connection
-from .database.session import Base, engine
 from .schemas import (
     APIRecord,
     ComplianceLevel,
@@ -59,6 +58,7 @@ api_router = APIRouter()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173", "http://127.0.0.1:5173"],
+    allow_origin_regex=r"^http://(localhost|127\.0\.0\.1):\d+$",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -69,6 +69,7 @@ def startup() -> None:
     initialize_database()
     initialize_notifications_table()
     initialize_reports_table()
+    initialize_settings_table()
     Base.metadata.create_all(bind=engine)
 
 def public_user(user: dict[str, Any]) -> dict[str, Any]:
@@ -77,6 +78,16 @@ def public_user(user: dict[str, Any]) -> dict[str, Any]:
 
 def model_payload(model: Any) -> dict[str, Any]:
     return model.model_dump(mode="json", exclude_unset=True)
+
+
+def database_role(role: str) -> str:
+    return {
+        "administrator": "Administrator",
+        "legal_manager": "Legal Manager",
+        "compliance_officer": "Compliance Officer",
+        "contract_manager": "Contract Manager",
+        "user": "Employee",
+    }.get(role, role)
 
 
 def ensure_record(table: str, record_id: str) -> dict[str, Any]:
@@ -111,7 +122,7 @@ def register(payload: UserCreate) -> dict[str, Any]:
             "name": payload.name,
             "email": payload.email.lower(),
             "password_hash": hash_password(payload.password),
-            "role": payload.role.value,
+            "role": database_role(payload.role.value),
             "department": payload.department,
         },
     )
@@ -120,12 +131,14 @@ def register(payload: UserCreate) -> dict[str, Any]:
 
 
 @api_router.post("/api/auth/login", response_model=TokenResponse)
-def login(payload: UserLogin) -> dict[str, str]:
-    user = find_user_by_email(payload.email)
-    if not user or not verify_password(payload.password, user["password_hash"]):
+def login(payload: dict[str, str]) -> dict[str, str]:
+    email = str(payload.get("email", "")).strip()
+    password = str(payload.get("password", ""))
+    if not email or not password:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="Email and password are required")
+    user = find_user_by_email(email)
+    if not user or not verify_password(password, user["password_hash"]):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid email or password")
-    if user["role"] != payload.role.value:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Selected role does not match this account")
     store.audit("logged in", "user", user["id"], user["id"])
     return {"access_token": create_token(user), "token_type": "bearer"}
 
@@ -205,6 +218,62 @@ def restore_managed_user(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Deleted user not found")
     store.audit("restored", "user", user_id, current_user["id"])
     return public_user(user)
+
+
+@api_router.get("/api/settings/profile")
+def get_settings_profile(current_user: dict[str, Any] = Depends(get_current_user)) -> dict[str, Any]:
+    profile = get_preferences(current_user["id"]).get("profile", {})
+    name_parts = current_user["name"].split(maxsplit=1)
+    return {
+        "first_name": profile.get("first_name", name_parts[0] if name_parts else ""),
+        "last_name": profile.get("last_name", name_parts[1] if len(name_parts) > 1 else ""),
+        "email": current_user["email"],
+        "department": current_user.get("department") or "",
+        "phone": profile.get("phone", ""),
+        "job_title": profile.get("job_title", current_user.get("role", "")),
+        "timezone": profile.get("timezone", "UTC"),
+        "profile_image": profile.get("profile_image", ""),
+    }
+
+
+@api_router.put("/api/settings/profile")
+def update_settings_profile(payload: dict[str, Any], current_user: dict[str, Any] = Depends(get_current_user)) -> dict[str, Any]:
+    first_name = str(payload.get("first_name", "")).strip()
+    last_name = str(payload.get("last_name", "")).strip()
+    name = " ".join(part for part in (first_name, last_name) if part) or current_user["name"]
+    update_user(current_user["id"], {
+        "name": name,
+        "email": payload.get("email") or current_user["email"],
+        "department": payload.get("department"),
+    })
+    preferences = update_preferences(current_user["id"], "profile", {
+        key: payload[key]
+        for key in ("first_name", "last_name", "phone", "job_title", "timezone", "profile_image")
+        if key in payload
+    })
+    store.audit("updated settings", "user", current_user["id"], current_user["id"])
+    return {**get_settings_profile(current_user), "preferences": preferences.get("profile", {})}
+
+
+@api_router.get("/api/settings/{section}")
+def get_settings_section(section: str, current_user: dict[str, Any] = Depends(get_current_user)) -> dict[str, Any]:
+    if section not in {"security", "notifications", "appearance", "organization", "integrations"}:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Settings section not found")
+    return get_preferences(current_user["id"]).get(section, {})
+
+
+@api_router.put("/api/settings/{section}")
+def update_settings_section(section: str, payload: dict[str, Any], current_user: dict[str, Any] = Depends(get_current_user)) -> dict[str, Any]:
+    if section not in {"security", "notifications", "appearance", "organization", "integrations"}:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Settings section not found")
+    if section == "security" and payload.get("new_password"):
+        if not verify_password(str(payload.get("current_password", "")), current_user["password_hash"]):
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Current password is incorrect")
+        update_user(current_user["id"], {"password_hash": hash_password(str(payload["new_password"]))})
+        payload = {key: value for key, value in payload.items() if key not in {"current_password", "new_password"}}
+    preferences = update_preferences(current_user["id"], section, payload)
+    store.audit("updated settings", section, current_user["id"], current_user["id"])
+    return preferences.get(section, {})
 
 
 @api_router.get("/api/contracts")
@@ -369,7 +438,7 @@ def create_contract_version(
     return version
 
 
-@api_router.get("/api/obligations", response_model=list[APIRecord])
+@api_router.get("/api/obligations", response_model=list[dict[str, Any]])
 def list_obligations(
     contract_id: str | None = None,
     status_filter: ObligationStatus | None = Query(default=None, alias="status"),
@@ -570,32 +639,32 @@ def list_compliance_reports(_: dict[str, Any] = Depends(get_current_user)) -> li
 
 def role_dashboard(role: str) -> dict[str, Any]:
     dashboards = {
-        Role.administrator.value: {
+        "Administrator": {
             "name": "Admin Dashboard",
             "features": ["User Management", "Contract Statistics", "System Monitoring", "Activity Logs"],
         },
-        Role.legal_manager.value: {
+        "Legal Manager": {
             "name": "Legal Dashboard",
             "features": ["Active Contracts", "Upcoming Renewals", "Pending Obligations", "Recent Activities"],
         },
-        Role.compliance_officer.value: {
+        "Compliance Officer": {
             "name": "Compliance Dashboard",
             "features": ["Compliance Reports", "Missed Deadlines", "Risk Indicators", "Audit Summary"],
         },
-        Role.contract_manager.value: {
+        "Contract Manager": {
             "name": "Contract Manager Dashboard",
             "features": ["Contract Repository", "Approval Workflow", "Version Management", "Assignments"],
         },
-        Role.department_head.value: {
+        "Department Head": {
             "name": "Department Head Dashboard",
             "features": ["Department Contracts", "Obligation Ownership", "Renewal Approvals", "Performance"],
         },
-        Role.employee.value: {
+        "Employee": {
             "name": "Employee Dashboard",
             "features": ["Assigned Obligations", "Notifications", "Contract Access", "Profile"],
         },
     }
-    return dashboards.get(role, dashboards[Role.employee.value])
+    return dashboards.get(role, dashboards["Employee"])
 
 
 @api_router.get("/api/dashboard")
@@ -675,7 +744,7 @@ def dashboard(current_user: dict[str, Any] = Depends(get_current_user)) -> dict[
         for item in contracts
         for value in (
             as_date(item.get("created_at")),
-            as_date(item.get("end_date")) if item.get("status") == ContractStatus.expired.value else None,
+            as_date(item.get("end_date")) if str(item.get("status", "")).casefold() == "expired" else None,
         )
         if value
     ]
@@ -688,7 +757,7 @@ def dashboard(current_user: dict[str, Any] = Depends(get_current_user)) -> dict[
             "month": month_start.strftime("%b"),
             "active": sum(
                 1 for item in contracts
-                if item.get("status") == ContractStatus.active.value
+                if str(item.get("status", "")).casefold() == "active"
                 and (created := as_date(item.get("created_at")))
                 and created < month_end
             ),
@@ -699,7 +768,7 @@ def dashboard(current_user: dict[str, Any] = Depends(get_current_user)) -> dict[
             ),
             "expired": sum(
                 1 for item in contracts
-                if item.get("status") == ContractStatus.expired.value
+                if str(item.get("status", "")).casefold() == "expired"
                 and (expiry_date := as_date(item.get("end_date")))
                 and month_start <= expiry_date < month_end
             ),
@@ -719,7 +788,7 @@ def dashboard(current_user: dict[str, Any] = Depends(get_current_user)) -> dict[
             ),
         })
 
-    active_contracts = sum(1 for item in contracts if item.get("status") == ContractStatus.active.value)
+    active_contracts = sum(1 for item in contracts if str(item.get("status", "")).casefold() == "active")
     upcoming_renewals = sum(
         1 for item in renewals
         if (renewal_date := as_date(item.get("renewal_date")))
@@ -765,12 +834,12 @@ def dashboard(current_user: dict[str, Any] = Depends(get_current_user)) -> dict[
     }
 
 
-@api_router.get("/api/notifications", response_model=list[APIRecord])
+@api_router.get("/api/notifications", response_model=list[dict[str, Any]])
 def list_notifications(current_user: dict[str, Any] = Depends(get_current_user)) -> list[dict[str, Any]]:
     return list_postgres_notifications(current_user["id"], current_user["role"] == Role.administrator.value)
 
 
-@api_router.post("/api/notifications", response_model=APIRecord, status_code=status.HTTP_201_CREATED)
+@api_router.post("/api/notifications", response_model=dict[str, Any], status_code=status.HTTP_201_CREATED)
 def create_notification(
     payload: NotificationCreate,
     current_user: dict[str, Any] = Depends(require_roles(Role.administrator.value, Role.legal_manager.value, Role.compliance_officer.value)),
@@ -780,7 +849,7 @@ def create_notification(
     return notification
 
 
-@api_router.post("/api/notifications/{notification_id}/read", response_model=APIRecord)
+@api_router.post("/api/notifications/{notification_id}/read", response_model=dict[str, Any])
 def mark_notification_read(notification_id: str, current_user: dict[str, Any] = Depends(get_current_user)) -> dict[str, Any]:
     updated = mark_postgres_notification_read(notification_id, current_user["id"], current_user["role"] == Role.administrator.value)
     if not updated:
@@ -794,14 +863,14 @@ def mark_all_notifications_as_read(current_user: dict[str, Any] = Depends(get_cu
     return {"updated_count": updated_count}
 
 
-@api_router.post("/api/reports", response_model=APIRecord, status_code=status.HTTP_201_CREATED)
+@api_router.post("/api/reports", response_model=dict[str, Any], status_code=status.HTTP_201_CREATED)
 def create_report(payload: ReportCreate, current_user: dict[str, Any] = Depends(get_current_user)) -> dict[str, Any]:
     report = create_postgres_report(model_payload(payload), current_user["id"])
     store.audit("generated", "report", report["id"], current_user["id"])
     return report
 
 
-@api_router.get("/api/reports", response_model=list[APIRecord])
+@api_router.get("/api/reports", response_model=list[dict[str, Any]])
 def list_reports(_: dict[str, Any] = Depends(get_current_user)) -> list[dict[str, Any]]:
     return list_postgres_reports()
 
@@ -848,7 +917,7 @@ def delete_report(report_id: str, current_user: dict[str, Any] = Depends(get_cur
     store.audit("deleted", "report", report_id, current_user["id"])
 
 
-@api_router.get("/api/audit-logs", response_model=list[APIRecord])
+@api_router.get("/api/audit-logs")
 def list_audit_logs(_: dict[str, Any] = Depends(get_current_user)) -> list[dict[str, Any]]:
     return list_database_audit_logs()
 

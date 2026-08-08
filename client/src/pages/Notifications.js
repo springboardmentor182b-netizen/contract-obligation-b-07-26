@@ -29,9 +29,12 @@ export default function Notifications() {
 
   useEffect(() => {
     let active = true
-    Promise.all([getNotifications(), getProfile(), getDashboard()])
-      .then(([items, user, dashboardData]) => { if (active) { setNotifications(items); setProfile(user); setDashboard(dashboardData) } })
+    getNotifications()
+      .then((items) => { if (active) setNotifications(Array.isArray(items) ? items : []) })
       .catch((requestError) => { if (active) setError(requestError.message || 'Unable to load notifications.') })
+    Promise.all([getProfile(), getDashboard()])
+      .then(([user, dashboardData]) => { if (active) { setProfile(user); setDashboard(dashboardData) } })
+      .catch(() => {})
     return () => { active = false }
   }, [])
 

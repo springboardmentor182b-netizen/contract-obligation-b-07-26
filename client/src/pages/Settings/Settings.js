@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FiUser, FiLock, FiBell, FiSettings, FiDroplet } from 'react-icons/fi';
 import { VscOrganization } from 'react-icons/vsc';
 import './Settings.css';
@@ -8,9 +8,38 @@ import Notifications from '../../components/Settings/Notifications/Notifications
 import Integrations from '../../components/Settings/Integrations/Integrations';
 import Organization from '../../components/Settings/Organization/Organization';
 import Appearance from '../../components/Settings/Appearance/Appearance';
+import Navbar from '../../layout/Navbar';
+import PageContainer from '../../layout/PageContainer';
+import Sidebar from '../../layout/Sidebar';
+import { getDashboard, getProfile } from '../../features/dashboard/services/dashboardApi';
 
 const Settings = () => {
   const [activeTab, setActiveTab] = useState('profile');
+  const [profile, setProfile] = useState(null);
+  const [dashboard, setDashboard] = useState(null);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(
+    () => localStorage.getItem('contractiq_sidebar_collapsed') === 'true',
+  );
+
+  useEffect(() => {
+    let active = true;
+    Promise.all([getProfile(), getDashboard()])
+      .then(([user, dashboardData]) => {
+        if (!active) return;
+        setProfile(user);
+        setDashboard(dashboardData);
+      })
+      .catch(() => {});
+    return () => { active = false; };
+  }, []);
+
+  const toggleSidebar = () => {
+    setSidebarCollapsed((current) => {
+      const next = !current;
+      localStorage.setItem('contractiq_sidebar_collapsed', String(next));
+      return next;
+    });
+  };
 
   const renderContent = () => {
     switch (activeTab) {
@@ -41,34 +70,43 @@ const Settings = () => {
   ];
 
   return (
-    <div className="settings-container">
-      <div className="settings-header">
-        <h1>Settings</h1>
-        <p className="settings-subtitle">Manage your account and platform preferences</p>
-      </div>
-      <div className="settings-layout">
-        <aside className="settings-sidebar">
-          <ul>
-            {navItems.map(item => (
-              <li
-                key={item.id}
-                className={activeTab === item.id ? 'active' : ''}
-                onClick={() => setActiveTab(item.id)}
-              >
-                <div className="sidebar-icon">
-                  {item.icon}
-                </div>
-                <div className="sidebar-text">
-                  <span className="sidebar-label">{item.label}</span>
-                  <span className="sidebar-sub">{item.sub}</span>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </aside>
-        <main className="settings-content">
-          {renderContent()}
-        </main>
+    <div className="app-shell">
+      <Sidebar
+        profile={profile}
+        stats={dashboard?.stats}
+        collapsed={sidebarCollapsed}
+        onToggle={toggleSidebar}
+      />
+      <div className="app-main">
+        <Navbar profile={profile} pageTitle="Settings" unreadCount={dashboard?.unread_notifications || 0} />
+        <PageContainer>
+          <div className="settings-container">
+            <div className="settings-header">
+              <h1>Settings</h1>
+              <p className="settings-subtitle">Manage your account and platform preferences</p>
+            </div>
+            <div className="settings-layout">
+              <aside className="settings-sidebar">
+                <ul>
+                  {navItems.map(item => (
+                    <li
+                      key={item.id}
+                      className={activeTab === item.id ? 'active' : ''}
+                      onClick={() => setActiveTab(item.id)}
+                    >
+                      <div className="sidebar-icon">{item.icon}</div>
+                      <div className="sidebar-text">
+                        <span className="sidebar-label">{item.label}</span>
+                        <span className="sidebar-sub">{item.sub}</span>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </aside>
+              <main className="settings-content">{renderContent()}</main>
+            </div>
+          </div>
+        </PageContainer>
       </div>
     </div>
   );

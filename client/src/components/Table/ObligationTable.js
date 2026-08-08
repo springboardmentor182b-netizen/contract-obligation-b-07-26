@@ -1,7 +1,6 @@
 import "./ObligationTable.css";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
-    getObligations,
     deleteObligation,
     updateObligation
 } from "../../api/api";
@@ -9,6 +8,12 @@ import EditObligationModal from "../EditObligationModal";
 import Loader from "../Loader/Loader";
 
 function ObligationTable({
+
+    obligations = [],
+
+    loading = false,
+
+    onRefresh,
 
     search,
 
@@ -18,43 +23,9 @@ function ObligationTable({
 
 }) {
 
-    const [loading, setLoading] = useState(true);
-
-    const [obligations, setObligations] = useState([]);
-
     const [isEditOpen, setIsEditOpen] = useState(false);
 
     const [selectedObligation, setSelectedObligation] = useState(null);
-
-    useEffect(() => {
-
-        loadData();
-
-    }, []);
-
-    function loadData() {
-
-        setLoading(true);
-
-        getObligations()
-
-            .then((data) => {
-
-                setObligations(data);
-
-                setLoading(false);
-
-            })
-
-            .catch((error) => {
-
-                console.log(error);
-
-                setLoading(false);
-
-            });
-
-    }
 
     const handleView = (item) => {
 
@@ -96,7 +67,7 @@ Status : ${item.status}`
 
         setIsEditOpen(false);
 
-        loadData();
+        onRefresh?.();
 
     };
 
@@ -110,7 +81,7 @@ Status : ${item.status}`
 
         await deleteObligation(id);
 
-        loadData();
+        onRefresh?.();
 
     };
 

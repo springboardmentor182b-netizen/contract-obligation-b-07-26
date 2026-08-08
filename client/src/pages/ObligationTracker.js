@@ -25,7 +25,9 @@ import {
 } from "@heroicons/react/24/outline";
 
 function ObligationTracker() {
-const [obligations, setObligations] = useState([]);
+    const [obligations, setObligations] = useState([]);
+    const [obligationsLoading, setObligationsLoading] = useState(true);
+    const [obligationsError, setObligationsError] = useState('');
 
     const [profile, setProfile] = useState(null);
     const [dashboard, setDashboard] = useState(null);
@@ -53,9 +55,10 @@ const [obligations, setObligations] = useState([]);
         compliance: 0
 
     });
-useEffect(() => {
-
-    getObligations()
+    const loadObligations = () => {
+        setObligationsLoading(true);
+        setObligationsError('');
+        return getObligations()
 
         .then((data) => {
 
@@ -82,12 +85,19 @@ useEffect(() => {
                 risk: rows.filter((item) => /high|risk|delayed|non-compliant/i.test(String(item.compliance_level || item.priority || ''))).length,
                 compliance: rows.length ? Math.round((compliantCount / rows.length) * 100) : 0,
             });
-
+            setObligationsLoading(false);
         })
+        .catch((err) => {
+            console.error(err);
+            setObligations([]);
+            setObligationsError('Unable to load obligations from the database.');
+            setObligationsLoading(false);
+        });
+    };
 
-        .catch((err) => console.log(err));
-
-}, []);
+    useEffect(() => {
+        loadObligations();
+    }, []);
 
     useEffect(() => {
         Promise.all([getProfile(), getDashboard()])
@@ -155,6 +165,8 @@ useEffect(() => {
                 <PageContainer>
 
                     <div className="tracker-page">
+
+            {obligationsError ? <p className="notifications-error" role="alert">{obligationsError}</p> : null}
 
             <Header
 
@@ -236,6 +248,9 @@ useEffect(() => {
                 <div className="left-content">
 
                     <ObligationTable
+                        obligations={obligations}
+                        loading={obligationsLoading}
+                        onRefresh={loadObligations}
                         search={search}
                         status={status}
                         priority={priority}

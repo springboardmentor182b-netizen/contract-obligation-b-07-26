@@ -4,7 +4,6 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import './App.css'
 import Settings from './pages/Settings/Settings'
 import { UserProvider } from './context/UserContext'
-import Layout from './components/Layout/Layout'
 import Home from './pages/Home'
 import Notifications from './pages/Notifications.js'
 import ComplianceDashboard from './pages/ComplianceDashboard'
@@ -13,6 +12,7 @@ import AuditLogs from './pages/AuditLogs'
 import Reports from './pages/Reports'
 import UserManagement from './pages/UserManagement'
 import ContractRepository from './pages/ContractRepository'
+import Profile from './pages/Profile/Profile'
 import { Auth } from './features/authentication/Auth'
 
 function ProtectedDashboard() {
@@ -22,7 +22,7 @@ function ProtectedDashboard() {
   return token ? React.createElement(Home) : React.createElement(Navigate, { to: '/login', replace: true })
 }
 
-export default function App() {
+function LegacyApp() {
   return React.createElement(
     BrowserRouter,
     null,
@@ -122,6 +122,20 @@ function ProtectedUserManagement() {
   return isAuthenticated() ? React.createElement(UserManagement) : React.createElement(Navigate, { to: '/login', replace: true })
 }
 
+function ProtectedRenewals() {
+  return isAuthenticated() ? null : React.createElement(Navigate, { to: '/login', replace: true })
+}
+
+function ProtectedProfile() {
+  return isAuthenticated() ? React.createElement(Profile) : React.createElement(Navigate, { to: '/login', replace: true })
+}
+
+function ProtectedSettings() {
+  return isAuthenticated()
+    ? React.createElement(Settings)
+    : React.createElement(Navigate, { to: '/login', replace: true })
+}
+
 function isAuthenticated() {
   return Boolean(window.localStorage.getItem('contractiq_token')
     || window.sessionStorage.getItem('contractiq_token')
@@ -141,7 +155,7 @@ export default function App() {
         React.createElement(Route, {
           path: '/',
           element: React.createElement(Navigate, {
-            to: '/contracts',
+            to: '/login',
             replace: true,
           }),
         }),
@@ -178,6 +192,10 @@ export default function App() {
           element: React.createElement(ProtectedObligationTracker),
         }),
         React.createElement(Route, {
+          path: '/renewals',
+          element: React.createElement(ProtectedRenewals),
+        }),
+        React.createElement(Route, {
           path: '/audit-logs',
           element: React.createElement(ProtectedAuditLogs),
         }),
@@ -186,17 +204,21 @@ export default function App() {
           element: React.createElement(ProtectedUserManagement),
         }),
         React.createElement(Route, {
+          path: '/reports',
+          element: React.createElement(ProtectedReports),
+        }),
+        React.createElement(Route, {
+          path: '/profile',
+          element: React.createElement(ProtectedProfile),
+        }),
+        React.createElement(Route, {
           path: '/settings',
-          element: React.createElement(
-            Layout,
-            null,
-            React.createElement(Settings),
-          ),
+          element: React.createElement(ProtectedSettings),
         }),
         React.createElement(Route, {
           path: '*',
           element: React.createElement(Navigate, {
-            to: '/contracts',
+            to: '/login',
             replace: true,
           }),
         }),
