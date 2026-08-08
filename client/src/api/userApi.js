@@ -1,15 +1,15 @@
 import axios from "axios";
-import API_URL from "../config/config";
+import { API_BASE_URL } from "../features/authentication/constants";
 
 const API = axios.create({
-    baseURL: API_URL,
+    baseURL: `${API_BASE_URL}/api`,
 });
 
 // Add JWT token automatically to every request
 API.interceptors.request.use(
     (config) => {
 
-        const token = localStorage.getItem("token");
+        const token = localStorage.getItem("contractiq_token") || sessionStorage.getItem("contractiq_token");
 
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;

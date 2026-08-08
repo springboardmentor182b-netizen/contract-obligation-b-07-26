@@ -1,0 +1,32 @@
+/* Organization.css */
+
+.org-edit-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 24px 16px;
+  background-color: #f9fafb;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.org-edit-row .settings-input {
+  max-width: 360px;
+}
+
+.org-save-toast {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 16px;
+  background-color: #d1fae5;
+  color: #065f46;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  border: 1px solid #a7f3d0;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

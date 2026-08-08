@@ -1,28 +1,36 @@
-import { defineConfig, transformWithOxc } from 'vite'
+import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// Custom plugin to transform JSX in .js files using oxc
-const transformJsxInJs = () => ({
-  name: 'transform-jsx-in-js',
-  enforce: 'pre',
-  async transform(code, id) {
-    if (!id.match(/.*\.js$/)) {
-      return null;
-    }
-
-    return await transformWithOxc(code, id, {
-      lang: 'jsx',
-    });
-  },
-});
-
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [
-    react(),
-    transformJsxInJs(),
+    react({
+      babel: {
+        presets: [
+          ['@babel/preset-react', {
+            runtime: 'automatic'
+          }]
+        ],
+        include: ["**/*.js", "**/*.jsx", "**/*.ts", "**/*.tsx"]
+      }
+    }),
   ],
+  optimizeDeps: {
+    esbuildOptions: {
+      loader: {
+        '.js': 'jsx',
+      },
+    },
+  },
+  build: {
+    rollupOptions: {
+      onwarn(warning, warn) {
+        if (warning.code === 'MODULE_LEVEL_DIRECTIVE') return
+        warn(warning)
+      }
+    }
+  },
   server: {
+    port: 5173,
     proxy: {
       '/api': {
         target: 'http://127.0.0.1:8000',

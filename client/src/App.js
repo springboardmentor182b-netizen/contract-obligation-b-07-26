@@ -2,6 +2,9 @@ import React from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 
 import './App.css'
+import Settings from './pages/Settings/Settings'
+import { UserProvider } from './context/UserContext'
+import Layout from './components/Layout/Layout'
 import Home from './pages/Home'
 import Notifications from './pages/Notifications.js'
 import ComplianceDashboard from './pages/ComplianceDashboard'
@@ -123,4 +126,81 @@ function isAuthenticated() {
   return Boolean(window.localStorage.getItem('contractiq_token')
     || window.sessionStorage.getItem('contractiq_token')
     || window.localStorage.getItem('access_token'))
+}
+
+export default function App() {
+  return React.createElement(
+    UserProvider,
+    null,
+    React.createElement(
+      BrowserRouter,
+      null,
+      React.createElement(
+        Routes,
+        null,
+        React.createElement(Route, {
+          path: '/',
+          element: React.createElement(Navigate, {
+            to: '/contracts',
+            replace: true,
+          }),
+        }),
+        React.createElement(Route, {
+          path: '/login',
+          element: React.createElement(Auth),
+        }),
+        React.createElement(Route, {
+          path: '/dashboard',
+          element: React.createElement(ProtectedDashboard),
+        }),
+        React.createElement(Route, {
+          path: '/contracts',
+          element: React.createElement(ProtectedContracts),
+        }),
+        React.createElement(Route, {
+          path: '/repository',
+          element: React.createElement(Navigate, { to: '/contracts', replace: true }),
+        }),
+        React.createElement(Route, {
+          path: '/notifications',
+          element: React.createElement(ProtectedNotifications),
+        }),
+        React.createElement(Route, {
+          path: '/compliance',
+          element: React.createElement(ProtectedComplianceDashboard),
+        }),
+        React.createElement(Route, {
+          path: '/compliance-dashboard',
+          element: React.createElement(ProtectedComplianceDashboard),
+        }),
+        React.createElement(Route, {
+          path: '/obligations',
+          element: React.createElement(ProtectedObligationTracker),
+        }),
+        React.createElement(Route, {
+          path: '/audit-logs',
+          element: React.createElement(ProtectedAuditLogs),
+        }),
+        React.createElement(Route, {
+          path: '/users',
+          element: React.createElement(ProtectedUserManagement),
+        }),
+        React.createElement(Route, {
+          path: '/settings',
+          element: React.createElement(
+            Layout,
+            null,
+            React.createElement(Settings),
+          ),
+        }),
+        React.createElement(Route, {
+          path: '*',
+          element: React.createElement(Navigate, {
+            to: '/contracts',
+            replace: true,
+          }),
+        }),
+      ),
+    ),
+  )
 }

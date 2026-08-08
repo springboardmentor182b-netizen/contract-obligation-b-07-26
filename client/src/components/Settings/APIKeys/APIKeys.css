@@ -1,0 +1,147 @@
+/* APIKeys.css */
+
+.apikey-row {
+  padding: 20px 24px;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.apikey-row:last-of-type {
+  border-bottom: none;
+}
+
+.apikey-row-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.apikey-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.apikey-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #111827;
+}
+
+.apikey-icon {
+  color: #3b82f6;
+  font-size: 15px;
+}
+
+.apikey-env-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.apikey-env-badge--production {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.apikey-env-badge--development {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.apikey-created {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+.apikey-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.apikey-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+.apikey-value-row {
+  background-color: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 10px 14px;
+  overflow: hidden;
+}
+
+.apikey-value {
+  display: block;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 13px;
+  color: #374151;
+  word-break: break-all;
+  letter-spacing: 0.04em;
+  white-space: pre-wrap;
+}
+
+.apikey-value--revealed {
+  color: #111827;
+}
+
+/* Webhook Section */
+.apikey-webhook-section {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.apikey-webhook-input-row {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.apikey-webhook-icon-wrap {
+  position: absolute;
+  left: 14px;
+  color: #9ca3af;
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.apikey-webhook-input {
+  padding-left: 40px;
+}
+
+.apikey-webhook-hint {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+.apikey-webhook-actions {
+  display: flex;
+  gap: 12px;
+}
+
+@media (max-width: 640px) {
+  .apikey-row-top {
+    flex-direction: column;
+  }
+
+  .apikey-actions {
+    flex-wrap: wrap;
+  }
+}

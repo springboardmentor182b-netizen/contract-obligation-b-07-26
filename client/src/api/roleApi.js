@@ -1,9 +1,7 @@
 import axios from "axios";
+import { API_BASE_URL } from "../features/authentication/constants";
 
-
-import API_URL from "../config/config";
-
-const ROLE_API = `${API_URL}/roles`;
+const ROLE_API = `${API_BASE_URL}/api/roles`;
 
 // Get All Roles
 export const getRoles = async () => {

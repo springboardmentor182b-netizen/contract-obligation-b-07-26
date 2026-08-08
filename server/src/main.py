@@ -7,6 +7,15 @@ from fastapi import APIRouter, Depends, FastAPI, HTTPException, Query, Response,
 from fastapi.middleware.cors import CORSMiddleware
 from psycopg.rows import dict_row
 
+from .dashboard.router import router as dashboard_router
+from .models import audit, compliance, history, missed_obligation, report, risk  # noqa: F401
+from .routers import audit as audit_router
+from .routers import compliance as compliance_router
+from .routers import header, history as history_router, kpi, missed_obligation as missed_obligation_router
+from .routers import report as report_router
+from .routers import risk as risk_router
+from .routers import settings
+
 from .auth.security import create_token, get_current_user, hash_password, require_roles, verify_password
 from .database import create_report as create_postgres_report, create_user, delete_report as delete_postgres_report, delete_user, find_user_by_email, get_report as get_postgres_report, initialize_database, initialize_notifications_table, initialize_reports_table, list_reports as list_postgres_reports, list_users as list_database_users, restore_user, update_user, update_user_password
 from .database.audit_logs import list_audit_logs as list_database_audit_logs
@@ -14,6 +23,7 @@ from .database.notifications import create_notification as create_postgres_notif
 from .database.obligations import list_obligations as list_postgres_obligations
 from .database.session import Base, engine
 from .database.users import get_connection
+from .database.session import Base, engine
 from .schemas import (
     APIRecord,
     ComplianceLevel,
@@ -42,7 +52,7 @@ from .storage import store
 app = FastAPI(
     title="ContractIQ: Contract Obligation Tracking API",
     version="1.0.0",
-    description="Backend API for contracts, obligations, renewals, compliance, notifications, reports, and audit logs.",
+    description="Backend API for contracts, obligations, renewals, compliance, notifications, reports, audit logs, and settings.",
 )
 api_router = APIRouter()
 
@@ -53,6 +63,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 @app.on_event("startup")
 def startup() -> None:
     initialize_database()

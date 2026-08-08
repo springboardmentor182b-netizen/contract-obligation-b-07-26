@@ -1,14 +1,14 @@
 import axios from "axios";
-import API_URL from "../config/config";
+import { API_BASE_URL } from "../features/authentication/constants";
 
 const API = axios.create({
-    baseURL: API_URL,
+    baseURL: `${API_BASE_URL}/api`,
 });
 
 // Register
 export const registerUser = async (userData) => {
     const response = await API.post(
-        "/register",
+        "/auth/register",
         userData
     );
 
@@ -18,7 +18,7 @@ export const registerUser = async (userData) => {
 // Login
 export const loginUser = async (credentials) => {
     const response = await API.post(
-        "/login",
+        "/auth/login",
         credentials
     );
 
@@ -28,7 +28,7 @@ export const loginUser = async (credentials) => {
 // Forgot Password
 export const forgotPassword = async (email) => {
     const response = await API.post(
-        "/forgot-password",
+        "/auth/forgot-password",
         {
             email,
         }
