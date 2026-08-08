@@ -63,8 +63,10 @@ function ComplianceOverview() {
         totalRecords > 0
             ? Math.round(
                   complianceData.reduce(
-                      (sum, item) =>
-                          sum + item.compliance_score,
+                      (sum, item) => {
+                          const score = Number(item.compliance_score);
+                          return sum + (Number.isFinite(score) ? score : 0);
+                      },
                       0
                   ) / totalRecords
               )

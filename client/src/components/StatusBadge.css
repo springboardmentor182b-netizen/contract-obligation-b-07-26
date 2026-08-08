@@ -2,7 +2,7 @@
   display: inline-flex;
   align-items: center;
   padding: 4px 10px;
-  border-radius: var(--radius-full);
+  border-radius: 999px;
   font-size: 0.75rem;
   font-weight: 600;
   white-space: nowrap;
@@ -10,42 +10,42 @@
 }
 
 .badge-active {
-  background-color: var(--status-active-bg);
-  color: var(--status-active-text);
+  background-color: #e8fbf2;
+  color: #08965b;
   border-color: rgba(16, 185, 129, 0.2);
 }
 
 .badge-approved {
-  background-color: var(--status-approved-bg);
-  color: var(--status-approved-text);
+  background-color: #eaf2ff;
+  color: #2563eb;
   border-color: rgba(59, 130, 246, 0.2);
 }
 
 .badge-review {
-  background-color: var(--status-review-bg);
-  color: var(--status-review-text);
+  background-color: #fff7df;
+  color: #d97706;
   border-color: rgba(245, 158, 11, 0.2);
 }
 
 .badge-draft {
-  background-color: var(--status-draft-bg);
-  color: var(--status-draft-text);
+  background-color: #f1f4f8;
+  color: #64748b;
   border-color: rgba(107, 114, 128, 0.2);
 }
 
 .badge-expired {
-  background-color: var(--status-expired-bg);
-  color: var(--status-expired-text);
+  background-color: #fff1e9;
+  color: #ea580c;
   border-color: rgba(249, 115, 22, 0.2);
 }
 
 .badge-terminated {
-  background-color: var(--status-terminated-bg);
-  color: var(--status-terminated-text);
+  background-color: #fff0f1;
+  color: #e5484d;
   border-color: rgba(239, 68, 68, 0.2);
 }
 
 .badge-default {
-  background-color: var(--border-color);
-  color: var(--text-muted);
+  background-color: #f1f4f8;
+  color: #64748b;
 }

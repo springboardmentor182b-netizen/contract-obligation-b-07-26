@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
-import Sidebar from "../components/Sidebar";
+import Sidebar from "../layout/Sidebar";
 import Navbar from "../components/Navbar";
+import { getDashboard, getProfile } from "../features/dashboard/services/dashboardApi";
 import ContractHeader from "../components/ContractHeader";
 import StatusTabs from "../components/StatusTabs";
 import CategoryTabs from "../components/CategoryTabs";
@@ -20,6 +21,11 @@ const ContractRepository = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [profile, setProfile] = useState(null);
+  const [dashboard, setDashboard] = useState(null);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(
+    () => localStorage.getItem("contractiq_sidebar_collapsed") === "true",
+  );
 
   const fetchContractsData = async () => {
     setLoading(true);
@@ -41,14 +47,41 @@ const ContractRepository = () => {
     fetchContractsData();
   }, [statusFilter, categoryFilter, searchTerm]);
 
+  useEffect(() => {
+    Promise.all([getProfile(), getDashboard()])
+      .then(([user, dashboardData]) => {
+        setProfile(user);
+        setDashboard(dashboardData);
+      })
+      .catch(() => {});
+  }, []);
+
+  const toggleSidebar = () => {
+    setSidebarCollapsed((current) => {
+      const next = !current;
+      localStorage.setItem("contractiq_sidebar_collapsed", String(next));
+      return next;
+    });
+  };
+
   const handleSaveContract = async (contract) => {
     setLoading(true);
     setError(null);
     try {
+      const payload = {
+        title: contract.name,
+        contract_number: contract.contract_id,
+        category: contract.category,
+        counterparty: contract.party,
+        department: contract.department,
+        status: contract.status,
+        value: contract.value || null,
+        expiry_date: contract.expiry || null,
+      };
       if (isEditing && contract.id) {
-        await updateContract(contract.id, contract);
+        await updateContract(contract.id, payload);
       } else {
-        await createContract(contract);
+        await createContract(payload);
       }
       setShowModal(false);
       setSelectedContract(null);
@@ -86,14 +119,21 @@ const ContractRepository = () => {
   };
 
   return (
-    <div className="layout">
-      <Sidebar />
-
-      <div className="main-content-wrapper">
-        <Navbar onNewContract={() => setShowModal(true)} />
-
-        <main className="main-content">
-          <ContractHeader filters={{ status: statusFilter !== "All" ? statusFilter : null, category: categoryFilter !== "All" ? categoryFilter : null, search: searchTerm }} />
+    <div className="app-shell contracts-page-shell">
+      <Sidebar
+        profile={profile}
+        stats={dashboard?.stats}
+        collapsed={sidebarCollapsed}
+        onToggle={toggleSidebar}
+      />
+      <div className="app-main">
+        <Navbar onNewContract={() => setShowModal(true)} onImportComplete={fetchContractsData} />
+        <main className="contracts-content">
+          <ContractHeader
+            filters={{ status: statusFilter, category: categoryFilter, search: searchTerm }}
+            onStatusChange={setStatusFilter}
+            onCategoryChange={setCategoryFilter}
+          />
 
           <StatusTabs
             selectedStatus={statusFilter}
@@ -136,7 +176,7 @@ const ContractRepository = () => {
               />
             )}
           </div>
-        </main>
+      </main>
       </div>
 
       <NewContractModal

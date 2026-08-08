@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { NavLink } from 'react-router-dom';
 import {
   FiGrid,
   FiFileText,
@@ -19,16 +20,16 @@ import { getCurrentUser } from '../api';
 import './Sidebar.css';
 
 const menuItems = [
-  { id: 'dashboard', label: 'Dashboard', icon: FiGrid },
-  { id: 'contracts', label: 'Contracts', icon: FiFileText, active: true, badge: '84' },
-  { id: 'obligations', label: 'Obligations', icon: FiCheckSquare, badge: '12' },
-  { id: 'renewals', label: 'Renewals', icon: FiRefreshCw, badge: '5' },
-  { id: 'compliance', label: 'Compliance', icon: FiShield, badge: '7' },
-  { id: 'reports', label: 'Reports', icon: FiPieChart },
-  { id: 'notifications', label: 'Notifications', icon: FiBell, badge: '3' },
-  { id: 'audit', label: 'Audit Logs', icon: FiList },
-  { id: 'users', label: 'Users', icon: FiUsers },
-  { id: 'settings', label: 'Settings', icon: FiSettings },
+  { id: 'dashboard', label: 'Dashboard', path: '/dashboard', icon: FiGrid },
+  { id: 'contracts', label: 'Contracts', path: '/repository', icon: FiFileText, badge: '84' },
+  { id: 'obligations', label: 'Obligations', path: '/obligations', icon: FiCheckSquare, badge: '12' },
+  { id: 'renewals', label: 'Renewals', path: '/renewals', icon: FiRefreshCw, badge: '5' },
+  { id: 'compliance', label: 'Compliance', path: '/compliance', icon: FiShield, badge: '7' },
+  { id: 'reports', label: 'Reports', path: '/reports', icon: FiPieChart },
+  { id: 'notifications', label: 'Notifications', path: '/notifications', icon: FiBell, badge: '3' },
+  { id: 'audit', label: 'Audit Logs', path: '/audit-logs', icon: FiList },
+  { id: 'users', label: 'Users', path: '/users', icon: FiUsers },
+  { id: 'settings', label: 'Settings', path: '/settings', icon: FiSettings },
 ];
 
 
@@ -113,10 +114,10 @@ const Sidebar = () => {
           const Icon = item.icon;
 
           return (
-            <a
+            <NavLink
               key={item.id}
-              href={`#${item.id}`}
-              className={`nav-item ${item.active ? 'active' : ''}`}
+              to={item.path}
+              className={({ isActive }) => `nav-item ${isActive ? 'active' : ''}`}
             >
 
               <Icon className="nav-icon" />
@@ -135,7 +136,7 @@ const Sidebar = () => {
                 </span>
               )}
 
-            </a>
+            </NavLink>
           );
 
         })}

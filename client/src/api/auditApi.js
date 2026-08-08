@@ -2,13 +2,13 @@ import api from "../utils/axios";
 
 // Get All Audits
 export const getAudits = async () => {
-    const response = await api.get("/audit/");
+    const response = await api.get("/api/audit/");
     return response.data;
 };
 
 // Get Audit By ID
 export const getAuditById = async (id) => {
-    const response = await api.get(`/audit/${id}`);
+    const response = await api.get(`/api/audit/${id}`);
     return response.data;
 };
 

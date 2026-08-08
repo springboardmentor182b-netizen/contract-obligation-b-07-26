@@ -4,13 +4,11 @@ import {
     getObligations,
     deleteObligation,
     updateObligation
-} from "../../api";
+} from "../../api/api";
 import EditObligationModal from "../EditObligationModal";
 import Loader from "../Loader/Loader";
 
 function ObligationTable({
-
-    obligations: propObligations,
 
     search,
 
@@ -20,21 +18,19 @@ function ObligationTable({
 
 }) {
 
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
 
-    const [obligations, setObligations] = useState(propObligations || []);
+    const [obligations, setObligations] = useState([]);
 
     const [isEditOpen, setIsEditOpen] = useState(false);
 
     const [selectedObligation, setSelectedObligation] = useState(null);
 
     useEffect(() => {
-        if (propObligations) {
-            setObligations(propObligations);
-        } else {
-            loadData();
-        }
-    }, [propObligations]);
+
+        loadData();
+
+    }, []);
 
     function loadData() {
 
@@ -52,7 +48,7 @@ function ObligationTable({
 
             .catch((error) => {
 
-                console.error("Error loading obligations:", error);
+                console.log(error);
 
                 setLoading(false);
 
@@ -124,25 +120,33 @@ Status : ${item.status}`
 
     const filteredObligations = obligations
 
-        .filter((item) => {
-            const searchLower = search.toLowerCase();
-            const title = (item.title || '').toLowerCase();
-            const department = (item.department || '').toLowerCase();
-            const owner = (item.owner || '').toLowerCase();
-            return title.includes(searchLower) || 
-                   department.includes(searchLower) || 
-                   owner.includes(searchLower);
-        })
+        .filter((item) =>
 
-        .filter((item) => {
-            if (!status) return true;
-            return String(item.status || '').toLowerCase() === status.toLowerCase();
-        })
+            (item.title || '')
+                .toLowerCase()
+                .includes(search.toLowerCase())
 
-        .filter((item) => {
-            if (!priority) return true;
-            return String(item.priority || '').toLowerCase() === priority.toLowerCase();
-        });
+        )
+
+        .filter((item) =>
+
+            status === ""
+
+                ? true
+
+                : item.status === status
+
+        )
+
+        .filter((item) =>
+
+            priority === ""
+
+                ? true
+
+                : item.priority === priority
+
+        );
 
     return (
 

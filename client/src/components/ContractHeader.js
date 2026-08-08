@@ -3,9 +3,10 @@ import { FiFilter, FiDownload } from 'react-icons/fi';
 import './ContractHeader.css';
 import { exportContractsCSV, exportContractsExcel } from '../api';
 
-const ContractHeader = ({ filters = {} }) => {
+const ContractHeader = ({ filters = {}, onStatusChange, onCategoryChange }) => {
   const [exportLoading, setExportLoading] = useState(false);
   const [showExportMenu, setShowExportMenu] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
   const menuRef = useRef(null);
 
   useEffect(() => {
@@ -64,7 +65,7 @@ const ContractHeader = ({ filters = {} }) => {
         <p className="page-subtitle">Create, edit, and manage the full contract lifecycle</p>
       </div>
       <div className="header-actions">
-        <button className="btn btn-secondary action-btn">
+        <button className="btn btn-secondary action-btn" type="button" onClick={() => setShowFilters((current) => !current)} aria-expanded={showFilters}>
           <FiFilter className="btn-icon" />
           Filter
         </button>
@@ -123,6 +124,29 @@ const ContractHeader = ({ filters = {} }) => {
           )}
         </div>
       </div>
+      {showFilters && (
+        <div className="contract-filter-panel">
+          <label>
+            Status
+            <select value={filters.status || "All"} onChange={(event) => onStatusChange?.(event.target.value)}>
+              {['All', 'Draft', 'Under Review', 'Approved', 'Active', 'Expired', 'Terminated'].map((status) => (
+                <option key={status} value={status}>{status}</option>
+              ))}
+            </select>
+          </label>
+          <label>
+            Category
+            <select value={filters.category || "All"} onChange={(event) => onCategoryChange?.(event.target.value)}>
+              {['All', 'Service Agreements', 'Lease Agreements', 'Employment Contracts', 'Vendor Contracts', 'Purchase Agreements', 'Partnership Agreements', 'Confidentiality Agreements'].map((category) => (
+                <option key={category} value={category}>{category}</option>
+              ))}
+            </select>
+          </label>
+          <button className="filter-clear-button" type="button" onClick={() => { onStatusChange?.('All'); onCategoryChange?.('All'); }}>
+            Clear filters
+          </button>
+        </div>
+      )}
     </div>
   );
 };

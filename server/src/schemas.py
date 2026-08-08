@@ -97,6 +97,7 @@ class UserPublic(BaseModel):
 
 class ContractCreate(BaseModel):
     title: str = Field(min_length=2)
+    contract_number: str | None = None
     category: str
     counterparty: str
     owner_id: str | None = None
@@ -111,6 +112,7 @@ class ContractCreate(BaseModel):
 
 class ContractUpdate(BaseModel):
     title: str | None = None
+    contract_number: str | None = None
     category: str | None = None
     counterparty: str | None = None
     owner_id: str | None = None

@@ -2,13 +2,13 @@ import api from "../utils/axios";
 
 // Get All History
 export const getHistory = async () => {
-    const response = await api.get("/history/");
+    const response = await api.get("/api/history/");
     return response.data;
 };
 
 // Get History By ID
 export const getHistoryById = async (id) => {
-    const response = await api.get(`/history/${id}`);
+    const response = await api.get(`/api/history/${id}`);
     return response.data;
 };
 

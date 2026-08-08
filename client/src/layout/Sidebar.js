@@ -2,7 +2,7 @@ import React from 'react'
 import { NavLink } from 'react-router-dom'
 
 const navigationItems = [
-  ['Dashboard', 'grid', '/dashboard', null], ['Contracts', 'file', '/contracts', 'total_contracts'], ['Repository', 'folder', '/repository', null], ['Obligations', 'check', '/obligations', 'pending_obligations'], ['Renewals', 'renew', '/renewals', 'upcoming_renewals'], ['Compliance', 'shield', '/compliance', null], ['Reports', 'chart', '/reports', null], ['Notifications', 'bell', '/notifications', null], ['Audit Logs', 'clipboard', '/audit-logs', null], ['Users', 'users', '/users', null], ['Settings', 'settings', '/settings', null],
+  ['Dashboard', 'grid', '/dashboard', null], ['Contracts', 'file', '/contracts', 'total_contracts'], ['Obligations', 'check', '/obligations', 'pending_obligations'], ['Renewals', 'renew', '/renewals', 'upcoming_renewals'], ['Compliance', 'shield', '/compliance', null], ['Reports', 'chart', '/reports', null], ['Notifications', 'bell', '/notifications', null], ['Audit Logs', 'clipboard', '/audit-logs', null], ['Users', 'users', '/users', null], ['Settings', 'settings', '/settings', null],
 ]
 
 function Icon({ name }) {

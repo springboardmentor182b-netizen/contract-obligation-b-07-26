@@ -1,7 +1,7 @@
 import api from '../utils/axios'
 
 export async function getReports() {
-  const response = await api.get('/reports/')
+  const response = await api.get('/api/report/')
   return response.data
 }
 

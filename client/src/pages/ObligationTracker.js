@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
-import { getObligations } from "../api/api";
+import { useEffect, useState } from "react";
 import "./ObligationTracker.css";
+import { getObligations } from "../api/api";
 import Header from "../components/Header/Header";
 import KPICard from "../components/KPI/KPICard";
 import SearchFilters from "../components/SearchFilters/SearchFilters";
@@ -236,7 +236,6 @@ useEffect(() => {
                 <div className="left-content">
 
                     <ObligationTable
-                        obligations={obligations}
                         search={search}
                         status={status}
                         priority={priority}

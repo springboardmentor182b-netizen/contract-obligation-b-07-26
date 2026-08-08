@@ -3,7 +3,7 @@ import './StatusBadge.css';
 
 const StatusBadge = ({ status }) => {
   const getStatusClass = (status) => {
-    switch (status.toLowerCase()) {
+    switch (String(status || '').toLowerCase()) {
       case 'active':
         return 'badge-active';
       case 'approved':

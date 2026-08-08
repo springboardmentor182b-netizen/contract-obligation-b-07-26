@@ -27,6 +27,13 @@
   z-index: 20;
 }
 
+/* Use the Lucide bell rendered by Navbar instead of the former CSS placeholder. */
+.notification-button { position: relative; display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border: 0; border-radius: 8px; background: transparent; color: #60779c; transition: background-color .2s ease, color .2s ease; }
+.notification-button::before { display: none; }
+.notification-button:hover { background: #eef4ff; color: #2466ed; }
+.notification-button svg { display: block; }
+.notification-dot { top: 4px; right: 4px; border: 2px solid #fff; }
+
 .app-main {
   flex: 0 0 calc(100% - 264px);
   width: calc(100% - 264px);

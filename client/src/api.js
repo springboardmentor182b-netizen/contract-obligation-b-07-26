@@ -9,7 +9,9 @@ const BASE = '/api';
 
 /** Get auth token from localStorage */
 function getAuthHeader() {
-  const token = localStorage.getItem('access_token');
+  const token = localStorage.getItem('contractiq_token')
+    || sessionStorage.getItem('contractiq_token')
+    || localStorage.getItem('access_token');
   return token ? { 'Authorization': `Bearer ${token}` } : {};
 }
 
@@ -56,7 +58,7 @@ async function post(path, data = {}) {
 /** Perform a PUT request and return parsed JSON. */
 async function put(path, data = {}) {
   const res = await fetch(path, {
-    method: 'PUT',
+    method: 'PATCH',
     headers: {
       'Content-Type': 'application/json',
       ...getAuthHeader()
@@ -80,7 +82,7 @@ async function del(path) {
     const err = await res.json().catch(() => ({ detail: res.statusText }));
     throw new Error(err.detail ?? 'Request failed');
   }
-  return res.json();
+  return res.status === 204 ? null : res.json();
 }
 
 // ── Contracts ──────────────────────────────────────────────────────────────

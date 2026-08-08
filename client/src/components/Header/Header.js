@@ -5,13 +5,7 @@ import { exportPDF } from '../../utils/exportPDF'
 
 function Header({ openModal, obligations }) {
   const isTracker = typeof openModal === 'function'
-  const handleExport = isTracker ? () => {
-    if (obligations && obligations.length > 0) {
-      exportPDF(obligations)
-    } else {
-      alert("No obligations to export")
-    }
-  } : exportDashboard
+  const handleExport = isTracker ? () => exportPDF(obligations || []) : exportDashboard
 
   return (
     <div className="header">
@@ -20,14 +14,11 @@ function Header({ openModal, obligations }) {
         <p>{isTracker ? 'Track and manage contractual obligations efficiently.' : 'Track, monitor, and manage compliance across all obligations.'}</p>
       </div>
       <div className="header-right">
-        <button className="export-btn" onClick={handleExport}>
-          <Download className="export-icon" />
-          Export {isTracker ? 'PDF' : 'Dashboard'}
-        </button>
+        <button className="export-btn" onClick={handleExport}><Download className="export-icon" />Export {isTracker ? 'PDF' : 'Dashboard'}</button>
         {isTracker && <button className="add-btn" onClick={openModal}>+ Add Obligation</button>}
       </div>
     </div>
   )
 }
 
-export default Header;
+export default Header

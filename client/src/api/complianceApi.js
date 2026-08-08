@@ -6,7 +6,7 @@ import api from "../utils/axios";
 
 export const getCompliance = async () => {
 
-    const response = await api.get("/compliance/");
+    const response = await api.get("/api/compliance/");
 
     return response.data;
 
@@ -19,7 +19,7 @@ export const getCompliance = async () => {
 
 export const getComplianceById = async (id) => {
 
-    const response = await api.get(`/compliance/${id}`);
+    const response = await api.get(`/api/compliance/${id}`);
 
     return response.data;
 
@@ -33,7 +33,7 @@ export const getComplianceById = async (id) => {
 export const createCompliance = async (compliance) => {
 
     const response = await api.post(
-        "/compliance/",
+        "/api/compliance/",
         compliance
     );
 
@@ -49,7 +49,7 @@ export const createCompliance = async (compliance) => {
 export const updateCompliance = async (id, compliance) => {
 
     const response = await api.put(
-        `/compliance/${id}`,
+        `/api/compliance/${id}`,
         compliance
     );
 
@@ -65,7 +65,7 @@ export const updateCompliance = async (id, compliance) => {
 export const deleteCompliance = async (id) => {
 
     const response = await api.delete(
-        `/compliance/${id}`
+        `/api/compliance/${id}`
     );
 
     return response.data;
