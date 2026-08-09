@@ -24,20 +24,19 @@ export default function Button({
     opacity: disabled ? 0.6 : 1,
     fontSize: '14px',
     transition: 'all 0.2s ease',
-    width: '100%', // Defaults to 100% width, easily overridden by parent divs
+    width: '100%', 
   };
 
-  // 2. Specific styles based on the 'styleType' prop (matching your Figma design)
   let typeStyle = {};
   
   if (styleType === 'primary') {
     typeStyle = {
-      background: '#2563eb', // The blue color from your Figma "Upload Contract" button
+      background: '#2563eb', 
       color: 'white',
     };
   } else if (styleType === 'secondary') {
     typeStyle = {
-      background: 'white', // The white color from your Figma "Export" button
+      background: 'white', 
       color: '#0f172a',
       border: '1px solid #e2e8f0',
     };

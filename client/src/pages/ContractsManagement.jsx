@@ -12,7 +12,7 @@ export default function Contracts() {
   const [stats, setStats] = useState({ draft: 0, under_review: 0, approved: 0, active: 0 });
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Reusable function to fetch dashboard statistics
+  
   const fetchStats = () => {
    
     fetch(`${API_BASE_URL}/dashboard/stats/`)

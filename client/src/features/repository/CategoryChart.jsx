@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { API_BASE_URL } from '../../config';
 
-// 1. Keep a mapping of colors for specific categories to keep your design consistent
 const CATEGORY_COLORS = {
   'Services': '#3b82f6',   // Blue
   'Technology': '#10b981', // Green
