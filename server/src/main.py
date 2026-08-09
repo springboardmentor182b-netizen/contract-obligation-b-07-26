@@ -279,7 +279,7 @@ def update_settings_section(section: str, payload: dict[str, Any], current_user:
 @api_router.get("/api/contracts")
 def list_contracts(
     search: str | None = Query(default=None),
-    status_filter: ContractStatus | None = Query(default=None, alias="status"),
+    status_filter: str | None = Query(default=None, alias="status"),
     category: str | None = None,
     _: dict[str, Any] = Depends(get_current_user),
 ) -> list[dict[str, Any]]:
@@ -288,9 +288,9 @@ def list_contracts(
     if search:
         clauses.append("(title ILIKE %s OR contract_number ILIKE %s OR category ILIKE %s)")
         parameters.extend([f"%{search}%", f"%{search}%", f"%{search}%"])
-    if status_filter:
-        clauses.append("status = %s")
-        parameters.append(status_filter.value)
+    if status_filter and status_filter != "All":
+        clauses.append("status ILIKE %s")
+        parameters.append(status_filter)
     if category:
         clauses.append("category ILIKE %s")
         parameters.append(category)

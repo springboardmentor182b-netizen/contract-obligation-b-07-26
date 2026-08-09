@@ -31,10 +31,10 @@ const ContractRepository = () => {
     setLoading(true);
     setError(null);
     try {
-      console.log('Fetching contracts with filters:', { status: statusFilter !== "All" ? statusFilter : null, category: categoryFilter !== "All" ? categoryFilter : null, search: searchTerm });
-      const data = await fetchContracts({ status: statusFilter !== "All" ? statusFilter : null, category: categoryFilter !== "All" ? categoryFilter : null, search: searchTerm });
-      console.log('Received contracts data:', data);
-      setContracts(data);
+      const status = typeof statusFilter === 'string' && statusFilter !== 'All' ? statusFilter : null;
+      const category = typeof categoryFilter === 'string' && categoryFilter !== 'All' ? categoryFilter : null;
+      const data = await fetchContracts({ status, category, search: searchTerm });
+      setContracts(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error("Failed to fetch contracts:", error);
       setError(error.message || "Failed to fetch contracts");

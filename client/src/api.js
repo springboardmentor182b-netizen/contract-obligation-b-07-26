@@ -19,23 +19,21 @@ function getAuthHeader() {
 async function get(path, params = {}) {
   const url = new URL(path, window.location.origin);
   Object.entries(params).forEach(([k, v]) => {
-    if (v !== null && v !== undefined && v !== '') {
+    if (['string', 'number', 'boolean'].includes(typeof v) && v !== '') {
       url.searchParams.set(k, v);
     }
   });
-  console.log(`GET Request: ${url.toString()}`);
   const res = await fetch(url.toString(), {
     headers: getAuthHeader()
   });
-  console.log(`Response Status: ${res.status} ${res.statusText}`);
   if (!res.ok) {
     const err = await res.json().catch(() => ({ detail: res.statusText }));
-    console.error('API Error:', err);
-    throw new Error(err.detail ?? 'Request failed');
+    const detail = Array.isArray(err.detail)
+      ? err.detail.map((item) => item.msg || item.message || 'Invalid request').join(', ')
+      : err.detail;
+    throw new Error(detail || 'Request failed');
   }
-  const data = await res.json();
-  console.log('Response Data:', data);
-  return data;
+  return res.json();
 }
 
 /** Perform a POST request and return parsed JSON. */
