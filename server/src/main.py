@@ -501,25 +501,80 @@ def list_renewals(
             return [dict(item) for item in cursor.fetchall()]
 
 
-@api_router.post("/api/renewals", response_model=APIRecord, status_code=status.HTTP_201_CREATED)
-def create_renewal(payload: RenewalCreate, current_user: dict[str, Any] = Depends(get_current_user)) -> dict[str, Any]:
-    ensure_record("contracts", payload.contract_id)
-    renewal = store.create("renewals", model_payload(payload))
+@api_router.get("/api/renewals/contracts")
+def list_renewal_contracts(_: dict[str, Any] = Depends(get_current_user)) -> list[dict[str, str]]:
+    with get_connection() as connection:
+        with connection.cursor(row_factory=dict_row) as cursor:
+            cursor.execute("""
+                SELECT contract_id::text AS id,
+                       COALESCE(contract_number, title) AS contract_number,
+                       title
+                FROM contracts
+                ORDER BY title, contract_number
+            """)
+            return [dict(item) for item in cursor.fetchall()]
+
+
+@api_router.post("/api/renewals", response_model=dict[str, Any], status_code=status.HTTP_201_CREATED)
+def create_renewal(payload: dict[str, Any], current_user: dict[str, Any] = Depends(get_current_user)) -> dict[str, Any]:
+    contract_id = str(payload.get("contract_id", "")).strip()
+    renewal_date = payload.get("renewal_date")
+    if not contract_id or not renewal_date:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="Contract and renewal date are required")
+
+    with get_connection() as connection:
+        with connection.cursor(row_factory=dict_row) as cursor:
+            cursor.execute("SELECT 1 FROM contracts WHERE contract_id = %s", (contract_id,))
+            if not cursor.fetchone():
+                raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Contract not found")
+            cursor.execute("""
+                INSERT INTO renewals (contract_id, renewal_date, reminder_date, status, remarks)
+                VALUES (%s, %s, %s, %s, %s)
+                RETURNING renewal_id::text AS id, contract_id::text AS contract_id,
+                          renewal_date, reminder_date, status, remarks
+            """, (
+                contract_id,
+                renewal_date,
+                payload.get("reminder_date") or None,
+                str(payload.get("status") or "upcoming").lower().replace(" ", "_"),
+                str(payload.get("remarks") or "").strip() or None,
+            ))
+            renewal = dict(cursor.fetchone())
     store.audit("created", "renewal", renewal["id"], current_user["id"])
     return renewal
 
 
-@api_router.patch("/api/renewals/{renewal_id}", response_model=APIRecord)
+@api_router.patch("/api/renewals/{renewal_id}", response_model=dict[str, Any])
 def update_renewal(
     renewal_id: str,
-    payload: RenewalUpdate,
+    payload: dict[str, Any],
     current_user: dict[str, Any] = Depends(get_current_user),
 ) -> dict[str, Any]:
-    renewal = store.update("renewals", renewal_id, model_payload(payload))
+    fields = {
+        "renewal_date": payload.get("renewal_date"),
+        "reminder_date": payload.get("reminder_date"),
+        "status": str(payload["status"]).lower().replace(" ", "_") if payload.get("status") else None,
+        "remarks": payload.get("remarks"),
+    }
+    changes = {key: value for key, value in fields.items() if value is not None}
+    if not changes:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="Provide at least one renewal field to update")
+
+    assignments = ", ".join(f"{key} = %s" for key in changes)
+    with get_connection() as connection:
+        with connection.cursor(row_factory=dict_row) as cursor:
+            cursor.execute(f"""
+                UPDATE renewals SET {assignments}
+                WHERE renewal_id = %s
+                RETURNING renewal_id::text AS id, contract_id::text AS contract_id,
+                          renewal_date, reminder_date, status, remarks
+            """, [*changes.values(), renewal_id])
+            renewal = cursor.fetchone()
     if not renewal:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Renewal not found")
-    store.audit("updated", "renewal", renewal_id, current_user["id"], model_payload(payload))
-    return renewal
+    result = dict(renewal)
+    store.audit("updated", "renewal", renewal_id, current_user["id"], changes)
+    return result
 
 
 @api_router.get("/api/compliance/summary")

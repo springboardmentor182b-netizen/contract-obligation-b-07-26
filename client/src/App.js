@@ -8,6 +8,7 @@ import Home from './pages/Home'
 import Notifications from './pages/Notifications.js'
 import ComplianceDashboard from './pages/ComplianceDashboard'
 import ObligationTracker from './pages/ObligationTracker'
+import RenewalManagement from './pages/RenewalManagement'
 import AuditLogs from './pages/AuditLogs'
 import Reports from './pages/Reports'
 import UserManagement from './pages/UserManagement'
@@ -123,7 +124,7 @@ function ProtectedUserManagement() {
 }
 
 function ProtectedRenewals() {
-  return isAuthenticated() ? null : React.createElement(Navigate, { to: '/login', replace: true })
+  return isAuthenticated() ? React.createElement(RenewalManagement) : React.createElement(Navigate, { to: '/login', replace: true })
 }
 
 function ProtectedProfile() {
