@@ -1,36 +1,25 @@
-from .routes import router
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 
-from .database import engine, get_db
-from . import crud, schemas
+from app.database import engine
+from app.contracts import models
+from app.contracts.router import router as contracts_router
 
-app = FastAPI()
-app.include_router(router)
+# Create database tables automatically
+models.Base.metadata.create_all(bind=engine)
 
-# Allow React frontend to access FastAPI
+app = FastAPI(title="ContractIQ API")
+
+# Allow React to communicate with FastAPI
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-
-@app.get("/")
-def root():
-    return {"message": "FastAPI is running successfully!"}
-
-
-@app.get("/test-db")
-def test_db():
-    try:
-        with engine.connect() as connection:
-            connection.execute(text("SELECT 1"))
-        return {"message": "Database connected successfully!"}
-    except Exception as e:
-        return {"error": str(e)}
-
+# Include the modular routes
+app.include_router(contracts_router)

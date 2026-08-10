@@ -20,3 +20,4 @@ class Contract(Base):
     version = Column(String)                               # e.g., v3.2
     file_size = Column(String)                             # e.g., 2.4 MB
     uploaded_date = Column(Date)                           # e.g., 2026-01-15
+    
