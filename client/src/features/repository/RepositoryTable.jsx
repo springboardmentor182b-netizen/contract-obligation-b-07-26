@@ -7,7 +7,6 @@ export default function RepositoryTable({ data = [] }) {
   const [editingContract, setEditingContract] = useState(null);
   const [viewingContract, setViewingContract] = useState(null);
 
-  // Safely format the incoming contract data so the table can read it
   useEffect(() => {
     if (data) {
       const formatted = data.map(item => ({

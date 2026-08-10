@@ -26,7 +26,7 @@ export default function ContractTable() {
   // 1. Create a state to hold the database data
   const [contracts, setContracts] = useState([]);
 
-  // 2. Fetch the data when the component loads
+  
   useEffect(() => {
     fetch(`${API_BASE_URL}/contracts/`)
       .then(response => response.json())

@@ -17,7 +17,7 @@
 .nav-tools { display: flex; align-items: center; gap: 24px; }
 .table-toolbar { display: flex; justify-content: space-between; align-items: center; padding: 20px 24px; border-bottom: 1px solid #f1f5f9; }
 
-/* Tablet Responsiveness */
+
 @media (max-width: 1024px) {
   .stats-grid { grid-template-columns: repeat(2, 1fr); }
   .charts-grid { grid-template-columns: 1fr; }
