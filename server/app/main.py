@@ -1,36 +1,42 @@
-from .routes import router
-from fastapi import FastAPI, Depends
+from app.database import Base, engine
+from app.models.obligation import Obligation
+
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy.orm import Session
-from sqlalchemy import text
 
-from .database import engine, get_db
-from . import crud, schemas
+from app.routes.obligations import router as obligations_router
+from app.contracts.router import router as contracts_router
+app = FastAPI(
+    title="ContractIQ Obligation Tracker API",
+    version="1.0.0",
+)
+Base.metadata.create_all(bind=engine)
 
-app = FastAPI()
-app.include_router(router)
-
-# Allow React frontend to access FastAPI
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "http://localhost:3000",
+        "http://localhost:3001",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+app.include_router(
+    obligations_router,
+    prefix="/api/obligations",
+    tags=["Obligations"],
+)
 
-@app.get("/")
-def root():
-    return {"message": "FastAPI is running successfully!"}
+app.include_router(
+    contracts_router,
+    prefix="/api",
+    tags=["Contracts"],
+)
 
-
-@app.get("/test-db")
-def test_db():
-    try:
-        with engine.connect() as connection:
-            connection.execute(text("SELECT 1"))
-        return {"message": "Database connected successfully!"}
-    except Exception as e:
-        return {"error": str(e)}
-
+@app.get("/health")
+def health_check():
+    return {"status": "ok"}
