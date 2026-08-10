@@ -6,7 +6,6 @@ export default function ContractStatusChart() {
   // We start with an empty chart
   const [chartData, setChartData] = useState([]);
 
-  // Fetch the real stats from the backend when the component loads
   useEffect(() => {
     // FIXED: Changed endpoint to /dashboard/stats/
     fetch(`${API_BASE_URL}/dashboard/stats/`)
@@ -19,7 +18,7 @@ export default function ContractStatusChart() {
           { name: 'Approved', value: data.approved_count || 0, color: '#f59e0b' }, // Yellow/Orange
           { name: 'Draft', value: data.draft_count || 0, color: '#64748b' } // Gray
         ];
-        // Remove any categories that have a value of 0 so the chart looks clean
+        
         setChartData(realData.filter(item => item.value > 0));
       })
       .catch(error => console.error('Error fetching chart data:', error));

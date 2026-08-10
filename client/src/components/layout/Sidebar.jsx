@@ -20,6 +20,7 @@ const menuItems = [
   { name: 'Settings', icon: Settings, path: '/settings' },
 ];
 
+
 export default function Sidebar({ onClose, user }) {
   const location = useLocation();
 
