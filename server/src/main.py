@@ -113,17 +113,31 @@ def health() -> dict[str, str]:
 
 
 @api_router.post("/api/auth/register", response_model=UserPublic, status_code=status.HTTP_201_CREATED)
-def register(payload: UserCreate) -> dict[str, Any]:
-    if find_user_by_email(payload.email):
+def register(payload: dict[str, Any]) -> dict[str, Any]:
+    name = str(payload.get("name") or payload.get("full_name") or "").strip()
+    email = str(payload.get("email") or "").strip().lower()
+    password = str(payload.get("password") or "")
+    role = str(payload.get("role") or "").strip()
+    department = str(payload.get("department") or "").strip() or None
+
+    if not name or not email or not password or not role:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+            detail="Name, email, password, and role are required",
+        )
+    if "@" not in email or email.startswith("@") or email.endswith("@"):
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="Enter a valid email address")
+
+    if find_user_by_email(email):
         raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email is already registered")
 
     user = create_user(
         {
-            "name": payload.name,
-            "email": payload.email.lower(),
-            "password_hash": hash_password(payload.password),
-            "role": database_role(payload.role.value),
-            "department": payload.department,
+            "name": name,
+            "email": email,
+            "password_hash": hash_password(password),
+            "role": database_role(role),
+            "department": department,
         },
     )
     store.audit("registered", "user", user["id"], user["id"])
@@ -134,11 +148,14 @@ def register(payload: UserCreate) -> dict[str, Any]:
 def login(payload: dict[str, str]) -> dict[str, str]:
     email = str(payload.get("email", "")).strip()
     password = str(payload.get("password", ""))
-    if not email or not password:
-        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="Email and password are required")
+    selected_role = str(payload.get("role", "")).strip()
+    if not email or not password or not selected_role:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="Email, password, and role are required")
     user = find_user_by_email(email)
     if not user or not verify_password(password, user["password_hash"]):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid email or password")
+    if user["role"].casefold() != database_role(selected_role).casefold():
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Selected role is incorrect for this account")
     store.audit("logged in", "user", user["id"], user["id"])
     return {"access_token": create_token(user), "token_type": "bearer"}
 

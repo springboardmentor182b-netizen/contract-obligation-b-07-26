@@ -99,6 +99,7 @@ export function Auth() {
       setFormData({
         ...emptyCredentials,
         email: registrationData.email,
+        role: registrationData.role,
       })
       setRegistrationData(emptyRegistration)
       setMode('login')
