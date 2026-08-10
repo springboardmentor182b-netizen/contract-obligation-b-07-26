@@ -2,6 +2,7 @@ node_modules/
 
 __pycache__/
 *.pyc
+<<<<<<< HEAD
 .env
 server/src/database/seed_audit_report.py
 build/
@@ -12,3 +13,6 @@ __pycache__/
 *.db
 .DS_Store
 
+=======
+.env
+>>>>>>> 5b0fc5b9d (Fixed Tailwind setup, cleared git cache, and secured environment variables)
