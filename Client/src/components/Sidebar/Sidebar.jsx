@@ -3,7 +3,7 @@ import { mainMenu, accountMenu, logoutMenu } from "../../data/sidebarMenu";
 
 const Sidebar = () => {
   return (
-    <aside className="w-70 bg-[#1B1B1B] flex flex-col justify-between shadow-2xl">
+    <aside className="w-[280px] min-w-[280px] bg-[#1B1B1B] flex flex-col justify-between shadow-2xl">
       <div>
         {/* Logo */}
         <div className="px-6 py-6 border-t border-[#ECE7DE]">

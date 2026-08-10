@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-import Sidebar from "../components/Sidebar";
-import Navbar from "../components/Navbar";
+
 import DashboardCard from "../components/DashboardCard";
 import ContractGrowth from "../components/ContractGrowth";
 import ContractStatus from "../components/ContractStatus";
@@ -40,108 +39,104 @@ function Dashboard() {
   }, []);
 
   return (
-    <div className="dashboard">
-      <Sidebar />
+    <>
+      <div className="dashboard-header">
+        <div>
+          <h1>Dashboard Overview</h1>
 
-      <main className="main-content">
-        <Navbar />
-
-        <div className="dashboard-header">
-          <div>
-            <h1>Dashboard Overview</h1>
-            <p>
-              Welcome back, Jennifer. Here is your compliance snapshot for
-              today.
-            </p>
-          </div>
-
-          <div className="header-actions">
-            <button className="action-btn">
-              <FiUpload />
-            </button>
-
-            <button className="action-btn">
-              <FiPlus />
-            </button>
-
-            <button className="action-btn">
-              <FiClipboard />
-            </button>
-
-            <button className="action-btn download">
-              <FiDownload />
-            </button>
-          </div>
+          <p>
+            Welcome back, Jennifer. Here is your compliance snapshot for today.
+          </p>
         </div>
 
-        <div className="cards">
-          <DashboardCard
-            title="Total Contracts"
-            value={summary ? summary.total_contracts : "..."}
-            percent="+12%"
-          />
+        <div className="header-actions">
+          <button className="action-btn">
+            <FiUpload />
+          </button>
 
-          <DashboardCard
-            title="Active Contracts"
-            value={summary ? summary.active_contracts : "..."}
-            percent="+8%"
-          />
+          <button className="action-btn">
+            <FiPlus />
+          </button>
 
-          <DashboardCard
-            title="Under Review"
-            value={summary ? summary.under_review : "..."}
-            percent="+5%"
-          />
+          <button className="action-btn">
+            <FiClipboard />
+          </button>
 
-          <DashboardCard
-            title="Upcoming Renewals"
-            value={summary ? summary.expiring_soon : "..."}
-            percent="-2%"
-          />
+          <button className="action-btn download">
+            <FiDownload />
+          </button>
+        </div>
+      </div>
 
-          <DashboardCard
-            title="Pending Obligations"
-            value={summary ? summary.pending_obligations : "..."}
-            percent="+10%"
-          />
+      <div className="cards">
+        <DashboardCard
+          title="Total Contracts"
+          value={summary ? summary.total_contracts : "..."}
+          percent="+12%"
+        />
 
-          <DashboardCard
-            title="Compliance Rate"
-            value={summary ? `${summary.compliance_rate}%` : "..."}
-            percent="+2%"
-          />
+        <DashboardCard
+          title="Active Contracts"
+          value={summary ? summary.active_contracts : "..."}
+          percent="+8%"
+        />
+
+        <DashboardCard
+          title="Under Review"
+          value={summary ? summary.under_review : "..."}
+          percent="+5%"
+        />
+
+        <DashboardCard
+          title="Upcoming Renewals"
+          value={summary ? summary.expiring_soon : "..."}
+          percent="-2%"
+        />
+
+        <DashboardCard
+          title="Pending Obligations"
+          value={summary ? summary.pending_obligations : "..."}
+          percent="+10%"
+        />
+
+        <DashboardCard
+          title="Compliance Rate"
+          value={summary ? `${summary.compliance_rate}%` : "..."}
+          percent="+2%"
+        />
+      </div>
+
+      <div className="dashboard-grid">
+        <div className="left-column">
+          <ContractGrowth />
+
+          <ContractStatus />
+
+          <ContractsByDepartment />
+
+          <ComplianceLevels />
+
+          <RecentContracts />
+
+          <RecentActivity />
+
+          <UpcomingRenewals />
+
+          <ComplianceSummary />
+
+          <Footer />
         </div>
 
-        <div className="dashboard-grid">
-          <div className="left-column">
-            <ContractGrowth />
+        <div className="right-column"></div>
+      </div>
 
-            <ContractStatus />
-
-            <ContractsByDepartment />
-
-            <ComplianceLevels />
-
-            <RecentContracts />
-
-            <RecentActivity />
-
-            <UpcomingRenewals />
-
-            <ComplianceSummary />
-
-            <Footer />
-          </div>
-
-          <div className="right-column"></div>
-        </div>
-
-        <div className="help-button">
-          ?
-          <span className="help-tooltip">Help & Resources</span>
-        </div>
-      </main>
-    </div>
+      <div className="help-button">
+        ?
+        <span className="help-tooltip">
+          Help & Resources
+        </span>
+      </div>
+    </>
   );
 }
 
