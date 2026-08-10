@@ -104,6 +104,17 @@ body,
   z-index: 15;
 }
 
+/* Authentication forms can be taller than a small screen. */
+body:has(.login-page),
+#root:has(.login-page) {
+  overflow-y: auto;
+}
+
+.login-page {
+  min-height: 100dvh;
+  overflow-y: auto;
+}
+
 /* Global dark-mode surface and contrast rules.  Individual modules use many
    fixed light colours, so these shared overrides keep every page readable. */
 html.dark,
