@@ -8,9 +8,11 @@ from src.database.core import Base, engine
 from src.auth.controller import router as auth_router
 from src.auth.oauth_controller import router as oauth_router
 from src.users.controller import router as users_router
+from src.roles.controller import router as roles_router
 from src.todos.controller import router as todos_router
 from src.auth.models import User
 from src.todos.models import Todo
+from src.roles.models import Role
 
 app = FastAPI(
     title="Contract Obligation API", 
@@ -30,6 +32,7 @@ app.include_router(dashboard_router)
 app.include_router(auth_router)
 app.include_router(oauth_router)
 app.include_router(users_router)
+app.include_router(roles_router)
 app.include_router(todos_router)
 
 @app.on_event("startup")

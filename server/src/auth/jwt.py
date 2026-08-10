@@ -17,7 +17,9 @@ load_dotenv(BASE_DIR / ".env")
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")
-ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 30))
+ACCESS_TOKEN_EXPIRE_MINUTES = int(
+    os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 30)
+)
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 
@@ -41,36 +43,46 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
         )
 
     to_encode.update({"exp": expire})
+
     encoded_jwt = jwt.encode(
         to_encode,
         SECRET_KEY,
-        algorithm=ALGORITHM
+        algorithm=ALGORITHM,
     )
+
     return encoded_jwt
 
 
 def verify_token(token: str, credentials_exception):
+    print("SECRET_KEY:", SECRET_KEY)
+    print("ALGORITHM:", ALGORITHM)
+    print("TOKEN:", token)
+
     try:
         payload = jwt.decode(
             token,
             SECRET_KEY,
-            algorithms=[ALGORITHM]
+            algorithms=[ALGORITHM],
         )
 
+        print("PAYLOAD:", payload)
+
         email = payload.get("sub")
+
+        print("EMAIL:", email)
 
         if email is None:
             raise credentials_exception
 
         return email
 
-    except JWTError:
+    except Exception as e:
+        print("JWT ERROR:", repr(e))
         raise credentials_exception
-
 
 def get_current_user(
     token: str = Depends(oauth2_scheme),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -78,9 +90,15 @@ def get_current_user(
         headers={"WWW-Authenticate": "Bearer"},
     )
 
+    print("TOKEN:", token)
+
     email = verify_token(token, credentials_exception)
 
+    print("EMAIL:", email)
+
     user = db.query(User).filter(User.email == email).first()
+
+    print("USER:", user)
 
     if user is None:
         raise credentials_exception

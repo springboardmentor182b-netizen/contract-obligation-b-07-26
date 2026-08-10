@@ -34,7 +34,7 @@ function Login() {
       api.setToken(response.access_token);
       
       alert("Login successful!");
-      navigate("/home");
+      navigate("/dashboard");
     } catch (err) {
       setError(err.message || "Login failed");
     } finally {
