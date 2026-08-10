@@ -13,6 +13,8 @@ import {
     ChevronRight
 } from "lucide-react";
 
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+
 export default function Notification_Screen() {
 
     const [notifications, setNotifications] = useState([]);
@@ -20,15 +22,21 @@ const [stats, setStats] = useState({});
 const [activity, setActivity] = useState([]);
 const [preferences, setPreferences] = useState([]);
 
+const getPreference = (channel) =>
+    preferences.find(
+        (preference) =>
+            preference.channel.toLowerCase() === channel.toLowerCase()
+    );
+
     useEffect(() => {
         // Fetch notifications
-        fetch("http://127.0.0.1:8000/notifications")
+        fetch(`${API_BASE_URL}/notifications`)
             .then((response) => response.json())
             .then((data) => setNotifications(data))
             .catch((error) => console.error(error));
 
         // Fetch notification statistics
-        fetch("http://127.0.0.1:8000/notification-stats")
+        fetch(`${API_BASE_URL}/notification-stats`)
             .then((response) => response.json())
             .then((data) => setStats(data))
             .catch((error) => console.error(error));
@@ -36,13 +44,13 @@ const [preferences, setPreferences] = useState([]);
 
 
         // Fetch notification activity
-        fetch("http://127.0.0.1:8000/notification-activity")
+        fetch(`${API_BASE_URL}/notification-activity`)
     .then((response) => response.json())
     .then((data) => setActivity(data))
     .catch((error) => console.error(error));
 
 // Fetch notification preferences
-        fetch("http://127.0.0.1:8000/notification-preferences")
+        fetch(`${API_BASE_URL}/notification-preferences`)
           .then((response) => response.json())
           .then((data) => setPreferences(data))
            .catch((error) => console.error(error));
@@ -251,6 +259,8 @@ const [preferences, setPreferences] = useState([]);
 
             </div>
 
+            
+
         </div>
     </div>
 
@@ -281,64 +291,53 @@ const [preferences, setPreferences] = useState([]);
 
     {/* Notification Activity */}
 
-    <div className="col-lg-5">
+    
 
-        <div className="activity-section">
+<div className="col-lg-5">
 
-            <div className="section-header">
+    <div className="activity-section">
 
-                <h4>Notification Activity</h4>
+        <div className="section-header">
 
-                <p>Alerts sent this week</p>
+            <h4>Notification Activity</h4>
 
-            </div>
-<div className="chart-placeholder">
-
-    <div className="chart-grid">
-
-        <div className="chart-bars">
-
-            <div className="bar bar-1"></div>
-
-            <div className="bar bar-2"></div>
-
-            <div className="bar bar-3"></div>
-
-            <div className="bar bar-4"></div>
-
-            <div className="bar bar-5"></div>
-
-            <div className="bar bar-6"></div>
-
-            <div className="bar bar-7"></div>
+            <p>Alerts sent this week</p>
 
         </div>
 
-        <div className="chart-labels">
+        <div className="chart-placeholder">
 
-            <span>Mon</span>
+            <div className="chart-grid">
 
-            <span>Tue</span>
+                <div className="chart-bars">
 
-            <span>Wed</span>
+                    {activity.map((item) => (
+                        <div
+                            key={item.id}
+                            className="bar"
+                            style={{
+                                height: `${item.alerts_sent}px`
+                            }}
+                        ></div>
+                    ))}
 
-            <span>Thu</span>
+                </div>
 
-            <span>Fri</span>
+                <div className="chart-labels">
 
-            <span>Sat</span>
+                    {activity.map((item) => (
+                        <span key={item.id}>{item.day}</span>
+                    ))}
 
-            <span>Sun</span>
+                </div>
+
+            </div>
 
         </div>
 
     </div>
 
 </div>
-
-        </div>
-
-    </div>
 
     {/* Notification Preferences */}
 
@@ -363,13 +362,19 @@ const [preferences, setPreferences] = useState([]);
                 <i className="bi bi-envelope"></i>
             </div>
 
-            <h6>Email Notifications</h6>
+           <h6>Email Notifications</h6>
 
-            <small>124 sent</small>
+<small>
+    {getPreference("Email")?.sent_count || "0 sent"}
+</small>
 
-            <div className="mt-3">
-                <div className="toggle-switch"></div>
-            </div>
+<div className="mt-3">
+    <div
+        className={`toggle-switch ${
+            getPreference("Email")?.enabled ? "" : "off"
+        }`}
+    ></div>
+</div>
 
         </div>
     </div>
@@ -384,11 +389,17 @@ const [preferences, setPreferences] = useState([]);
 
             <h6>SMS Alerts</h6>
 
-            <small>38 sent</small>
+<small>
+    {getPreference("SMS")?.sent_count || "0 sent"}
+</small>
 
-            <div className="mt-3">
-                <div className="toggle-switch"></div>
-            </div>
+<div className="mt-3">
+    <div
+        className={`toggle-switch ${
+            getPreference("SMS")?.enabled ? "" : "off"
+        }`}
+    ></div>
+</div>
 
         </div>
     </div>
@@ -403,11 +414,17 @@ const [preferences, setPreferences] = useState([]);
 
             <h6>In-App</h6>
 
-            <small>86 sent</small>
+<small>
+    {getPreference("In-App")?.sent_count || "0 sent"}
+</small>
 
-            <div className="mt-3">
-                <div className="toggle-switch"></div>
-            </div>
+<div className="mt-3">
+    <div
+        className={`toggle-switch ${
+            getPreference("In-App")?.enabled ? "" : "off"
+        }`}
+    ></div>
+</div>
 
         </div>
     </div>
@@ -420,13 +437,19 @@ const [preferences, setPreferences] = useState([]);
                 <i className="bi bi-file-earmark-text"></i>
             </div>
 
-            <h6>Contract Expiry</h6>
+           <h6>Contract Expiry</h6>
 
-            <small>Auto</small>
+<small>
+    {getPreference("Contract Expiry")?.sent_count || "0 sent"}
+</small>
 
-            <div className="mt-3">
-                <div className="toggle-switch"></div>
-            </div>
+<div className="mt-3">
+    <div
+        className={`toggle-switch ${
+            getPreference("Contract Expiry")?.enabled ? "" : "off"
+        }`}
+    ></div>
+</div>
 
         </div>
     </div>
@@ -441,11 +464,17 @@ const [preferences, setPreferences] = useState([]);
 
             <h6>Obligation Reminders</h6>
 
-            <small>Auto</small>
+<small>
+    {getPreference("Obligation Reminders")?.sent_count || "0 sent"}
+</small>
 
-            <div className="mt-3">
-                <div className="toggle-switch"></div>
-            </div>
+<div className="mt-3">
+    <div
+        className={`toggle-switch ${
+            getPreference("Obligation Reminders")?.enabled ? "" : "off"
+        }`}
+    ></div>
+</div>
 
         </div>
     </div>
@@ -460,11 +489,17 @@ const [preferences, setPreferences] = useState([]);
 
             <h6>Security Alerts</h6>
 
-            <small>Disabled</small>
+<small>
+    {getPreference("Security Alerts")?.sent_count || "0 sent"}
+</small>
 
-            <div className="mt-3">
-                <div className="toggle-switch off"></div>
-            </div>
+<div className="mt-3">
+    <div
+        className={`toggle-switch ${
+            getPreference("Security Alerts")?.enabled ? "" : "off"
+        }`}
+    ></div>
+</div>
 
         </div>
     </div>

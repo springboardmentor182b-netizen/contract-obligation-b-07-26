@@ -1,3 +1,4 @@
+from .routes import router
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
@@ -7,6 +8,7 @@ from .database import engine, get_db
 from . import crud, schemas
 
 app = FastAPI()
+app.include_router(router)
 
 # Allow React frontend to access FastAPI
 app.add_middleware(
@@ -32,20 +34,3 @@ def test_db():
     except Exception as e:
         return {"error": str(e)}
 
-@app.get("/notifications", response_model=list[schemas.Notification])
-def get_notifications(db: Session = Depends(get_db)):
-    return crud.get_notifications(db)
-
-
-@app.get("/notification-stats", response_model=schemas.NotificationStats)
-def get_notification_stats(db: Session = Depends(get_db)):
-    return crud.get_notification_stats(db)
-
-@app.get("/notification-activity", response_model=list[schemas.NotificationActivity])
-def get_notification_activity(db: Session = Depends(get_db)):
-    return crud.get_notification_activity(db)
-
-
-@app.get("/notification-preferences", response_model=list[schemas.NotificationPreference])
-def get_notification_preferences(db: Session = Depends(get_db)):
-    return crud.get_notification_preferences(db)
