@@ -12,7 +12,7 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 
 from ..config import TOKEN_SECRET, TOKEN_TTL_SECONDS
-from ..database import find_user_by_id
+from ..database import find_user_by_id, session_is_active, touch_session
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
@@ -47,13 +47,15 @@ def _b64decode(payload: str) -> bytes:
     return base64.urlsafe_b64decode(payload + padding)
 
 
-def create_token(user: dict[str, Any]) -> str:
+def create_token(user: dict[str, Any], token_id: str | None = None) -> str:
     payload = {
         "sub": user["id"],
         "email": user["email"],
         "role": user["role"],
         "exp": int((datetime.now(timezone.utc) + timedelta(seconds=TOKEN_TTL_SECONDS)).timestamp()),
     }
+    if token_id:
+        payload["sid"] = token_id
 
     body = _b64encode(json.dumps(payload, separators=(",", ":")).encode())
     signature = hmac.new(TOKEN_SECRET.encode(), body.encode(), hashlib.sha256).digest()
@@ -94,6 +96,10 @@ def decode_token(token: str) -> dict[str, Any]:
 def get_current_user(token: str = Depends(oauth2_scheme)) -> dict[str, Any]:
     payload = decode_token(token)
 
+    token_id = payload.get("sid")
+    if token_id and not session_is_active(token_id):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="This session has been revoked")
+
     user = find_user_by_id(payload["sub"])
 
     if not user or not user.get("is_active", True):
@@ -102,6 +108,9 @@ def get_current_user(token: str = Depends(oauth2_scheme)) -> dict[str, Any]:
             detail="User is inactive or missing"
         )
 
+    if token_id:
+        touch_session(token_id)
+        user["session_id"] = token_id
     return user
 
 

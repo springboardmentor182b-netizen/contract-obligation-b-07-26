@@ -18,6 +18,7 @@ import ObligationCard from "./ObligationCard";
 function MissedObligations() {
 
     const [search, setSearch] = useState("");
+    const [filter, setFilter] = useState("all");
 
     const [obligations, setObligations] = useState([]);
 
@@ -71,6 +72,12 @@ function MissedObligations() {
 
         )
 
+        .filter((item) => {
+            if (filter === "all") return true;
+            if (filter === "overdue") return item.status === "Overdue";
+            return String(item.priority || "").toLowerCase() === filter;
+        })
+
         .sort(
 
             (a, b) =>
@@ -79,9 +86,7 @@ function MissedObligations() {
 
                 new Date(a.due_date)
 
-        )
-
-        .slice(0, 4);
+        );
 
     if (loading) {
 
@@ -221,13 +226,16 @@ function MissedObligations() {
 
                 </div>
 
-                <button className="filter-btn">
-
+                <label className="filter-btn">
                     <FunnelIcon className="filter-icon" />
-
-                    Filter
-
-                </button>
+                    <select value={filter} onChange={(event) => setFilter(event.target.value)} aria-label="Filter missed obligations">
+                        <option value="all">All obligations</option>
+                        <option value="overdue">Overdue</option>
+                        <option value="high">High priority</option>
+                        <option value="medium">Medium priority</option>
+                        <option value="low">Low priority</option>
+                    </select>
+                </label>
 
             </div>
 
@@ -244,8 +252,6 @@ function MissedObligations() {
                             <ObligationCard
 
                                 key={item.id}
-
-                                id={item.id}
 
                                 title={item.obligation_name}
 

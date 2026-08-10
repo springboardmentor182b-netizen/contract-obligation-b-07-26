@@ -2,8 +2,6 @@ import "./ComplianceReports.css";
 
 import { useEffect, useState } from "react";
 
-import { API_BASE_URL } from "../../features/authentication/constants";
-
 import {
     DocumentPlusIcon
 } from "@heroicons/react/24/outline";
@@ -61,24 +59,23 @@ function ComplianceReports() {
 
 
 
-    const handlePDF = (id)=>{
-
-        window.open(
-    `${API_BASE_URL}/api/reports/${id}/pdf`,
-    "_blank"
-);
-
-    };
-
-
-
-    const handleExcel = (id)=>{
-
-        window.open(
-    `${API_BASE_URL}/api/reports/${id}/excel`,
-    "_blank"
-);
-
+    const download = async (id, format) => {
+        try {
+            const token = localStorage.getItem("contractiq_token") || localStorage.getItem("token");
+            const response = await fetch(`${import.meta.env.VITE_API_URL || "http://127.0.0.1:8000"}/api/reports/${id}/${format}`, {
+                headers: token ? { Authorization: `Bearer ${token}` } : {},
+            });
+            if (!response.ok) throw new Error("Download failed");
+            const url = URL.createObjectURL(await response.blob());
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = `contractiq-report-${id}.${format === "excel" ? "xls" : "csv"}`;
+            link.click();
+            URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error(error);
+            alert("Unable to download the report.");
+        }
     };
 
 
@@ -144,21 +141,21 @@ function ComplianceReports() {
 
                         id={report.id}
 
-                        title={report.title}
+                        title={report.name}
 
                         department={report.department}
 
-                        generated={report.generated_date}
+                        generated={report.generated_at ? new Date(report.generated_at).toLocaleDateString() : "Today"}
 
-                        size={report.file_size}
+                        size={`${Number(report.value || 0).toLocaleString()} value`}
 
                         status={report.status}
 
                         onPreview={()=>handlePreview(report)}
 
-                        onPDF={handlePDF}
+                        onCSV={(id) => download(id, "csv")}
 
-                        onExcel={handleExcel}
+                        onExcel={(id) => download(id, "excel")}
 
                     />
 
@@ -204,7 +201,7 @@ Report Preview
 
 
 <p>
-<b>Title:</b> {selectedReport.title}
+<b>Title:</b> {selectedReport.name}
 </p>
 
 
@@ -219,12 +216,12 @@ Report Preview
 
 
 <p>
-<b>File Size:</b> {selectedReport.file_size}
+<b>Value:</b> {selectedReport.value}
 </p>
 
 
 <p>
-<b>Generated Date:</b> {selectedReport.generated_date}
+<b>Generated Date:</b> {selectedReport.generated_at ? new Date(selectedReport.generated_at).toLocaleString() : "-"}
 </p>
 
 

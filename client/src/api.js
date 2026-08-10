@@ -107,6 +107,10 @@ export function createContract(contractData) {
   return post(`${BASE}/contracts`, contractData);
 }
 
+export function importContracts(contracts) {
+  return post(`${BASE}/contracts/import`, contracts);
+}
+
 /**
  * Update an existing contract.
  */
@@ -155,6 +159,16 @@ export function exportContractsExcel(params = {}) {
     headers: getAuthHeader()
   }).then(res => {
     if (!res.ok) throw new Error('Export failed');
+    return res.blob();
+  });
+}
+
+export function exportDashboardCSV() {
+  return fetch(`${BASE}/dashboard/export/csv`, { headers: getAuthHeader() }).then(async (res) => {
+    if (!res.ok) {
+      const error = await res.json().catch(() => ({ detail: 'Dashboard export failed' }));
+      throw new Error(error.detail || 'Dashboard export failed');
+    }
     return res.blob();
   });
 }

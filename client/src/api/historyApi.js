@@ -14,18 +14,18 @@ export const getHistoryById = async (id) => {
 
 // Create History
 export const createHistory = async (history) => {
-    const response = await api.post("/history/", history);
+    const response = await api.post("/api/history/", history);
     return response.data;
 };
 
 // Update History
 export const updateHistory = async (id, history) => {
-    const response = await api.put(`/history/${id}`, history);
+    const response = await api.put(`/api/history/${id}`, history);
     return response.data;
 };
 
 // Delete History
 export const deleteHistory = async (id) => {
-    const response = await api.delete(`/history/${id}`);
+    const response = await api.delete(`/api/history/${id}`);
     return response.data;
 };

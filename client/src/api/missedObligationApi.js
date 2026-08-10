@@ -14,18 +14,18 @@ export const getMissedObligationById = async (id) => {
 
 // Create Missed Obligation
 export const createMissedObligation = async (obligation) => {
-    const response = await api.post("/missed-obligations/", obligation);
+    const response = await api.post("/api/missed-obligations/", obligation);
     return response.data;
 };
 
 // Update Missed Obligation
 export const updateMissedObligation = async (id, obligation) => {
-    const response = await api.put(`/missed-obligations/${id}`, obligation);
+    const response = await api.put(`/api/missed-obligations/${id}`, obligation);
     return response.data;
 };
 
 // Delete Missed Obligation
 export const deleteMissedObligation = async (id) => {
-    const response = await api.delete(`/missed-obligations/${id}`);
+    const response = await api.delete(`/api/missed-obligations/${id}`);
     return response.data;
 };

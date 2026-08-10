@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import SettingsCard from '../SettingsCard';
 import SettingsRow from '../SettingsRow';
 import '../SettingsShared.css';
 import './Integrations.css';
+import { getIntegrations, updateIntegrations } from '../../../api/settingsApi';
 
 const INTEGRATIONS = [
   {
@@ -74,12 +75,20 @@ const INTEGRATIONS = [
 const Integrations = () => {
   const [integrations, setIntegrations] = useState(INTEGRATIONS);
 
-  const toggleConnection = (id) => {
-    setIntegrations((prev) =>
-      prev.map((item) =>
-        item.id === id ? { ...item, connected: !item.connected } : item
-      )
-    );
+  useEffect(() => {
+    getIntegrations().then((data) => {
+      const connections = data?.connections;
+      if (!connections || typeof connections !== 'object') return;
+      setIntegrations((current) => current.map((item) => ({ ...item, connected: Boolean(connections[item.id]) })));
+    }).catch(() => {});
+  }, []);
+
+  const toggleConnection = async (id) => {
+    const next = integrations.map((item) => item.id === id ? { ...item, connected: !item.connected } : item);
+    try {
+      await updateIntegrations({ connections: Object.fromEntries(next.map((item) => [item.id, item.connected])) });
+      setIntegrations(next);
+    } catch {}
   };
 
   return (

@@ -67,3 +67,236 @@
     margin-left: 72px;
   }
 }
+
+/* Independent application scrolling: navigation and page content do not move
+   together, and the shared navbar remains visible while content is read. */
+html,
+body,
+#root {
+  height: 100%;
+  overflow: hidden;
+}
+
+.app-shell {
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.sidebar {
+  top: 0;
+  bottom: 0;
+  height: 100dvh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.app-main {
+  height: 100dvh;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 15;
+}
+
+/* Global dark-mode surface and contrast rules.  Individual modules use many
+   fixed light colours, so these shared overrides keep every page readable. */
+html.dark,
+html.dark body,
+html.dark #root,
+html.dark .app-shell,
+html.dark .app-main,
+html.dark .page-container,
+html.dark .dashboard-page,
+html.dark .settings-container,
+html.dark .reports-page,
+html.dark .users-page,
+html.dark .missed-page,
+html.dark .risk-page,
+html.dark .audit-summary-page,
+html.dark .history-page {
+  background: #111827 !important;
+  color: #e5e7eb !important;
+}
+
+html.dark .navbar,
+html.dark .header,
+html.dark .profile-settings,
+html.dark .settings-sidebar,
+html.dark .settings-content,
+html.dark .dashboard-card,
+html.dark .kpi-card,
+html.dark .stat-card,
+html.dark .audit-stat-card,
+html.dark .audit-log-card,
+html.dark .renewal-metric,
+html.dark .renewal-list-card,
+html.dark .report-metric-card,
+html.dark .reports-card,
+html.dark .reports-status-card,
+html.dark .risk-summary-card,
+html.dark .audit-summary-card,
+html.dark .overview-card,
+html.dark .compliance-score-card,
+html.dark .status-card,
+html.dark .history-card,
+html.dark .profile-card,
+html.dark .notification-card,
+html.dark .calendar-card,
+html.dark .weekly-card,
+html.dark .report-card,
+html.dark .obligation-card,
+html.dark .users-card,
+html.dark .user-stat,
+html.dark .settings-card,
+html.dark .audit-chart-card,
+html.dark .audit-table-card,
+html.dark .risk-chart-card,
+html.dark .login-card,
+html.dark .modal,
+html.dark .report-modal,
+html.dark .risk-modal,
+html.dark .user-modal,
+html.dark .preview-modal,
+html.dark [class$="-table"],
+html.dark [class$="-table-wrap"] {
+  background: #1f2937 !important;
+  border-color: #374151 !important;
+  color: #e5e7eb !important;
+}
+
+html.dark .tracker-page,
+html.dark .left-content > *,
+html.dark .right-content > *,
+html.dark .table-card,
+html.dark .compact-deadlines,
+html.dark .weekly-card,
+html.dark .settings-card,
+html.dark .settings-sidebar li.active,
+html.dark .appearance-theme-card,
+html.dark .appearance-date-format-card,
+html.dark .appearance-select-row {
+  background: #1f2937 !important;
+  border-color: #4b5563 !important;
+}
+
+html.dark .table-card th,
+html.dark .users-table th,
+html.dark .settings-sidebar li:hover,
+html.dark .compact-deadline-item,
+html.dark tbody tr:hover {
+  background: #374151 !important;
+}
+
+html.dark .table-card td,
+html.dark .table-card th,
+html.dark .obligation-code,
+html.dark .compact-deadline-item strong,
+html.dark .compact-deadline-item span,
+html.dark .compact-deadline-item time,
+html.dark .settings-sidebar .sidebar-label,
+html.dark .settings-sidebar .sidebar-sub,
+html.dark .settings-row-title,
+html.dark .settings-row-sub,
+html.dark .settings-card-title {
+  color: #f3f4f6 !important;
+}
+
+html.dark h1,
+html.dark h2,
+html.dark h3,
+html.dark h4,
+html.dark p,
+html.dark label,
+html.dark th,
+html.dark td,
+html.dark .settings-sidebar li,
+html.dark .settings-sidebar span,
+html.dark .report-meta,
+html.dark .department,
+html.dark .obligation-card .details-grid p,
+html.dark .obligation-card .details-grid label {
+  color: #e5e7eb !important;
+}
+
+html.dark .stat-value,
+html.dark .stat-label,
+html.dark .kpi-card h2,
+html.dark .kpi-card p,
+html.dark .audit-stat-card strong,
+html.dark .renewal-metric strong,
+html.dark .renewal-metric span,
+html.dark .report-metric-card strong,
+html.dark .report-metric-card p,
+html.dark .audit-card-value,
+html.dark .audit-card-title,
+html.dark .audit-card-subtitle,
+html.dark .risk-summary-card h2,
+html.dark .risk-summary-card p,
+html.dark .overview-card h2,
+html.dark .overview-card h3,
+html.dark .overview-card p,
+html.dark .card-left h2,
+html.dark .card-left h4,
+html.dark .history-card *:not(.history-status),
+html.dark .notification-card * {
+  color: #f3f4f6 !important;
+}
+
+html.dark input,
+html.dark select,
+html.dark textarea,
+html.dark .search-box,
+html.dark .filter-btn,
+html.dark .settings-input,
+html.dark .settings-select {
+  background: #111827 !important;
+  border-color: #4b5563 !important;
+  color: #f9fafb !important;
+}
+
+html.dark input::placeholder,
+html.dark textarea::placeholder {
+  color: #9ca3af !important;
+}
+
+html.dark tr,
+html.dark thead,
+html.dark tbody,
+html.dark .settings-sidebar li:hover,
+html.dark .settings-sidebar li.active {
+  border-color: #374151 !important;
+}
+
+html.dark .login-page {
+  background: #111827 !important;
+}
+
+html.dark .header-left h1,
+html.dark .header-left p,
+html.dark .profile-settings h2,
+html.dark .profile-settings .profile-details h3,
+html.dark .profile-settings .profile-details p,
+html.dark .profile-settings label,
+html.dark .profile-settings .form-group label,
+html.dark .profile-settings .btn-change-photo-text {
+  color: #f9fafb !important;
+}
+
+html.dark .profile-settings,
+html.dark .profile-settings .profile-header-card {
+  background: #1f2937 !important;
+  border-color: #374151 !important;
+}
+
+html.dark .profile-settings input,
+html.dark .profile-settings select {
+  background: #111827 !important;
+  border-color: #4b5563 !important;
+  color: #f9fafb !important;
+}

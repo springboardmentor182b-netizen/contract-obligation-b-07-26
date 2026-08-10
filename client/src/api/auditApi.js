@@ -14,18 +14,18 @@ export const getAuditById = async (id) => {
 
 // Create Audit
 export const createAudit = async (audit) => {
-    const response = await api.post("/audit/", audit);
+    const response = await api.post("/api/audit/", audit);
     return response.data;
 };
 
 // Update Audit
 export const updateAudit = async (id, audit) => {
-    const response = await api.put(`/audit/${id}`, audit);
+    const response = await api.put(`/api/audit/${id}`, audit);
     return response.data;
 };
 
 // Delete Audit
 export const deleteAudit = async (id) => {
-    const response = await api.delete(`/audit/${id}`);
+    const response = await api.delete(`/api/audit/${id}`);
     return response.data;
 };

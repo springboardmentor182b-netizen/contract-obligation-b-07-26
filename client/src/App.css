@@ -290,3 +290,88 @@ body{
   width:100%;
 
 }
+
+/* Shared application theme: applies to every routed module, not only Settings. */
+html.dark,
+html.dark body,
+html.dark .app-shell,
+html.dark .app-main,
+html.dark .page-container,
+html.dark .dashboard-page,
+html.dark .settings-container,
+html.dark .login-page {
+  background: #111827 !important;
+  color: #e5e7eb;
+}
+
+html.dark .navbar,
+html.dark .settings-content,
+html.dark .settings-sidebar,
+html.dark .settings-card,
+html.dark .dashboard-card,
+html.dark .card,
+html.dark .contract-card,
+html.dark .report-card,
+html.dark .obligation-card,
+html.dark .risk-chart-card,
+html.dark .audit-chart-card,
+html.dark .audit-table-card,
+html.dark .users-card,
+html.dark .login-card,
+html.dark .modal-content,
+html.dark .report-modal,
+html.dark .risk-modal {
+  background: #1f2937 !important;
+  border-color: #374151 !important;
+  color: #e5e7eb !important;
+}
+
+html.dark h1,
+html.dark h2,
+html.dark h3,
+html.dark h4,
+html.dark strong,
+html.dark .settings-sidebar .sidebar-label,
+html.dark .settings-content label,
+html.dark .contract-card,
+html.dark .report-title-row h3,
+html.dark .obligation-card h3,
+html.dark .details-grid p {
+  color: #f9fafb !important;
+}
+
+html.dark p,
+html.dark small,
+html.dark label,
+html.dark .settings-sidebar .sidebar-sub,
+html.dark .table td,
+html.dark .report-meta,
+html.dark .department,
+html.dark .details-grid label {
+  color: #cbd5e1 !important;
+}
+
+html.dark input,
+html.dark select,
+html.dark textarea,
+html.dark .search-box,
+html.dark .filter-btn,
+html.dark .settings-input,
+html.dark .settings-select {
+  background: #111827 !important;
+  border-color: #4b5563 !important;
+  color: #f9fafb !important;
+}
+
+html.dark table th,
+html.dark .users-table th,
+html.dark .audit-table th {
+  background: #111827 !important;
+  color: #e5e7eb !important;
+}
+
+html.dark table td,
+html.dark tr,
+html.dark .settings-sidebar li {
+  border-color: #374151 !important;
+}

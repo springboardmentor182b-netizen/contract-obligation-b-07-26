@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   FiMail,
   FiMessageSquare,
@@ -13,6 +13,7 @@ import SettingsCard from '../SettingsCard';
 import SettingsRow from '../SettingsRow';
 import ToggleSwitch from '../ToggleSwitch';
 import '../SettingsShared.css';
+import { getNotifications, updateNotifications } from '../../../api/settingsApi';
 
 const NOTIFICATION_ITEMS = [
   {
@@ -100,14 +101,23 @@ const Notifications = () => {
 
   const [saved, setSaved] = useState(false);
 
+  useEffect(() => {
+    getNotifications().then((data) => {
+      if (data && typeof data === 'object') setPrefs((current) => ({ ...current, ...data }));
+    }).catch(() => {});
+  }, []);
+
   const handleToggle = (id) => {
     setPrefs((prev) => ({ ...prev, [id]: !prev[id] }));
     setSaved(false);
   };
 
-  const handleSave = () => {
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2500);
+  const handleSave = async () => {
+    try {
+      await updateNotifications(prefs);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
+    } catch { setSaved(false); }
   };
 
   return (

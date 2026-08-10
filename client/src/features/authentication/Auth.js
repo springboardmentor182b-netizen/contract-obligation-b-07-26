@@ -98,9 +98,10 @@ export function Auth() {
 
       setFormData({
         ...emptyCredentials,
-        email: registrationData.email,
+        email: registrationData.email.trim().toLowerCase(),
         role: registrationData.role,
       })
+      setRoleTouched(true)
       setRegistrationData(emptyRegistration)
       setMode('login')
       setStatus('success')

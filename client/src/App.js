@@ -4,6 +4,7 @@ import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import './App.css'
 import Settings from './pages/Settings/Settings'
 import { UserProvider } from './context/UserContext'
+import { getAppearance } from './api/settingsApi'
 import Home from './pages/Home'
 import Notifications from './pages/Notifications.js'
 import ComplianceDashboard from './pages/ComplianceDashboard'
@@ -144,6 +145,32 @@ function isAuthenticated() {
 }
 
 export default function App() {
+  React.useEffect(() => {
+    const applyTheme = (theme) => {
+      const resolved = theme === 'system'
+        ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+        : theme
+      const root = document.documentElement
+      root.classList.toggle('dark', resolved === 'dark')
+      const colors = resolved === 'dark'
+        ? { bgPrimary: '#1f2937', bgSecondary: '#111827', bgSidebar: '#111827', bgHover: '#374151', textPrimary: '#f9fafb', textSecondary: '#d1d5db', border: '#4b5563' }
+        : { bgPrimary: '#ffffff', bgSecondary: '#f3f4f6', bgSidebar: '#111827', bgHover: '#fafafa', textPrimary: '#111827', textSecondary: '#6b7280', border: '#e5e7eb' }
+      root.style.setProperty('--bg-primary', colors.bgPrimary)
+      root.style.setProperty('--bg-secondary', colors.bgSecondary)
+      root.style.setProperty('--bg-sidebar', colors.bgSidebar)
+      root.style.setProperty('--bg-hover', colors.bgHover)
+      root.style.setProperty('--text-primary', colors.textPrimary)
+      root.style.setProperty('--text-secondary', colors.textSecondary)
+      root.style.setProperty('--border-color', colors.border)
+    }
+    applyTheme(window.localStorage.getItem('contractiq_theme') || 'light')
+    getAppearance().then((appearance) => {
+      if (!appearance?.theme) return
+      window.localStorage.setItem('contractiq_theme', appearance.theme)
+      applyTheme(appearance.theme)
+    }).catch(() => {})
+  }, [])
+
   return React.createElement(
     UserProvider,
     null,

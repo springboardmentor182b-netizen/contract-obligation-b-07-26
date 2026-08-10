@@ -5,6 +5,7 @@ import SettingsRow from '../SettingsRow';
 import ToggleSwitch from '../ToggleSwitch';
 import '../SettingsShared.css';
 import './Appearance.css';
+import { getAppearance, updateAppearance } from '../../../api/settingsApi';
 
 const ACCENT_COLORS = [
   { name: 'Blue', value: '#3b82f6' },
@@ -23,12 +24,23 @@ const THEMES = [
 ];
 
 const Appearance = () => {
-  const [selectedTheme, setSelectedTheme] = useState('light');
+  const [selectedTheme, setSelectedTheme] = useState(() => localStorage.getItem('contractiq_theme') || 'light');
   const [accentColor, setAccentColor] = useState('#3b82f6');
   const [compactMode, setCompactMode] = useState(false);
   const [language, setLanguage] = useState('en');
   const [dateFormat, setDateFormat] = useState('DD/MM/YYYY');
   const [saved, setSaved] = useState(false);
+
+  useEffect(() => {
+    getAppearance().then((data) => {
+      if (!data || typeof data !== 'object') return;
+      setSelectedTheme(data.theme || localStorage.getItem('contractiq_theme') || 'light');
+      setAccentColor(data.accent_color || '#3b82f6');
+      setCompactMode(Boolean(data.compact_mode));
+      setLanguage(data.language || 'en');
+      setDateFormat(data.date_format || 'DD/MM/YYYY');
+    }).catch(() => {});
+  }, []);
 
   const DATE_FORMATS = [
     { value: 'DD/MM/YYYY', label: 'DD/MM/YYYY', example: '05/08/2026' },
@@ -67,14 +79,30 @@ const Appearance = () => {
     }
   };
 
-  const handleSave = () => {
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2500);
+  const handleSave = async () => {
+    try {
+      await updateAppearance({ theme: selectedTheme, accent_color: accentColor, compact_mode: compactMode, language, date_format: dateFormat });
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
+    } catch { setSaved(false); }
+  };
+
+  const selectTheme = async (theme) => {
+    setSelectedTheme(theme);
+    localStorage.setItem('contractiq_theme', theme);
+    try {
+      await updateAppearance({ theme, accent_color: accentColor, compact_mode: compactMode, language, date_format: dateFormat });
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
+    } catch {
+      setSaved(false);
+    }
   };
 
   // Apply theme changes
   useEffect(() => {
     const root = document.documentElement;
+    localStorage.setItem('contractiq_theme', selectedTheme);
     if (selectedTheme === 'dark') {
       root.classList.add('dark');
       root.style.setProperty('--bg-primary', '#111827');
@@ -163,7 +191,7 @@ const Appearance = () => {
             <button
               key={theme.id}
               className={`appearance-theme-card ${selectedTheme === theme.id ? 'appearance-theme-card--active' : ''}`}
-              onClick={() => setSelectedTheme(theme.id)}
+              onClick={() => selectTheme(theme.id)}
             >
               <div className="appearance-theme-icon">{theme.icon}</div>
               <div className="appearance-theme-label">{theme.label}</div>

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react'
 import { Bell, Upload } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { createContract, getCurrentUser } from '../api'
+import { getCurrentUser, importContracts } from '../api'
 import './Navbar.css'
 
 // Contracts-only navbar: same base layout as the shared navbar, plus Import.
@@ -55,9 +55,9 @@ export default function Navbar({ onNewContract, onImportComplete }) {
         window.alert('Choose a CSV with a header row and at least one contract title.')
         return
       }
-      await Promise.all(contracts.map((contract) => createContract(contract)))
+      const result = await importContracts(contracts)
       onImportComplete?.()
-      window.alert(`${contracts.length} contract${contracts.length === 1 ? '' : 's'} imported successfully.`)
+      window.alert(`${result.imported_count} contract${result.imported_count === 1 ? '' : 's'} imported successfully. Linked obligations, renewals, notification, and import report were created.`)
     } catch (error) {
       window.alert(error.message || 'Unable to import contracts. Check the CSV data and try again.')
     }

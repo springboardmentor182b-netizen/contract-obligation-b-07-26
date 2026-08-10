@@ -43,7 +43,7 @@ export function LoginForm({
 
       <label className="field">
         <span>Role</span>
-        <select name="role" onChange={onChange} required value={roleTouched ? formData.role : ''}>
+        <select name="role" onChange={onChange} required value={formData.role}>
           <option value="">Select the role</option>
           {roles.map((role) => (
             <option key={role} value={role}>

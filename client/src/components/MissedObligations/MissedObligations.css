@@ -158,6 +158,16 @@
 
 }
 
+.filter-btn select{
+    border:0;
+    outline:0;
+    background:transparent;
+    color:#334155;
+    font:inherit;
+    font-weight:600;
+    cursor:pointer;
+}
+
 /* ===========================
    LIST
 =========================== */

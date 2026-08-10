@@ -21,7 +21,7 @@ generated,
 size,
 status,
 onPreview,
-onPDF,
+onCSV,
 onExcel
 
 }) {
@@ -134,13 +134,13 @@ onClick={onPreview}
 
         className="pdf-btn"
 
-        onClick={()=>onPDF(id)}
+onClick={()=>onCSV(id)}
 
         >
 
             <ArrowDownTrayIcon/>
 
-            PDF
+            CSV
 
         </button>
 

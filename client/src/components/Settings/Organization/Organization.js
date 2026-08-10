@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   FiGrid,
   FiGlobe,
@@ -11,6 +11,7 @@ import SettingsCard from '../SettingsCard';
 import SettingsRow from '../SettingsRow';
 import '../SettingsShared.css';
 import './Organization.css';
+import { getOrganization, updateOrganization } from '../../../api/settingsApi';
 
 const INITIAL_ORG = [
   {
@@ -82,6 +83,12 @@ const Organization = () => {
   const [editValue, setEditValue] = useState('');
   const [saved, setSaved] = useState(false);
 
+  useEffect(() => {
+    getOrganization().then((data) => {
+      if (data && typeof data === 'object') setOrgData((current) => ({ ...current, ...data }));
+    }).catch(() => {});
+  }, []);
+
   const startEdit = (field, currentValue) => {
     setEditingField(field);
     setEditValue(currentValue);
@@ -92,12 +99,16 @@ const Organization = () => {
     setEditValue('');
   };
 
-  const saveEdit = (field) => {
-    setOrgData((prev) => ({ ...prev, [field]: editValue }));
-    setEditingField(null);
-    setEditValue('');
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2500);
+  const saveEdit = async (field) => {
+    const next = { ...orgData, [field]: editValue };
+    try {
+      await updateOrganization(next);
+      setOrgData(next);
+      setEditingField(null);
+      setEditValue('');
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
+    } catch { setSaved(false); }
   };
 
   return (

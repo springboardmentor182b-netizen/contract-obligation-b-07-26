@@ -5,7 +5,7 @@ export const exportDashboard = async () => {
     try {
 
         const response = await api.get(
-            "/dashboard/export/pdf",
+            "/api/compliance-dashboard/export/csv",
             {
                 responseType: "blob",
             }
@@ -21,7 +21,7 @@ export const exportDashboard = async () => {
 
         link.setAttribute(
             "download",
-            "Compliance_Dashboard_Report.pdf"
+            "contractiq-compliance-dashboard.csv"
         );
 
         document.body.appendChild(link);

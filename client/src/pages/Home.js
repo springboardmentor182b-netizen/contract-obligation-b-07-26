@@ -10,6 +10,7 @@ import Navbar from '../layout/Navbar'
 import PageContainer from '../layout/PageContainer'
 import Sidebar from '../layout/Sidebar'
 import { getDashboard, getProfile } from '../features/dashboard/services/dashboardApi'
+import { exportDashboardCSV } from '../api'
 
 export default function Home() {
   const [dashboard, setDashboard] = useState(null)
@@ -48,6 +49,22 @@ export default function Home() {
     })
   }
 
+  async function exportDashboard() {
+    try {
+      const file = await exportDashboardCSV()
+      const url = window.URL.createObjectURL(file)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = 'contractiq-dashboard.csv'
+      document.body.appendChild(link)
+      link.click()
+      link.remove()
+      window.URL.revokeObjectURL(url)
+    } catch (requestError) {
+      setError(requestError.message || 'Unable to export dashboard data.')
+    }
+  }
+
   return React.createElement('div', { className: 'app-shell' },
     React.createElement(Sidebar, {
       profile,
@@ -64,7 +81,7 @@ export default function Home() {
           React.createElement(StatCards, { stats: dashboard.stats }),
           React.createElement('section', { className: 'dashboard-grid overview-grid' }, React.createElement(ContractVolumeChart, { data: dashboard.contracts }), React.createElement(ComplianceChart, { data: dashboard.compliance })),
           React.createElement('section', { className: 'dashboard-grid insight-grid' }, React.createElement(RenewalTrend, { data: dashboard.renewals }), React.createElement(RecentActivity, { activities: dashboard.activities })),
-          React.createElement(UpcomingDeadlines, { deadlines: dashboard.deadlines }),
+          React.createElement(UpcomingDeadlines, { deadlines: dashboard.deadlines, onExport: exportDashboard }),
         ) : null,
       ),
     ),

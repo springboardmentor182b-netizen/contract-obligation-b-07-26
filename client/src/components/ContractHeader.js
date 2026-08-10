@@ -36,7 +36,7 @@ const ContractHeader = ({ filters = {}, onStatusChange, onCategoryChange }) => {
         filename = 'contracts.csv';
       } else if (format === 'excel') {
         blob = await exportContractsExcel(filters);
-        filename = 'contracts.xlsx';
+        filename = 'contracts.xls';
       }
       
       // Create download link

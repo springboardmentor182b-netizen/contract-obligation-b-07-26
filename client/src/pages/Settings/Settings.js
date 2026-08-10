@@ -8,6 +8,7 @@ import Notifications from '../../components/Settings/Notifications/Notifications
 import Integrations from '../../components/Settings/Integrations/Integrations';
 import Organization from '../../components/Settings/Organization/Organization';
 import Appearance from '../../components/Settings/Appearance/Appearance';
+import APIKeys from '../../components/Settings/APIKeys/APIKeys';
 import Navbar from '../../layout/Navbar';
 import PageContainer from '../../layout/PageContainer';
 import Sidebar from '../../layout/Sidebar';
@@ -55,6 +56,8 @@ const Settings = () => {
         return <Organization />;
       case 'appearance':
         return <Appearance />;
+      case 'api-keys':
+        return <APIKeys />;
       default:
         return <ProfileForm />;
     }
@@ -67,6 +70,7 @@ const Settings = () => {
     { id: 'integrations',  label: 'Integrations',  sub: 'Connect external tools',    icon: <FiSettings size={18} /> },
     { id: 'organization',  label: 'Organization',  sub: 'Company settings',          icon: <VscOrganization size={18} /> },
     { id: 'appearance',    label: 'Appearance',    sub: 'Theme, colors, language',   icon: <FiDroplet size={18} /> },
+    { id: 'api-keys',      label: 'API Keys',      sub: 'Keys and webhooks',          icon: <FiSettings size={18} /> },
   ];
 
   return (

@@ -10,7 +10,6 @@ import {
 
 function ObligationCard({
 
-    id,
     title,
     contract,
     department,
@@ -39,12 +38,6 @@ function ObligationCard({
                         <ExclamationTriangleIcon className="priority-icon" />
 
                         {priority}
-
-                    </span>
-
-                    <span className="obligation-id">
-
-                        {id}
 
                     </span>
 
