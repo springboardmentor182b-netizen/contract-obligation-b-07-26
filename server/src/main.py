@@ -2,13 +2,11 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from src.database.core import Base, engine
-from src.renewals import controller
-from src.routers.routes import router
+from src.settings import controller as settings_controller
 
-# Create database tables
 Base.metadata.create_all(bind=engine)
 
-app = FastAPI(title="ContractIQ API")
+app = FastAPI(title="Settings API")
 
 app.add_middleware(
     CORSMiddleware,
@@ -18,15 +16,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Renewal Module
-app.include_router(controller.router)
-
-# Authentication Module
-app.include_router(router)
+app.include_router(settings_controller.router)
 
 
 @app.get("/")
 def root():
-    return {
-        "message": "ContractIQ API Running"
-    }
+    return {"message": "Settings API Running"}
