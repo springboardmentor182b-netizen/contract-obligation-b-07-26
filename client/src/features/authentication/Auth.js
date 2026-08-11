@@ -13,7 +13,7 @@ export function Auth() {
   const [formData, setFormData] = useState(emptyCredentials)
   const [registrationData, setRegistrationData] = useState(emptyRegistration)
   const [passwordResetData, setPasswordResetData] = useState(emptyPasswordReset)
-  const [rememberMe, setRememberMe] = useState(true)
+  const [rememberMe, setRememberMe] = useState(false)
   const [status, setStatus] = useState('idle')
   const [message, setMessage] = useState('')
   const [roleTouched, setRoleTouched] = useState(false)
@@ -44,6 +44,8 @@ export function Auth() {
     setMode(nextMode)
     setStatus('idle')
     setMessage('')
+    // A fresh login never persists the session unless the user explicitly opts in.
+    if (nextMode === 'login') setRememberMe(false)
   }
 
   async function handleSubmit(event) {

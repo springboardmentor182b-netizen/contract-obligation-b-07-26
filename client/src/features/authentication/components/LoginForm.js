@@ -14,11 +14,11 @@ export function LoginForm({
   status,
 }) {
   return (
-    <form className="login-form" onSubmit={onSubmit}>
+    <form autoComplete="off" className="login-form" onSubmit={onSubmit}>
       <label className="field">
         <span>Email address</span>
         <input
-          autoComplete="email"
+          autoComplete="off"
           name="email"
           onChange={onChange}
           placeholder="Enter your work email"
@@ -31,7 +31,7 @@ export function LoginForm({
       <label className="field">
         <span>Password</span>
         <input
-          autoComplete="current-password"
+          autoComplete="off"
           name="password"
           onChange={onChange}
           placeholder="Enter your password"
