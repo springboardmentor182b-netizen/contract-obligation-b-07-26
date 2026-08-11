@@ -4,6 +4,8 @@ FastAPI backend for contract obligation tracking, compliance monitoring, renewal
 
 ## Run locally
 
+Use Python 3.12 or 3.13. Python 3.14 is not yet supported by every project dependency.
+
 ```powershell
 cd server
 .\venv\Scripts\Activate.ps1

@@ -30,6 +30,10 @@ function statusKey(value) {
   return String(value || 'upcoming').trim().toLowerCase().replaceAll('_', ' ')
 }
 
+function displayStatus(value) {
+  return statusKey(value).replace(/\b\w/g, (letter) => letter.toUpperCase())
+}
+
 export default function RenewalManagement() {
   const [renewals, setRenewals] = useState([])
   const [contracts, setContracts] = useState([])
@@ -73,6 +77,14 @@ export default function RenewalManagement() {
     expired: renewals.filter((item) => statusKey(item.status) === 'expired' || (daysUntil(item.renewal_date) ?? 0) < 0).length,
     renewed: renewals.filter((item) => statusKey(item.status) === 'completed' || statusKey(item.status) === 'renewed').length,
   }), [renewals])
+
+  function contractDetails(item) {
+    const contract = contracts.find((entry) => entry.id === item.contract_id)
+    return {
+      name: contract?.contract_number || item.contract_name || 'Contract',
+      title: contract?.title || 'Contract renewal',
+    }
+  }
 
   function toggleSidebar() {
     setSidebarCollapsed((current) => {
@@ -148,13 +160,15 @@ export default function RenewalManagement() {
               <tbody>
                 {loading ? <tr><td colSpan="6" className="renewal-empty">Loading renewals...</td></tr> : null}
                 {!loading && !visibleRenewals.length ? <tr><td colSpan="6" className="renewal-empty">No renewal records found.</td></tr> : null}
-                {visibleRenewals.map((item) => <tr key={item.id}>
-                  <td><strong>{item.contract_name || 'Contract'}</strong><small>{item.contract_id}</small></td>
+                {visibleRenewals.map((item) => {
+                  const contract = contractDetails(item)
+                  return <tr key={item.id}>
+                  <td><strong>{contract.name}</strong><small>{contract.title}</small></td>
                   <td>{formatDate(item.renewal_date)}</td><td>{formatDate(item.reminder_date)}</td>
-                  <td><span className={`renewal-status ${statusKey(item.status).replaceAll(' ', '-')}`}>{item.status || 'Upcoming'}</span></td>
+                  <td><span className={`renewal-status ${statusKey(item.status).replaceAll(' ', '-')}`}>{displayStatus(item.status)}</span></td>
                   <td>{item.remarks || '—'}</td>
                   <td><button className="initiate-renewal-button" type="button" onClick={() => initiateRenewal(item)} disabled={statusKey(item.status) === 'in progress' || statusKey(item.status) === 'completed'}>{statusKey(item.status) === 'in progress' ? 'In Progress' : 'Initiate Renewal'}</button></td>
-                </tr>)}
+                </tr>})}
               </tbody>
             </table></div>
           </div>

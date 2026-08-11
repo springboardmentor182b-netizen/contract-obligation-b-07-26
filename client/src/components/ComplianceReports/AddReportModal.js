@@ -11,6 +11,7 @@ function AddReportModal({ close, refresh }) {
         value: "0",
         due_date: "",
     });
+    const [isSaving, setIsSaving] = useState(false);
 
     const handleChange = (event) => {
         setForm({ ...form, [event.target.name]: event.target.value });
@@ -21,6 +22,7 @@ function AddReportModal({ close, refresh }) {
             alert("Report title and department are required.");
             return;
         }
+        setIsSaving(true);
         try {
             await createReport({ ...form, value: Number(form.value || 0) });
             await refresh();
@@ -28,12 +30,14 @@ function AddReportModal({ close, refresh }) {
         } catch (error) {
             console.error(error);
             alert("Unable to generate the report.");
+        } finally {
+            setIsSaving(false);
         }
     };
 
     return (
         <div className="modal-overlay">
-            <div className="report-modal">
+            <div className="report-generate-modal">
                 <h2>Generate Report</h2>
                 <input name="title" placeholder="Report Title" value={form.title} onChange={handleChange} />
                 <select name="report_type" value={form.report_type} onChange={handleChange}>
@@ -50,9 +54,11 @@ function AddReportModal({ close, refresh }) {
                 </select>
                 <input name="value" type="number" min="0" placeholder="Report value" value={form.value} onChange={handleChange} />
                 <input type="date" name="due_date" value={form.due_date} onChange={handleChange} />
-                <div className="modal-buttons">
-                    <button className="save-btn" onClick={submit}>Generate</button>
-                    <button className="cancel-btn" onClick={close}>Cancel</button>
+                <div className="report-generate-actions">
+                    <button className="report-generate-submit" type="button" onClick={submit} disabled={isSaving}>
+                        {isSaving ? "Generating..." : "Generate Report"}
+                    </button>
+                    <button className="report-generate-cancel" type="button" onClick={close} disabled={isSaving}>Cancel</button>
                 </div>
             </div>
         </div>

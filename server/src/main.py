@@ -1494,31 +1494,6 @@ def list_reports(_: dict[str, Any] = Depends(get_current_user)) -> list[dict[str
     return list_postgres_reports()
 
 
-@api_router.get("/api/reports/{report_id}/csv")
-def export_single_report_csv(report_id: str, _: dict[str, Any] = Depends(get_current_user)) -> Response:
-    report = get_postgres_report(report_id)
-    if not report:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Report not found")
-    return csv_download(
-        f"contractiq-report-{report_id}.csv",
-        ["Name", "Type", "Department", "Status", "Value", "Due date", "Generated at"],
-        [[report.get(key) for key in ("name", "report_type", "department", "status", "value", "due_date", "generated_at")]],
-    )
-
-
-@api_router.get("/api/reports/{report_id}/excel")
-def export_single_report_excel(report_id: str, _: dict[str, Any] = Depends(get_current_user)) -> Response:
-    report = get_postgres_report(report_id)
-    if not report:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Report not found")
-    return csv_download(
-        f"contractiq-report-{report_id}.xls",
-        ["Name", "Type", "Department", "Status", "Value", "Due date", "Generated at"],
-        [[report.get(key) for key in ("name", "report_type", "department", "status", "value", "due_date", "generated_at")]],
-        media_type="application/vnd.ms-excel",
-    )
-
-
 @api_router.get("/api/reports/export/csv")
 def export_reports_csv(_: dict[str, Any] = Depends(get_current_user)) -> Response:
     reports = list_postgres_reports()
@@ -1544,6 +1519,31 @@ def export_reports_csv(_: dict[str, Any] = Depends(get_current_user)) -> Respons
         content="\n".join([header, *rows]),
         media_type="text/csv",
         headers={"Content-Disposition": "attachment; filename=contractiq-reports.csv"},
+    )
+
+
+@api_router.get("/api/reports/{report_id}/csv")
+def export_single_report_csv(report_id: str, _: dict[str, Any] = Depends(get_current_user)) -> Response:
+    report = get_postgres_report(report_id)
+    if not report:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Report not found")
+    return csv_download(
+        f"contractiq-report-{report_id}.csv",
+        ["Name", "Type", "Department", "Status", "Value", "Due date", "Generated at"],
+        [[report.get(key) for key in ("name", "report_type", "department", "status", "value", "due_date", "generated_at")]],
+    )
+
+
+@api_router.get("/api/reports/{report_id}/excel")
+def export_single_report_excel(report_id: str, _: dict[str, Any] = Depends(get_current_user)) -> Response:
+    report = get_postgres_report(report_id)
+    if not report:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Report not found")
+    return csv_download(
+        f"contractiq-report-{report_id}.xls",
+        ["Name", "Type", "Department", "Status", "Value", "Due date", "Generated at"],
+        [[report.get(key) for key in ("name", "report_type", "department", "status", "value", "due_date", "generated_at")]],
+        media_type="application/vnd.ms-excel",
     )
 
 

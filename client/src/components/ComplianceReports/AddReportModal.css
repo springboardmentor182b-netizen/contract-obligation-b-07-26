@@ -20,7 +20,7 @@ align-items:center;
 
 
 
-.report-modal{
+.report-generate-modal{
 
 background:white;
 
@@ -34,8 +34,8 @@ border-radius:16px;
 
 
 
-.report-modal input,
-.report-modal select{
+.report-generate-modal input,
+.report-generate-modal select{
 
 width:100%;
 
@@ -51,7 +51,7 @@ border-radius:8px;
 
 
 
-.modal-buttons{
+.report-generate-actions{
 
 display:flex;
 
@@ -63,23 +63,47 @@ margin-top:20px;
 
 
 
-.save-btn{
+.report-generate-submit{
 
-background:#2563eb;
+background:#2563eb !important;
 
-color:white;
+color:white !important;
 
-border:none;
+border:1px solid #2563eb !important;
 
 padding:10px 20px;
 
 border-radius:8px;
 
+font-weight:700;
+
+cursor:pointer;
+
+box-shadow:0 6px 14px rgba(37,99,235,.32);
+
 }
 
 
 
-.cancel-btn{
+.report-generate-submit:hover:not(:disabled){
+
+background:#1d4ed8 !important;
+
+border-color:#1d4ed8 !important;
+
+transform:translateY(-1px);
+
+}
+
+.report-generate-submit:disabled{
+
+opacity:.7;
+
+cursor:wait;
+
+}
+
+.report-generate-cancel{
 
 background:#e5e7eb;
 
