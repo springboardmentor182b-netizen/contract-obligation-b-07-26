@@ -104,6 +104,19 @@ body,
   z-index: 15;
 }
 
+.logout-button {
+  border: 1px solid #d8e1ee;
+  border-radius: 8px;
+  padding: 8px 12px;
+  background: #fff;
+  color: #b91c1c;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.logout-button:hover { background: #fff1f2; }
+html.dark .logout-button { background: #374151; border-color: #4b5563; color: #fecaca; }
+
 /* Authentication forms can be taller than a small screen. */
 body:has(.login-page),
 #root:has(.login-page) {

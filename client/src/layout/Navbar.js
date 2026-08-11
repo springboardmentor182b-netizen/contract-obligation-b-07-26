@@ -7,6 +7,26 @@ import { Link } from 'react-router-dom'
 export default function Navbar({ profile, pageTitle = 'Dashboard', unreadCount = 0 }) {
   const initials = profile?.name?.split(' ').map((name) => name[0]).join('').slice(0, 2).toUpperCase() || '-'
 
+  const logout = async () => {
+    const token = window.localStorage.getItem('contractiq_token')
+      || window.sessionStorage.getItem('contractiq_token')
+      || window.localStorage.getItem('access_token')
+    try {
+      await fetch(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/api/auth/logout`, {
+        method: 'POST',
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      })
+    } catch {
+      // The local logout still succeeds if the server is unavailable.
+    }
+    window.localStorage.removeItem('contractiq_token')
+    window.localStorage.removeItem('contractiq_role')
+    window.localStorage.removeItem('access_token')
+    window.sessionStorage.removeItem('contractiq_token')
+    window.sessionStorage.removeItem('contractiq_role')
+    window.location.assign('/login')
+  }
+
   return React.createElement(
     'header',
     { className: 'navbar' },
@@ -31,6 +51,7 @@ export default function Navbar({ profile, pageTitle = 'Dashboard', unreadCount =
           React.createElement('small', null, profile?.role || ''),
         ),
       ),
+      React.createElement('button', { className: 'logout-button', type: 'button', onClick: logout }, 'Logout'),
     ),
   )
 }

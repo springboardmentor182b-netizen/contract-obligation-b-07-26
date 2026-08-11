@@ -94,7 +94,7 @@ def revoke_api_key(user_id: str, key_id: str) -> bool:
     with get_connection() as connection:
         with connection.cursor() as cursor:
             cursor.execute(
-                "UPDATE api_keys SET revoked_at = NOW() WHERE api_key_id = %s AND user_id = %s AND revoked_at IS NULL",
+                "DELETE FROM api_keys WHERE api_key_id = %s AND user_id = %s",
                 (key_id, user_id),
             )
             return cursor.rowcount > 0

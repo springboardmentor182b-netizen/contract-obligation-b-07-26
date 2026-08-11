@@ -67,3 +67,13 @@ def revoke_session(user_id: str, session_id: str) -> bool:
                 (session_id, user_id),
             )
             return cursor.rowcount > 0
+
+
+def revoke_session_by_token(user_id: str, token_id: str) -> bool:
+    with get_connection() as connection:
+        with connection.cursor() as cursor:
+            cursor.execute(
+                "UPDATE user_sessions SET revoked_at = NOW() WHERE token_id = %s AND user_id = %s AND revoked_at IS NULL",
+                (token_id, user_id),
+            )
+            return cursor.rowcount > 0

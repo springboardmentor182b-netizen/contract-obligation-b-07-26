@@ -5,7 +5,7 @@ from .users import create_user, delete_user, find_user_by_email, find_user_by_id
 from .notifications import initialize_notifications_table
 from .reports import create_report, delete_report, get_report, initialize_reports_table, list_reports
 from .settings import create_api_key, get_preferences, initialize_settings_table, list_api_keys, revoke_api_key, update_preferences
-from .sessions import create_session, initialize_sessions_table, list_sessions, revoke_session, session_is_active, touch_session
+from .sessions import create_session, initialize_sessions_table, list_sessions, revoke_session, revoke_session_by_token, session_is_active, touch_session
 
 __all__ = [
     "Base",
@@ -37,6 +37,7 @@ __all__ = [
     "initialize_sessions_table",
     "list_sessions",
     "revoke_session",
+    "revoke_session_by_token",
     "session_is_active",
     "touch_session",
 ]
