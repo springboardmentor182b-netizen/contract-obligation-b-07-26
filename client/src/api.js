@@ -7,6 +7,18 @@
 
 const BASE = '/api';
 
+function errorMessage(detail, fallback = 'Request failed') {
+  if (typeof detail === 'string') return detail;
+  if (Array.isArray(detail)) {
+    return detail.map((item) => {
+      if (typeof item === 'string') return item;
+      const field = Array.isArray(item?.loc) ? item.loc.filter((part) => part !== 'body').join('.') : '';
+      return field ? `${field}: ${item?.msg || 'Invalid value'}` : item?.msg || 'Invalid request';
+    }).join('. ');
+  }
+  return fallback;
+}
+
 /** Get auth token from localStorage */
 function getAuthHeader() {
   const token = localStorage.getItem('contractiq_token')
@@ -28,10 +40,7 @@ async function get(path, params = {}) {
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({ detail: res.statusText }));
-    const detail = Array.isArray(err.detail)
-      ? err.detail.map((item) => item.msg || item.message || 'Invalid request').join(', ')
-      : err.detail;
-    throw new Error(detail || 'Request failed');
+    throw new Error(errorMessage(err.detail));
   }
   return res.json();
 }
@@ -48,7 +57,7 @@ async function post(path, data = {}) {
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({ detail: res.statusText }));
-    throw new Error(err.detail ?? 'Request failed');
+    throw new Error(errorMessage(err.detail));
   }
   return res.json();
 }
@@ -65,7 +74,7 @@ async function put(path, data = {}) {
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({ detail: res.statusText }));
-    throw new Error(err.detail ?? 'Request failed');
+    throw new Error(errorMessage(err.detail));
   }
   return res.json();
 }
@@ -78,7 +87,7 @@ async function del(path) {
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({ detail: res.statusText }));
-    throw new Error(err.detail ?? 'Request failed');
+    throw new Error(errorMessage(err.detail));
   }
   return res.status === 204 ? null : res.json();
 }

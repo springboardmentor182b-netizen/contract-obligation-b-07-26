@@ -1,17 +1,18 @@
 from pydantic import BaseModel
 from typing import Optional
-from datetime import datetime
+from datetime import date
 
 
 class ContractBase(BaseModel):
-    contract_id: str
+    title: str
+    contract_number: Optional[str] = None
     category: str
-    name: str
-    party: str
-    department: str
+    counterparty: Optional[str] = None
+    department: Optional[str] = None
     status: str
     value: Optional[float] = None
-    expiry: Optional[datetime] = None
+    effective_date: Optional[date] = None
+    expiry_date: Optional[date] = None
     version: Optional[str] = "v1.0"
 
 
@@ -20,19 +21,21 @@ class ContractCreate(ContractBase):
 
 
 class ContractUpdate(BaseModel):
+    title: Optional[str] = None
+    contract_number: Optional[str] = None
     category: Optional[str] = None
-    name: Optional[str] = None
-    party: Optional[str] = None
+    counterparty: Optional[str] = None
     department: Optional[str] = None
     status: Optional[str] = None
     value: Optional[float] = None
-    expiry: Optional[datetime] = None
+    effective_date: Optional[date] = None
+    expiry_date: Optional[date] = None
     version: Optional[str] = None
 
 
 class ContractResponse(ContractBase):
-    id: int
-    created_at: Optional[datetime] = None
+    id: str
+    created_at: Optional[date] = None
 
     class Config:
         from_attributes = True
