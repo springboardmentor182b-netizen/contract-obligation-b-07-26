@@ -15,6 +15,7 @@ import {
   FiX
 } from 'react-icons/fi';
 import { getCurrentUser } from '../api';
+import { useUser } from '../context/UserContext';
 
 import './Sidebar.css';
 
@@ -32,6 +33,8 @@ const menuItems = [
 
 
 const Sidebar = () => {
+
+  const { userData } = useUser();
 
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [user, setUser] = useState(null);
@@ -149,9 +152,11 @@ const Sidebar = () => {
 
           <div className="sidebar-profile">
 
-            <div className="sidebar-avatar">
-              {displayInitials}
-            </div>
+            {userData?.profile_image ? (
+              <img className="sidebar-avatar avatar-image" src={userData.profile_image} alt="User profile" />
+            ) : (
+              <div className="sidebar-avatar">{displayInitials}</div>
+            )}
 
 
             <div className="sidebar-user-info">

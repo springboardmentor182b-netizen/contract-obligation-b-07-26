@@ -25,7 +25,11 @@ const Navbar = () => {
         </button>
 
         <div className="user-profile-nav">
-          <div className="user-avatar-small">{getInitials()}</div>
+          {userData?.profile_image ? (
+            <img className="user-avatar-small avatar-image" src={userData.profile_image} alt="User profile" />
+          ) : (
+            <div className="user-avatar-small">{getInitials()}</div>
+          )}
           <div className="user-info">
             <span className="user-name">
               {userData ? `${userData.first_name || ''} ${userData.last_name || ''}`.trim() || 'User' : 'Loading...'}

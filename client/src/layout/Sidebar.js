@@ -1,5 +1,6 @@
 import React from 'react'
 import { NavLink } from 'react-router-dom'
+import { useUser } from '../context/UserContext'
 
 const navigationItems = [
   ['Dashboard', 'grid', '/dashboard', null], ['Contracts', 'file', '/contracts', 'total_contracts'], ['Obligations', 'check', '/obligations', 'pending_obligations'], ['Renewals', 'renew', '/renewals', 'upcoming_renewals'], ['Compliance', 'shield', '/compliance', null], ['Reports', 'chart', '/reports', null], ['Notifications', 'bell', '/notifications', null], ['Audit Logs', 'clipboard', '/audit-logs', null], ['Users', 'users', '/users', null], ['Settings', 'settings', '/settings', null],
@@ -16,8 +17,15 @@ export default function Sidebar({
   collapsed = false,
   onToggle,
 }) {
+  const { userData } = useUser()
   const counts = Object.fromEntries(stats.map((stat) => [stat.key, stat.value]))
-  const initials = profile?.name?.split(' ').map((part) => part[0]).join('').slice(0, 2).toUpperCase() || '-'
+  const displayedProfile = {
+    ...profile,
+    ...(userData || {}),
+    name: userData ? `${userData.first_name || ''} ${userData.last_name || ''}`.trim() || profile?.name : profile?.name,
+    role: userData?.job_title || profile?.role,
+  }
+  const initials = displayedProfile?.name?.split(' ').map((part) => part[0]).join('').slice(0, 2).toUpperCase() || '-'
   return React.createElement(
     'aside',
     {
@@ -43,10 +51,12 @@ export default function Sidebar({
       )),
     ),
     React.createElement('div', { className: 'sidebar-profile' },
-      React.createElement('span', { className: 'avatar sidebar-avatar' }, initials),
+      displayedProfile?.profile_image
+        ? React.createElement('img', { className: 'avatar sidebar-avatar avatar-image', src: displayedProfile.profile_image, alt: `${displayedProfile.name || 'User'} profile` })
+        : React.createElement('span', { className: 'avatar sidebar-avatar' }, initials),
       React.createElement('span', { className: 'sidebar-profile-copy' },
-        React.createElement('strong', null, profile?.name || '-'),
-        React.createElement('small', null, profile?.role || ''),
+        React.createElement('strong', null, displayedProfile?.name || '-'),
+        React.createElement('small', null, displayedProfile?.role || ''),
       ),
       React.createElement('span', { className: 'profile-chevron' }, 'v'),
       React.createElement('button', {

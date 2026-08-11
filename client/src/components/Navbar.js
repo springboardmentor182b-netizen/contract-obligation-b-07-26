@@ -1,7 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useRef } from 'react'
 import { Bell, Upload } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { getCurrentUser, importContracts } from '../api'
+import { importContracts } from '../api'
+import { useUser } from '../context/UserContext'
 import './Navbar.css'
 
 // Contracts-only navbar: same base layout as the shared navbar, plus Import.
@@ -34,15 +35,31 @@ function parseCsv(text) {
 }
 
 export default function Navbar({ onNewContract, onImportComplete }) {
-  const [user, setUser] = useState(null)
   const fileInputRef = useRef(null)
+  const { userData: user } = useUser()
 
-  useEffect(() => {
-    getCurrentUser().then(setUser).catch(() => setUser({ name: 'User', role: '' }))
-  }, [])
-
-  const displayName = user?.name || user?.full_name || 'User'
+  const displayName = `${user?.first_name || ''} ${user?.last_name || ''}`.trim() || user?.name || user?.full_name || 'User'
   const initials = displayName.split(' ').filter(Boolean).map((part) => part[0]).join('').slice(0, 2).toUpperCase() || 'U'
+
+  async function logout() {
+    const token = window.localStorage.getItem('contractiq_token')
+      || window.sessionStorage.getItem('contractiq_token')
+      || window.localStorage.getItem('access_token')
+    try {
+      await fetch(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/api/auth/logout`, {
+        method: 'POST',
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      })
+    } catch {
+      // The local logout still completes if the API is unavailable.
+    }
+    window.localStorage.removeItem('contractiq_token')
+    window.localStorage.removeItem('contractiq_role')
+    window.localStorage.removeItem('access_token')
+    window.sessionStorage.removeItem('contractiq_token')
+    window.sessionStorage.removeItem('contractiq_role')
+    window.location.assign('/login')
+  }
 
   async function handleImport(event) {
     const file = event.target.files?.[0]
@@ -89,12 +106,15 @@ export default function Navbar({ onNewContract, onImportComplete }) {
           <span className="notification-dot" />
         </Link>
         <div className="profile-summary">
-          <span className="avatar">{initials}</span>
+          {user?.profile_image
+            ? <img className="avatar avatar-image" src={user.profile_image} alt={`${displayName} profile`} />
+            : <span className="avatar">{initials}</span>}
           <span className="profile-copy">
             <strong>{displayName}</strong>
-            <small>{user?.role || ''}</small>
+            <small>{user?.job_title || user?.role || ''}</small>
           </span>
         </div>
+        <button className="logout-button" type="button" onClick={logout}>Logout</button>
       </div>
     </header>
   )

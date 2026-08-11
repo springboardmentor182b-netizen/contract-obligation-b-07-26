@@ -146,6 +146,11 @@ function isAuthenticated() {
 
 export default function App() {
   React.useEffect(() => {
+    const applyAccent = (accent) => {
+      const value = accent || '#3b82f6'
+      document.documentElement.style.setProperty('--accent-color', value)
+      document.documentElement.style.setProperty('--primary-color', value)
+    }
     const applyTheme = (theme) => {
       const resolved = theme === 'system'
         ? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
@@ -164,10 +169,16 @@ export default function App() {
       root.style.setProperty('--border-color', colors.border)
     }
     applyTheme(window.localStorage.getItem('contractiq_theme') || 'light')
+    applyAccent(window.localStorage.getItem('contractiq_accent_color'))
     getAppearance().then((appearance) => {
-      if (!appearance?.theme) return
-      window.localStorage.setItem('contractiq_theme', appearance.theme)
-      applyTheme(appearance.theme)
+      if (appearance?.theme) {
+        window.localStorage.setItem('contractiq_theme', appearance.theme)
+        applyTheme(appearance.theme)
+      }
+      if (appearance?.accent_color) {
+        window.localStorage.setItem('contractiq_accent_color', appearance.accent_color)
+        applyAccent(appearance.accent_color)
+      }
     }).catch(() => {})
   }, [])
 

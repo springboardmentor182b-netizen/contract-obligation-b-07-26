@@ -53,7 +53,11 @@ const Sidebar = () => {
       
       <div className="sidebar-footer">
         <div className="sidebar-user-block">
-          <div className="sidebar-avatar">{getInitials()}</div>
+          {userData?.profile_image ? (
+            <img className="sidebar-avatar avatar-image" src={userData.profile_image} alt="User profile" />
+          ) : (
+            <div className="sidebar-avatar">{getInitials()}</div>
+          )}
           <div className="sidebar-user-info">
             <span className="sidebar-user-name">
               {userData ? `${userData.first_name || ''} ${userData.last_name || ''}`.trim() || 'User' : 'Loading...'}

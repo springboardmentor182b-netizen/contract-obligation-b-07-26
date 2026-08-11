@@ -205,8 +205,8 @@
 }
 
 .primary-button {
-  border: 1px solid #1d4ed8;
-  background: #1d4ed8;
+  border: 1px solid var(--primary-color, #1d4ed8);
+  background: var(--primary-color, #1d4ed8);
   color: #ffffff;
   cursor: pointer;
   font: inherit;
@@ -374,4 +374,41 @@ html.dark table td,
 html.dark tr,
 html.dark .settings-sidebar li {
   border-color: #374151 !important;
+}
+
+/* Shared application accent. Settings updates these variables at runtime. */
+:root {
+  --accent-color: #3b82f6;
+  --accent-hover: #2563eb;
+  --primary-color: var(--accent-color);
+}
+
+.primary-button,
+.btn-primary,
+.settings-form-actions .btn-primary {
+  background-color: var(--accent-color) !important;
+  border-color: var(--accent-color) !important;
+}
+
+.primary-button:hover,
+.btn-primary:hover,
+.settings-form-actions .btn-primary:hover {
+  background-color: var(--accent-hover) !important;
+  border-color: var(--accent-hover) !important;
+}
+
+.link-button,
+.sidebar-link.active,
+.settings-sidebar li.active .sidebar-label {
+  color: var(--accent-color) !important;
+}
+
+.sidebar-link.active,
+.settings-sidebar li.active {
+  border-color: var(--accent-color) !important;
+}
+
+input[type='checkbox'],
+input[type='radio'] {
+  accent-color: var(--accent-color);
 }

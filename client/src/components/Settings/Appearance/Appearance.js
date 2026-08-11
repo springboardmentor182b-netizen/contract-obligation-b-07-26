@@ -35,7 +35,7 @@ const Appearance = () => {
     getAppearance().then((data) => {
       if (!data || typeof data !== 'object') return;
       setSelectedTheme(data.theme || localStorage.getItem('contractiq_theme') || 'light');
-      setAccentColor(data.accent_color || '#3b82f6');
+      setAccentColor(data.accent_color || localStorage.getItem('contractiq_accent_color') || '#3b82f6');
       setCompactMode(Boolean(data.compact_mode));
       setLanguage(data.language || 'en');
       setDateFormat(data.date_format || 'DD/MM/YYYY');
@@ -82,6 +82,7 @@ const Appearance = () => {
   const handleSave = async () => {
     try {
       await updateAppearance({ theme: selectedTheme, accent_color: accentColor, compact_mode: compactMode, language, date_format: dateFormat });
+      localStorage.setItem('contractiq_accent_color', accentColor);
       setSaved(true);
       setTimeout(() => setSaved(false), 2500);
     } catch { setSaved(false); }
@@ -155,6 +156,9 @@ const Appearance = () => {
     const root = document.documentElement;
     root.style.setProperty('--accent-color', accentColor);
     root.style.setProperty('--accent-hover', adjustColor(accentColor, -20));
+    // Older modules use --primary-color; keep both variable names synchronized.
+    root.style.setProperty('--primary-color', accentColor);
+    localStorage.setItem('contractiq_accent_color', accentColor);
   }, [accentColor]);
 
   // Apply compact mode changes
