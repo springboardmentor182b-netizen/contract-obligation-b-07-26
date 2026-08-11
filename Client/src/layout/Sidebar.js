@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 import { FileText, LayoutGrid, ShieldCheck, ClipboardCheck, RefreshCw, BarChart3, Bell, ChevronLeft } from "lucide-react";
 
 const WORKSPACE_ITEMS = [
@@ -63,7 +63,7 @@ export function Sidebar({ userName = "Sarah Chen", userRole = "Legal Manager" })
     </aside>
   );
 }
-=======
+
 const icons = {
   renewals: (
     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
@@ -137,4 +137,4 @@ function Sidebar({ open, onToggle }) {
 }
 
 export default Sidebar
->>>>>>> 5b0fc5b9d (Fixed Tailwind setup, cleared git cache, and secured environment variables)
+
