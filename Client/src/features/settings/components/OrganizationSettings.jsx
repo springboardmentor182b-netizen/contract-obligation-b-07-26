@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import {
   FiBriefcase,
   FiGlobe,
@@ -7,40 +8,26 @@ import {
   FiHeadphones,
 } from "react-icons/fi";
 
-const organizationData = [
-  {
-    icon: <FiBriefcase />,
-    title: "Company Name",
-    value: "ContractIQ Inc.",
-  },
-  {
-    icon: <FiGlobe />,
-    title: "Domain",
-    value: "contractiq.com",
-  },
-  {
-    icon: <FiCreditCard />,
-    title: "Billing Plan",
-    value: "Enterprise - 25 Seats",
-  },
-  {
-    icon: <FiDatabase />,
-    title: "Data Region",
-    value: "US East (N. Virginia)",
-  },
-  {
-    icon: <FiClock />,
-    title: "Timezone",
-    value: "Asia/Kolkata (UTC +5:30)",
-  },
-  {
-    icon: <FiHeadphones />,
-    title: "Support Contact",
-    value: "support@contractiq.com",
-  },
-];
-
 function OrganizationSettings() {
+  const [organizationData, setOrganizationData] = useState([]);
+
+  useEffect(() => {
+    // Fetch organization details from backend later
+    // Example:
+    // fetch("http://localhost:8000/settings/organization")
+    //   .then((res) => res.json())
+    //   .then((data) => setOrganizationData(data));
+  }, []);
+
+  const iconMap = {
+    company: <FiBriefcase />,
+    domain: <FiGlobe />,
+    billing: <FiCreditCard />,
+    region: <FiDatabase />,
+    timezone: <FiClock />,
+    support: <FiHeadphones />,
+  };
+
   return (
     <div className="organization-section">
 
@@ -54,40 +41,41 @@ function OrganizationSettings() {
 
       <div className="organization-card">
 
-        {organizationData.map((item) => (
+        {organizationData.length === 0 ? (
+          <p className="organization-empty">
+            No organization data available.
+          </p>
+        ) : (
+          organizationData.map((item) => (
+            <div
+              key={item.title}
+              className="organization-row"
+            >
+              <div className="organization-left">
 
-          <div
-            key={item.title}
-            className="organization-row"
-          >
+                <div className="organization-icon">
+                  {iconMap[item.type]}
+                </div>
 
-            <div className="organization-left">
+                <div>
+                  <h5 className="organization-title">
+                    {item.title}
+                  </h5>
 
-              <div className="organization-icon">
-                {item.icon}
+                  <p className="organization-value">
+                    {item.value}
+                  </p>
+                </div>
+
               </div>
 
-              <div>
-
-                <h5 className="organization-title">
-                  {item.title}
-                </h5>
-
-                <p className="organization-value">
-                  {item.value}
-                </p>
-
-              </div>
+              <button className="edit-btn">
+                Edit
+              </button>
 
             </div>
-
-            <button className="edit-btn">
-              Edit
-            </button>
-
-          </div>
-
-        ))}
+          ))
+        )}
 
       </div>
 

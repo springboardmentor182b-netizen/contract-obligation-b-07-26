@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 import {
   FiLock,
   FiShield,
@@ -6,6 +8,20 @@ import {
 } from "react-icons/fi";
 
 function SecuritySettings() {
+
+  const [security] = useState({
+    passwordUpdated: "",
+    twoFactorEnabled: false,
+    currentSession: {
+      device: "",
+      status: "",
+    },
+    otherSession: {
+      device: "",
+      lastActive: "",
+    },
+  });
+
   return (
     <div className="security-section">
 
@@ -36,7 +52,8 @@ function SecuritySettings() {
               </h4>
 
               <p className="security-desc">
-                Last changed 3 months ago
+                {security.passwordUpdated ||
+                  "No password information available"}
               </p>
 
             </div>
@@ -51,7 +68,7 @@ function SecuritySettings() {
 
       </div>
 
-      {/* Two Factor Authentication */}
+      {/* Two Factor */}
 
       <div className="security-card">
 
@@ -70,22 +87,34 @@ function SecuritySettings() {
               </h4>
 
               <p className="security-desc">
-                Authenticator app is enabled
+
+                {security.twoFactorEnabled
+                  ? "Enabled"
+                  : "Disabled"}
+
               </p>
 
             </div>
 
           </div>
 
-          <span className="status enabled">
-            Enabled
+          <span
+            className={`status ${
+              security.twoFactorEnabled
+                ? "enabled"
+                : "disabled"
+            }`}
+          >
+            {security.twoFactorEnabled
+              ? "Enabled"
+              : "Disabled"}
           </span>
 
         </div>
 
       </div>
 
-      {/* Active Sessions */}
+      {/* Sessions */}
 
       <h3 className="card-heading">
         Active Sessions
@@ -104,11 +133,12 @@ function SecuritySettings() {
             <div>
 
               <h5 className="session-title">
-                Windows • Chrome
+                {security.currentSession.device ||
+                  "No Active Session"}
               </h5>
 
               <p className="session-desc">
-                Current Session
+                {security.currentSession.status}
               </p>
 
             </div>
@@ -132,11 +162,12 @@ function SecuritySettings() {
             <div>
 
               <h5 className="session-title">
-                Android • Chrome
+                {security.otherSession.device ||
+                  "No Device"}
               </h5>
 
               <p className="session-desc">
-                Last active yesterday
+                {security.otherSession.lastActive}
               </p>
 
             </div>

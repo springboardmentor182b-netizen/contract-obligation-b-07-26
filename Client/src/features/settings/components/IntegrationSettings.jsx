@@ -1,119 +1,136 @@
-const integrations = [
-  {
-    name: "Slack",
-    description: "Contract and compliance notifications",
-    initials: "SL",
-    connected: true,
-    color: "#4A154B",
-  },
-  {
-    name: "Salesforce",
-    description: "CRM contract synchronization",
-    initials: "SF",
-    connected: true,
-    color: "#00A1E0",
-  },
-  {
-    name: "DocuSign",
-    description: "Electronic signature workflow",
-    initials: "DS",
-    connected: false,
-    color: "#FFB300",
-  },
-  {
-    name: "Google Drive",
-    description: "Cloud document storage",
-    initials: "GD",
-    connected: false,
-    color: "#34A853",
-  },
-  {
-    name: "Microsoft Teams",
-    description: "Team collaboration and alerts",
-    initials: "MT",
-    connected: false,
-    color: "#6264A7",
-  },
-  {
-    name: "OneDrive",
-    description: "Microsoft cloud storage",
-    initials: "OD",
-    connected: false,
-    color: "#0078D4",
-  },
-  {
-    name: "Dropbox",
-    description: "File sharing and storage",
-    initials: "DB",
-    connected: false,
-    color: "#0061FF",
-  },
-  {
-    name: "Outlook",
-    description: "Email and calendar integration",
-    initials: "OL",
-    connected: false,
-    color: "#0078D4",
-  },
-];
+import { useState } from "react";
+import {
+  FiMail,
+  FiMessageSquare,
+  FiBell,
+  FiRefreshCw,
+  FiCalendar,
+  FiAlertCircle,
+  FiCheckCircle,
+  FiFileText,
+} from "react-icons/fi";
 
-function IntegrationSettings() {
+function NotificationSettings() {
+  const [settings, setSettings] = useState({
+    email: false,
+    sms: false,
+    app: false,
+    renewal: false,
+    obligations: false,
+    compliance: false,
+    approval: false,
+    digest: false,
+  });
+
+  const toggle = (key) => {
+    setSettings((prev) => ({
+      ...prev,
+      [key]: !prev[key],
+    }));
+  };
+
+  const items = [
+    {
+      key: "email",
+      icon: <FiMail />,
+      title: "Email Notifications",
+      desc: "Receive updates via email.",
+    },
+    {
+      key: "sms",
+      icon: <FiMessageSquare />,
+      title: "SMS Notifications",
+      desc: "Receive important alerts via SMS.",
+    },
+    {
+      key: "app",
+      icon: <FiBell />,
+      title: "In-App Notifications",
+      desc: "Get alerts inside the application.",
+    },
+    {
+      key: "renewal",
+      icon: <FiRefreshCw />,
+      title: "Contract Renewals",
+      desc: "Receive reminders before contracts expire.",
+    },
+    {
+      key: "obligations",
+      icon: <FiCalendar />,
+      title: "Obligation Due Dates",
+      desc: "Get notified before obligation deadlines.",
+    },
+    {
+      key: "compliance",
+      icon: <FiAlertCircle />,
+      title: "Compliance Alerts",
+      desc: "Receive compliance and risk notifications.",
+    },
+    {
+      key: "approval",
+      icon: <FiCheckCircle />,
+      title: "Approval Requests",
+      desc: "Stay informed about approval workflows.",
+    },
+    {
+      key: "digest",
+      icon: <FiFileText />,
+      title: "Weekly Digest",
+      desc: "Receive a weekly activity summary.",
+    },
+  ];
+
   return (
-    <div className="integration-section">
+    <div className="notification-section">
 
       <h2 className="section-title">
-        Integrations
+        Notification Preferences
       </h2>
 
       <p className="section-subtitle">
-        Connect external applications and services to streamline your workflow.
+        Choose how you want to receive updates and reminders.
       </p>
 
-      <div className="integration-card">
+      <div className="notification-card">
 
-        {integrations.map((item) => (
+        {items.map((item) => (
 
           <div
-            key={item.name}
-            className="integration-row"
+            key={item.key}
+            className="notification-row"
           >
 
-            <div className="integration-left">
+            <div className="notification-left">
 
-              <div
-                className="integration-logo"
-                style={{
-                  background: item.color,
-                }}
-              >
-                {item.initials}
+              <div className="notification-icon">
+                {item.icon}
               </div>
 
               <div>
 
-                <h5 className="integration-title">
-                  {item.name}
+                <h5 className="notification-title">
+                  {item.title}
                 </h5>
 
-                <p className="integration-desc">
-                  {item.description}
+                <p className="notification-desc">
+                  {item.desc}
                 </p>
 
               </div>
 
             </div>
 
-            <button
-              className={
-                item.connected
-                  ? "disconnect-btn"
-                  : "connect-btn"
-              }
-            >
-              {item.connected
-                ? "Disconnect"
-                : "Connect"}
-            </button>
+            <label className="switch">
+
+              <input
+                type="checkbox"
+                checked={settings[item.key]}
+                onChange={() => toggle(item.key)}
+              />
+
+              <span className="slider"></span>
+
+            </label>
 
           </div>
 
@@ -121,8 +138,16 @@ function IntegrationSettings() {
 
       </div>
 
+      <div className="button-group">
+
+        <button className="save-btn">
+          Save Preferences
+        </button>
+
+      </div>
+
     </div>
   );
 }
 
-export default IntegrationSettings;
+export default NotificationSettings;
