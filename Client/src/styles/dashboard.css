@@ -1,0 +1,1223 @@
+/* =========================================================
+   GLOBAL
+========================================================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+html,
+body {
+    width: 100%;
+    min-height: 100%;
+    overflow-x: hidden;
+    background: #F5F7FB;
+}
+
+body {
+    color: #111827;
+}
+
+.dashboard-page {
+    width: 100%;
+}
+
+/* =========================================================
+   DASHBOARD HEADER
+========================================================= */
+.dashboard{
+    display:flex;
+    min-height:100vh;
+    width:100%;
+    background:#F5F7FB;
+}
+
+.main-content{
+    flex:1;
+    margin-left:280px;
+    padding:20px 28px;
+    padding-top:80px;
+    overflow-x:hidden;
+    width:calc(100% - 280px);
+}
+
+.dashboard-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    margin-top:10px;
+    margin-bottom:20px;
+    padding-left:8px;
+}
+
+.dashboard-title{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+}
+
+.dashboard-title h1{
+    text-align:left;
+}
+
+.dashboard-title p{
+    text-align:left;
+}
+
+.dashboard-header h1{
+    font-size:22px;
+    font-weight:700;
+    color:#111827;
+}
+
+.dashboard-header p{
+    margin-top:2px;
+    color:#6B7280;
+    font-size:13px;
+}
+
+.header-actions{
+    display:flex;
+    gap:12px;
+    align-items:center;
+}
+
+.action-btn{
+    width:42px;
+    height:42px;
+    border-radius:50%;
+    border:1px solid #E5E7EB;
+    background:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    transition:.25s;
+}
+
+.action-btn:hover{
+    background:#F3F4F6;
+}
+
+.action-btn.download{
+    background:#F59E0B;
+    color:white;
+    border:none;
+}
+
+.action-btn.download:hover{
+    background:#E28B06;
+}
+
+/* =========================================================
+   DASHBOARD CARDS
+========================================================= */
+.cards{
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap: 8px;
+    margin-bottom:4px;
+    width:100%;
+}
+
+.dashboard-card{
+    background:#fff;
+    border-radius:18px;
+    padding:12px;
+    position:relative;
+    box-shadow:0 4px 12px rgba(0,0,0,.06);
+    transition:.25s;
+}
+
+.dashboard-card:hover{
+    transform:translateY(-2px);
+    box-shadow:0 8px 20px rgba(0,0,0,.08);
+}
+
+.card-icon{
+    width:36px;
+    height:36px;
+    border-radius:10px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:16px;
+    margin-bottom:8px;
+}
+
+.card-info{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    margin-top:10px;
+}
+
+.card-value{
+    font-size:24px;
+    font-weight:700;
+    color:#111827;
+    margin:0;
+    line-height:1;
+}
+
+.card-title{
+    margin-top:6px;
+    font-size:13px;
+    color:#6B7280;
+    text-align:left;
+}
+
+.card-percent{
+    position:absolute;
+    top:10px;
+    right:10px;
+    font-size:10px;
+    font-weight:700;
+}
+
+/* =========================================================
+   DASHBOARD GRID
+========================================================= */
+
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 24px;
+    width: 100%;
+    align-items: start;
+}
+
+.left-column,
+.right-column {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1600px) {
+    .cards {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 900px) {
+    .cards {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 650px) {
+    .cards {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-header {
+        flex-direction: column;
+        gap: 18px;
+    }
+
+    .header-actions {
+        align-self: flex-start;
+    }
+}
+
+
+/* =========================================================
+   CONTRACT GROWTH
+========================================================= */
+
+.growth-chart {
+    width: 100%;
+    height: 220px;
+}
+
+.growth-legend {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    margin-top: 12px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.legend-dot.total {
+    background: #F59E0B;
+}
+
+.legend-dot.active {
+    background: #16A34A;
+}
+
+/* =========================================================
+   COMPLIANCE SUMMARY
+========================================================= */
+.summary-section{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    margin-bottom:8px;
+    padding-bottom: 0;
+    gap:18px;
+}
+
+.summary-card{
+    background:#fff;
+    border-radius:14px;
+    padding:14px;
+    display:flex;
+    align-items:center;
+    gap:16px;
+    box-shadow:0 4px 12px rgba(0,0,0,.06);
+}
+
+.summary-card svg{
+    font-size:28px;
+}
+
+.summary-card h2{
+    margin:0;
+    font-size:20px;
+    color:#111827;
+}
+
+.summary-card p{
+    margin-top:2px;
+    color:#6B7280;
+    font-size:13px;
+}
+
+.green svg{ color:#22C55E; }
+.orange svg{ color:#F59E0B; }
+.red svg{ color:#EF4444; }
+.purple svg{ color:#8B5CF6; }
+.pink svg{ color:#EC4899; }
+
+
+/* =========================================================
+   CONTRACT STATUS
+========================================================= */
+
+.status-content {
+    display: flex;
+    gap: 120px;
+    align-items: center;
+    justify-content:flex-start;
+    padding-left:70px;
+}
+
+.status-chart {
+    width: 190px;
+    height: 190px;
+    margin-left:80px;
+}
+
+.status-list {
+    flex: 1;
+    margin-left:100px;
+}
+
+.status-row {
+    display: flex;
+    align-items:center;
+    justify-content:flex-start;
+    gap:35px;
+    margin-bottom:16px;
+}
+
+.status-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width:170px;
+}
+
+.status-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+/* =========================================
+   COMPLIANCE LEVELS
+========================================= */
+
+.compliance-card{
+    background:#FFFFFF;
+    border-radius:20px;
+    padding:24px;
+
+    box-shadow:
+        0 2px 6px rgba(15,23,42,.04),
+        0 8px 24px rgba(15,23,42,.05);
+}
+
+.chart-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    margin-bottom:20px;
+}
+
+.chart-header h2{
+    font-size:22px;
+    font-weight:700;
+    color:#111827;
+}
+
+.chart-header p{
+    font-size:14px;
+    color:#6B7280;
+    margin-top:4px;
+}
+
+.compliance-content{
+    display:flex;
+    flex-direction: column;
+    align-items:center;
+    justify-content:center;
+    gap:20px;
+}
+
+.pie-chart{
+    width:220px;
+    height:220px;
+    display:flex;
+    justify-content:center;
+    align-items: center;
+    margin:0 auto;
+    margin-top: -35px;
+}
+
+.compliance-legend{
+    width:85%;
+    margin: 0 auto;
+}
+
+.legend-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:10px 0;
+    border-bottom:1px solid #F3F4F6;
+}
+
+.legend-row:last-child{
+    border-bottom:none;
+}
+
+.legend-left{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.legend-dot{
+    width:12px;
+    height:12px;
+    border-radius:50%;
+}
+
+.legend-name{
+    font-size:15px;
+    color:#374151;
+}
+
+.legend-value{
+    font-size:16px;
+    font-weight:700;
+    color:#111827;
+}
+
+/* =========================================
+   RECENT CONTRACTS
+========================================= */
+
+.recent-contracts{
+    background:#FFFFFF;
+    border-radius:20px;
+    padding:18px;
+
+    box-shadow:
+        0 2px 6px rgba(15,23,42,.04),
+        0 8px 24px rgba(15,23,42,.05);
+
+    width:100%;
+}
+
+.table-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    width:100%;
+    margin-bottom:14px;
+}
+
+.table-header h2{
+    font-size:22px;
+    font-weight:700;
+    color:#111827;
+}
+
+.table-subtitle{
+    margin-top:4px;
+    font-size:14px;
+    color:#6B7280;
+}
+
+.view-all-btn{
+    margin-left:auto;
+    background:#FFF7ED;
+    color:#D97706;
+    border:none;
+    padding:8px 14px;
+    border-radius:10px;
+    font-size:13px;
+    font-weight:600;
+    cursor:pointer;
+    width:auto;
+    min-width:90px;
+    height:36px;
+    transition:.2s;
+}
+
+.view-all-btn:hover{
+    background:#F59E0B;
+    color:white;
+}
+
+.table-wrapper{
+    overflow-x:auto;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+thead tr{
+    border-bottom:1px solid #E5E7EB;
+}
+
+thead th{
+    padding:10px 10px;
+
+    text-align:left;
+
+    font-size:12px;
+    font-weight:700;
+
+    color:#6B7280;
+}
+
+tbody tr{
+    border-bottom:1px solid #F3F4F6;
+}
+
+tbody td{
+    padding:12px 10px;
+
+    font-size:13px;
+
+    color:#374151;
+}
+
+tbody tr:last-child{
+    border-bottom:none;
+}
+
+tbody tr:hover{
+    background:#FAFAFA;
+}
+
+.status{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+
+    padding:4px 10px;
+
+    border-radius:999px;
+
+    font-size:11px;
+    font-weight:600;
+}
+
+.status-dot{
+    width:8px;
+    height:8px;
+    border-radius:50%;
+}
+
+.status.active{
+    background:#DCFCE7;
+    color:#16A34A;
+}
+
+.status.active .status-dot{
+    background:#16A34A;
+}
+
+.status.pending{
+    background:#FEF3C7;
+    color:#D97706;
+}
+
+.status.pending .status-dot{
+    background:#D97706;
+}
+
+.status.review{
+    background:#DBEAFE;
+    color:#2563EB;
+}
+
+.status.review .status-dot{
+    background:#2563EB;
+}
+
+.action-icons{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+
+    color:#6B7280;
+
+    cursor:pointer;
+}
+
+.action-icons svg:hover{
+    color:#F59E0B;
+}
+
+.recent-contracts,
+.contract-growth-card,
+.compliance-card,
+.contract-status-card,
+.renewals-card,
+.recent-activity {
+    background: #FFFFFF;
+    border: 1px solid #ECECEC;
+    border-radius: 18px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    width: 100%;
+}
+
+table-header,
+.contract-growth-header,
+.chart-header,
+.activity-header,
+.renewals-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+}
+
+.table-header h2,
+.contract-growth-header h2,
+.chart-header h2,
+.activity-header h2,
+.renewals-header h3 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #111827;
+}
+
+.table-subtitle,
+.contract-growth-header p,
+.chart-header p {
+    font-size: 14px;
+    color: #6B7280;
+    margin-top: 4px;
+}
+
+.status.under-review{
+    background:#DBEAFE;
+    color:#2563EB;
+}
+
+.status.under-review .status-dot{
+    background:#2563EB;
+}
+
+.status.expired{
+    background:#FEE2E2;
+    color:#DC2626;
+}
+
+.status.expired .status-dot{
+    background:#DC2626;
+}
+
+.status.draft{
+    background:#F3F4F6;
+    color:#6B7280;
+}
+
+.status.draft .status-dot{
+    background:#6B7280;
+}
+
+
+/* =========================================================
+   RECENT ACTIVITY
+========================================================= */
+
+.recent-activity{
+    padding:14px 18px;
+    background:#fff;
+    border-radius:18px;
+    box-shadow:0 4px 12px rgba(0,0,0,.06);
+    overflow:hidden;
+    width:100%;
+}
+
+.actions-icons svg{
+    font-size:13px;
+}
+
+.activity-header{
+    margin-bottom: 12px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:14px 18px;
+    border-bottom:1px solid #ECECEC;
+}
+
+.activity-header h2{
+    font-size:20px;
+    font-weight:700;
+    color:#111827;
+    margin:0;
+}
+
+.view-all{
+    color:#F59E0B;
+    font-size:14px;
+    font-weight:600;
+    cursor:pointer;
+    transition:.25s;
+}
+
+.view-all:hover{
+    color:#D97706;
+}
+
+.activity-item{
+    display:flex;
+    align-items:flex-start;
+    gap:12px;
+    padding:10px 0;
+    border-bottom:1px solid #F3F4F6;
+}
+
+.activity-item:last-child{
+    border-bottom:none;
+}
+
+.activity-icon{
+    width:34px;
+    height:34px;
+    min-width:34px;
+    border-radius:10px;
+    background:#FFF7ED;
+    color:#F59E0B;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:13px;
+    gap:6px;
+}
+
+.activity-content{
+    flex:1;
+    display: flex;
+    flex-direction:column;
+    align-items:flex-start;
+    text-align:left;
+}
+
+.activity-content h4{
+    font-size:13px;
+    font-weight:600;
+    color:#111827;
+    margin:0;
+}
+
+.activity-content p{
+    font-size:12px;
+    color:#6B7280;
+    margin-top:2px;
+    line-height:1.3;
+}
+
+.activity-time{
+    font-size:11px;
+    color:#9CA3AF;
+    white-space:nowrap;
+}
+
+.recent-contracts th:nth-child(1),
+.recent-contracts td:nth-child(1){
+    width:130px;
+    min-width:130px;
+    max-width:130px;
+}
+
+.recent-contracts td:first-child{
+    color:#ED6C09;
+    font-weight:600;
+}
+
+.recent-contracts th:nth-child(2),
+.recent-contracts td:nth-child(2){
+    width:80px;
+    min-width:80px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+.recent-contracts th:nth-child(3),
+.recent-contracts td:nth-child(3){
+    width:100px;
+    max-width:100px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+.recent-contracts th:nth-child(4),
+.recent-contracts td:nth-child(4){
+    width:80px;
+    max-width:90px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+.recent-contracts th:nth-child(5),
+.recent-contracts td:nth-child(5){
+    width:90px;
+    max-width:140px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+.recent-contracts th:nth-child(6),
+.recent-contracts td:nth-child(6){
+    width:120px;
+}
+
+.recent-contracts th:nth-child(7),
+.recent-contracts td:nth-child(7){
+    width:95px;
+    min-width:95px;
+    max-width:95px;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+}
+
+.recent-contracts th:nth-child(8),
+.recent-contracts td:nth-child(8){
+    width:55px;
+    min-width:55px;
+    max-width:55px;
+    text-align:center;
+}
+
+.recent-contracts th:nth-child(9),
+.recent-contracts td:nth-child(9){
+    width:80px;
+    min-width:80px;
+    max-width:80px;
+    text-align:center;
+}
+
+
+/* =========================================================
+   UPCOMING RENEWALS
+========================================================= */
+.renewals-card{
+    background:#fff;
+    border:1px solid #ececec;
+    border-radius:18px;
+    overflow:hidden;
+    margin-top:0px;
+    box-shadow:0 4px 12px rgba(0,0,0,.05);
+}
+
+.renewals-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:14px 18px;
+    border-bottom:1px solid #f1f1f1;
+}
+
+.renewals-header .left{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.renewals-header h3{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin:0;
+    font-size:18px;
+    font-weight:700;
+    color:#111827;
+}
+
+.badge{
+    background:#FEE2E2;
+    color:#DC2626;
+    padding:4px 10px;
+    border-radius:20px;
+    font-size:11px;
+    font-weight:600;
+}
+
+.filters{
+    display:flex;
+    gap:10px;
+}
+
+.filters button{
+    background:#fafafa;
+    border:1px solid #ececec;
+    color:#555;
+    padding:5px 12px;
+    border-radius:10px;
+    font-size:12px;
+    cursor:pointer;
+    transition:.2s;
+}
+
+.filters button:hover{
+    background:#F59E0B;
+    color:#fff;
+    border-color:#F59E0B;
+}
+
+.renewal-row{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:12px 18px;
+    border-bottom:1px solid #f1f1f1;
+}
+
+.renewal-row:last-child{
+    border-bottom:none;
+}
+
+.renewal-left{
+    display:flex;
+    align-items:center;
+    gap:14px;
+}
+
+.renewal-icon{
+    width:36px;
+    height:36px;
+    border-radius:50%;
+    background:#Fef3c7;
+    color:#D97706;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:15px;
+    flex-shrink:0;
+}
+
+.renewal-left h4{
+    margin:0;
+    font-size:14px;
+    font-weight:600;
+    color:#111827;
+}
+
+.renewal-left p{
+    margin-top:3px;
+    font-size:12px;
+    color:#6B7280;
+}
+
+.renewal-right{
+    display:flex;
+    align-items:center;
+    gap:20px;
+}
+
+.days{
+    width:70px;
+    text-align:center;
+}
+
+.days-number{
+    font-size:30px;
+    font-weight:700;
+    line-height:1;
+}
+
+.days-number.high-risk{
+    color:#DC2626;
+}
+
+.days-number.medium-risk{
+    color:#ea580c;
+}
+
+.days-number.low-risk{
+    color:#ca8a04;
+}
+
+.days-text{
+    margin-top:4px;
+    font-size:11px;
+    color:#9CA3AF;
+}
+
+.risk-badge{
+    width:90px;
+    text-align:center;
+    font-size:12px;
+    font-weight:600;
+}
+
+.risk-badge.high-risk{
+    color:#DC2626;
+}
+
+.risk-badge.medium-risk{
+    color:#EA580C;
+}
+
+.risk-badge.low-risk{
+    color:#CA8A04;
+}
+
+.renew-btn{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    background:none;
+    border:none;
+    color:#C67A1C;
+    font-size:12px;
+    font-weight:600;
+    cursor:pointer;
+    transition:.2s;
+}
+
+.renew-btn:hover{
+    color:#B45309;
+}
+
+/* =========================================================
+   COMMON
+========================================================= */
+
+.recharts-default-tooltip {
+    border-radius: 12px !important;
+    border: 1px solid #E5E7EB !important;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+}
+
+.table-wrapper::-webkit-scrollbar {
+    height: 8px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb {
+    background: #D1D5DB;
+    border-radius: 8px;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 1200px) {
+
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .summary-section {
+        grid-template-columns: repeat(2,1fr);
+    }
+
+    .compliance-content,
+    .status-content {
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 768px) {
+
+    .summary-section {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-header {
+        flex-direction: column;
+        gap: 18px;
+    }
+
+    .header-actions {
+        align-self: flex-start;
+    }
+
+    .cards {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ====================
+   HELP BUTTOM
+===================== */
+.help-button{
+    position:fixed;
+    bottom:12px;
+    right:20px;
+
+    width:40px;
+    height:40px;
+
+    background:#0C0C0C;
+    color:#fff;
+
+    border-radius:50%;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+
+    font-size:28px;
+    font-weight:bold;
+
+    cursor:pointer;
+
+    box-shadow:0 8px 18px rgba(0,0,0,.25);
+
+    z-index:9999;
+
+    transition:.25s;
+}
+
+.help-tooltip{
+    position:absolute;
+    right:65px;
+    white-space:nowrap;
+    background:#111827;
+    color:#fff;
+    padding:8px 12px;
+    border-radius:6px;
+    font-size:12px;
+    opacity:0;
+    visibility:hidden;
+    transition:.2s;
+}
+
+.help-button:hover .help-tooltip{
+    opacity:1;
+    visibility:visible;
+}
+
+.help-button:hover{
+    transform:scale(1.08);
+    background:#1F2937
+}
+
+.chart-title{
+    display:flex;
+    flex-direction: column;
+    align-items:flex-start;
+    margin-bottom:14px;
+}
+
+.chart-title h3{
+    font-size:20px;
+    font-weight:700;
+    color:#111827;
+    margin:0;
+}
+
+.chart-title span{
+    margin-top:4px;
+    font-size:13px;
+    color:#6B7280;
+    text-align:left;
+}
+
+.contract-department-card{
+    background:#FFFFFF!important;
+}
+
+.dashboard-footer{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:18px 12px;
+    margin-top:20px;
+    border-top:1px solid #ECECEC;
+    color:#6B7280;
+    font-size:13px;
+}
+
+.footer-left{
+    flex:1;
+    text-align:left;
+}
+
+.footer-center{
+    flex:1;
+    text-align:center;
+    font-weight:600;
+}
+
+.footer-right{
+    flex:1;
+    display:flex;
+    justify-content:flex-end;
+    gap:22px;
+}
+
+.footer-right a{
+    color:#6B7280;
+    text-decoration:none;
+}
+
+.footer-right a:hover{
+    color:#D88B1E;
+}
