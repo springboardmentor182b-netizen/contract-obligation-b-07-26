@@ -1,7 +1,9 @@
 import axios from 'axios'
 
 const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || "/api",
+  // Callers already use paths beginning with /api.  Keeping the origin here
+  // prevents production requests such as /api/api/dashboard.
+  baseURL: import.meta.env.VITE_API_URL || '',
   headers: { 'Content-Type': 'application/json' },
   timeout: 15000,
 })

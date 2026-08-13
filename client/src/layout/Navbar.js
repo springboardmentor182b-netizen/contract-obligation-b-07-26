@@ -20,7 +20,7 @@ export default function Navbar({ profile, pageTitle = 'Dashboard', unreadCount =
       || window.sessionStorage.getItem('contractiq_token')
       || window.localStorage.getItem('access_token')
     try {
-      await fetch(`${import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000'}/api/auth/logout`, {
+      await fetch(`${import.meta.env.VITE_API_URL || ''}/api/auth/logout`, {
         method: 'POST',
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       })

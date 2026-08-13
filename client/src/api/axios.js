@@ -1,8 +1,9 @@
 import axios from 'axios';
 
 const api = axios.create({
-  // Using the Vite proxy defined in vite.config.js
-  baseURL: import.meta.env.VITE_API_BASE_URL || '/api',
+  // API helpers already use paths beginning with /api.  Do not prepend /api
+  // here or the request becomes /api/api/... in production.
+  baseURL: import.meta.env.VITE_API_URL || '',
   headers: {
     'Content-Type': 'application/json',
     'x-api-key': import.meta.env.VITE_API_KEY || ''
