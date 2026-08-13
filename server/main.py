@@ -2,27 +2,51 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field, field_validator
 from typing import List
+
 from src.database.core import get_connection
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
-from typing import List
+from src.dashboard.controller import router as dashboard_router
+from src.audit.controller import router as audit_router
+
 
 app = FastAPI(
-    title="Contract Obligation API", 
+    title="Contract Obligation API",
     version="1.0.0"
 )
 
-# Configure CORS
+
+# ==========================================================
+# ROUTERS
+# ==========================================================
+
+app.include_router(
+    dashboard_router,
+    prefix="/api/dashboard",
+    tags=["Dashboard"]
+)
+
+# Current audit-log backend
+app.include_router(
+    audit_router,
+    prefix="/api",
+)
+
+
+# ==========================================================
+# CORS
+# ==========================================================
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins for development
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 
+# ==========================================================
+# OBLIGATIONS
+# ==========================================================
 
 class Obligation(BaseModel):
     id: str
@@ -42,31 +66,29 @@ class Obligation(BaseModel):
     @classmethod
     def validate_priority(cls, value):
         allowed = ["High", "Medium", "Low"]
+
         if value not in allowed:
-            raise ValueError("Priority must be High, Medium or Low")
+            raise ValueError(
+                "Priority must be High, Medium or Low"
+            )
+
         return value
 
     @field_validator("status")
     @classmethod
     def validate_status(cls, value):
-        allowed = ["Pending", "In Progress", "Completed"]
+        allowed = [
+            "Pending",
+            "In Progress",
+            "Completed"
+        ]
+
         if value not in allowed:
-            raise ValueError("Status must be Pending, In Progress or Completed")
+            raise ValueError(
+                "Status must be Pending, In Progress or Completed"
+            )
+
         return value
-
-
-# obligations: List[Obligation] = [
-#     Obligation(
-#         id="OBL-001",
-#         obligation="Review Vendor Contract",
-#         contract="Vendor Agreement",
-#         owner="John Smith",
-#         priority="High",
-#         status="Pending",
-#         dueDate="2026-07-20",
-#         description="Review legal clauses",
-#     )
-# ]
 
 
 @app.get("/obligations")
@@ -75,8 +97,15 @@ def get_obligations():
     cursor = conn.cursor()
 
     cursor.execute("""
-        SELECT id, obligation, contract, owner,
-               priority, status, due_date, description
+        SELECT
+            id,
+            obligation,
+            contract,
+            owner,
+            priority,
+            status,
+            due_date,
+            description
         FROM obligations
     """)
 
@@ -99,6 +128,7 @@ def get_obligations():
         for row in rows
     ]
 
+
 @app.get("/obligations/stats")
 def get_obligation_stats():
     conn = get_connection()
@@ -107,12 +137,25 @@ def get_obligation_stats():
     cursor.execute("""
         SELECT
             COUNT(*) AS total,
-            COUNT(*) FILTER (WHERE status = 'Pending') AS pending,
-            COUNT(*) FILTER (WHERE status = 'In Progress') AS progress,
-            COUNT(*) FILTER (WHERE status = 'Completed') AS completed,
-            COUNT(*) FILTER (WHERE due_date < CURRENT_DATE AND status != 'Completed') AS overdue,
-            COUNT(*) FILTER (WHERE priority = 'High') AS risk,
-            COUNT(*) FILTER (WHERE due_date = CURRENT_DATE) AS due
+            COUNT(*) FILTER (
+                WHERE status = 'Pending'
+            ) AS pending,
+            COUNT(*) FILTER (
+                WHERE status = 'In Progress'
+            ) AS progress,
+            COUNT(*) FILTER (
+                WHERE status = 'Completed'
+            ) AS completed,
+            COUNT(*) FILTER (
+                WHERE due_date < CURRENT_DATE
+                AND status != 'Completed'
+            ) AS overdue,
+            COUNT(*) FILTER (
+                WHERE priority = 'High'
+            ) AS risk,
+            COUNT(*) FILTER (
+                WHERE due_date = CURRENT_DATE
+            ) AS due
         FROM obligations;
     """)
 
@@ -123,7 +166,8 @@ def get_obligation_stats():
 
     compliance = (
         round((completed / total) * 100)
-        if total > 0 else 0
+        if total > 0
+        else 0
     )
 
     cursor.close()
@@ -149,7 +193,16 @@ def add_obligation(obligation: Obligation):
     cursor.execute(
         """
         INSERT INTO obligations
-        (id, obligation, contract, owner, priority, status, due_date, description)
+        (
+            id,
+            obligation,
+            contract,
+            owner,
+            priority,
+            status,
+            due_date,
+            description
+        )
         VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
         """,
         (
@@ -165,6 +218,7 @@ def add_obligation(obligation: Obligation):
     )
 
     conn.commit()
+
     cursor.close()
     conn.close()
 
@@ -175,14 +229,18 @@ def add_obligation(obligation: Obligation):
 
 
 @app.put("/obligations/{obligation_id}")
-def update_obligation(obligation_id: str, updated: Obligation):
+def update_obligation(
+    obligation_id: str,
+    updated: Obligation
+):
     conn = get_connection()
     cursor = conn.cursor()
 
     cursor.execute(
         """
         UPDATE obligations
-        SET obligation=%s,
+        SET
+            obligation=%s,
             contract=%s,
             owner=%s,
             priority=%s,
@@ -208,7 +266,11 @@ def update_obligation(obligation_id: str, updated: Obligation):
     if cursor.rowcount == 0:
         cursor.close()
         conn.close()
-        raise HTTPException(status_code=404, detail="Obligation not found")
+
+        raise HTTPException(
+            status_code=404,
+            detail="Obligation not found"
+        )
 
     cursor.close()
     conn.close()
@@ -234,7 +296,11 @@ def delete_obligation(obligation_id: str):
     if cursor.rowcount == 0:
         cursor.close()
         conn.close()
-        raise HTTPException(status_code=404, detail="Obligation not found")
+
+        raise HTTPException(
+            status_code=404,
+            detail="Obligation not found"
+        )
 
     cursor.close()
     conn.close()
@@ -245,13 +311,7 @@ def delete_obligation(obligation_id: str):
 
 
 # ==========================================================
-# COMPLIANCE MONITORING — all data below is derived live from
-# the real schema (contracts, obligations, compliance_records,
-# users, audit_logs, contract_versions). No hardcoded values.
-#
-# compliance_level -> numeric score mapping used for scoring:
-#   Compliant = 100, Pending = 70, Delayed = 50,
-#   Non-Compliant = 20, High Risk = 10
+# COMPLIANCE MONITORING
 # ==========================================================
 
 SCORE_CASE_SQL = """
@@ -271,88 +331,158 @@ def get_compliance_overview():
     conn = get_connection()
     cursor = conn.cursor()
 
-    # latest compliance_level per contract
-    cursor.execute(f"""
+    cursor.execute("""
         SELECT DISTINCT ON (cr.contract_id)
-            cr.contract_id, cr.compliance_level
+            cr.contract_id,
+            cr.compliance_level
         FROM compliance_records cr
-        ORDER BY cr.contract_id, cr.checked_on DESC
+        ORDER BY cr.contract_id,
+                 cr.checked_on DESC
     """)
+
     latest_rows = cursor.fetchall()
 
     breakdown = {}
+
     for _, level in latest_rows:
         breakdown[level] = breakdown.get(level, 0) + 1
+
     total = len(latest_rows)
 
     status_breakdown = [
         {
             "label": level,
             "count": count,
-            "percentage": round((count / total) * 100) if total else 0,
+            "percentage": (
+                round((count / total) * 100)
+                if total
+                else 0
+            ),
         }
         for level, count in breakdown.items()
     ]
 
     score_map = {
-        "Compliant": 100, "Pending": 70, "Delayed": 50,
-        "Non-Compliant": 20, "High Risk": 10,
+        "Compliant": 100,
+        "Pending": 70,
+        "Delayed": 50,
+        "Non-Compliant": 20,
+        "High Risk": 10,
     }
+
     overall_score = (
-        round(sum(score_map.get(level, 50) for _, level in latest_rows) / total)
-        if total else 0
+        round(
+            sum(
+                score_map.get(level, 50)
+                for _, level in latest_rows
+            ) / total
+        )
+        if total
+        else 0
     )
 
     cursor.execute("""
-        SELECT COUNT(*) FROM obligations
-        WHERE priority IN ('High', 'Critical') AND status != 'Completed'
+        SELECT COUNT(*)
+        FROM obligations
+        WHERE priority IN ('High', 'Critical')
+        AND status != 'Completed'
     """)
+
     open_risks = cursor.fetchone()[0]
 
     cursor.execute("""
-        SELECT COUNT(*) FROM compliance_records
-        WHERE compliance_level IN ('Non-Compliant', 'High Risk')
+        SELECT COUNT(*)
+        FROM compliance_records
+        WHERE compliance_level IN (
+            'Non-Compliant',
+            'High Risk'
+        )
         AND checked_on >= CURRENT_DATE - INTERVAL '30 days'
     """)
+
     audit_findings = cursor.fetchone()[0]
 
     cursor.execute("""
-        SELECT COUNT(*) FROM obligations
-        WHERE due_date < CURRENT_DATE AND status != 'Completed'
+        SELECT COUNT(*)
+        FROM obligations
+        WHERE due_date < CURRENT_DATE
+        AND status != 'Completed'
     """)
+
     missed_obligations = cursor.fetchone()[0]
 
     cursor.execute("""
-        SELECT u.department,
-               100.0 * COUNT(*) FILTER (WHERE o.status = 'Completed') / NULLIF(COUNT(*), 0) AS score
+        SELECT
+            u.department,
+            100.0 *
+            COUNT(*) FILTER (
+                WHERE o.status = 'Completed'
+            ) /
+            NULLIF(COUNT(*), 0) AS score
         FROM obligations o
-        JOIN users u ON u.id = o.assigned_to
+        JOIN users u
+            ON u.id = o.assigned_to
         WHERE u.department IS NOT NULL
         GROUP BY u.department
     """)
+
     dept_rows = cursor.fetchall()
+
     dept_total = len(dept_rows)
-    dept_compliant = sum(1 for _, score in dept_rows if (score or 0) >= 80)
+
+    dept_compliant = sum(
+        1
+        for _, score in dept_rows
+        if (score or 0) >= 80
+    )
+
     dept_avg_score = (
-        round(sum((score or 0) for _, score in dept_rows) / dept_total)
-        if dept_total else 0
+        round(
+            sum(
+                (score or 0)
+                for _, score in dept_rows
+            ) / dept_total
+        )
+        if dept_total
+        else 0
     )
 
     cursor.execute("""
-        SELECT COUNT(DISTINCT document_path) FROM contract_versions
+        SELECT COUNT(DISTINCT document_path)
+        FROM contract_versions
         WHERE uploaded_at >= CURRENT_DATE - INTERVAL '30 days'
     """)
+
     reports_ready = cursor.fetchone()[0]
 
     cursor.execute(f"""
-        SELECT to_char(date_trunc('month', cr.checked_on), 'Mon') AS month,
-               AVG({SCORE_CASE_SQL}) AS score
+        SELECT
+            to_char(
+                date_trunc('month', cr.checked_on),
+                'Mon'
+            ) AS month,
+            AVG({SCORE_CASE_SQL}) AS score
         FROM compliance_records cr
         WHERE cr.checked_on >= CURRENT_DATE - INTERVAL '12 months'
-        GROUP BY date_trunc('month', cr.checked_on), to_char(date_trunc('month', cr.checked_on), 'Mon')
-        ORDER BY date_trunc('month', cr.checked_on)
+        GROUP BY
+            date_trunc('month', cr.checked_on),
+            to_char(
+                date_trunc('month', cr.checked_on),
+                'Mon'
+            )
+        ORDER BY date_trunc(
+            'month',
+            cr.checked_on
+        )
     """)
-    trend = [{"month": month, "score": round(float(score))} for month, score in cursor.fetchall()]
+
+    trend = [
+        {
+            "month": month,
+            "score": round(float(score))
+        }
+        for month, score in cursor.fetchall()
+    ]
 
     cursor.close()
     conn.close()
@@ -361,6 +491,7 @@ def get_compliance_overview():
         "overallScore": overall_score,
         "totalContracts": total,
         "statusBreakdown": status_breakdown,
+
         "kpis": {
             "complianceScore": overall_score,
             "openRisks": open_risks,
@@ -369,12 +500,16 @@ def get_compliance_overview():
             "deptAvgScore": dept_avg_score,
             "reportsReady": reports_ready,
         },
+
         "quickStats": {
             "openRisks": open_risks,
             "auditFindings": audit_findings,
             "missedObligations": missed_obligations,
-            "compliantDepts": f"{dept_compliant}/{dept_total}",
+            "compliantDepts": (
+                f"{dept_compliant}/{dept_total}"
+            ),
         },
+
         "trend": trend,
     }
 
@@ -385,26 +520,49 @@ def get_risk_indicators():
     cursor = conn.cursor()
 
     cursor.execute("""
-        SELECT o.title, c.title AS contract_title, u.department, o.due_date, o.priority
+        SELECT
+            o.title,
+            c.title AS contract_title,
+            u.department,
+            o.due_date,
+            o.priority
         FROM obligations o
-        JOIN contracts c ON c.id = o.contract_id
-        LEFT JOIN users u ON u.id = o.assigned_to
-        WHERE o.priority IN ('High', 'Critical') AND o.status != 'Completed'
+        JOIN contracts c
+            ON c.id = o.contract_id
+        LEFT JOIN users u
+            ON u.id = o.assigned_to
+        WHERE o.priority IN ('High', 'Critical')
+        AND o.status != 'Completed'
         ORDER BY o.due_date ASC
         LIMIT 20
     """)
+
     rows = cursor.fetchall()
+
     cursor.close()
     conn.close()
 
     return [
         {
             "title": title,
-            "meta": f"{department or 'Unassigned'} \u00b7 {due_date}",
-            "severity": "Critical" if priority == "Critical" else "High",
+            "meta": (
+                f"{department or 'Unassigned'} "
+                f"· {due_date}"
+            ),
+            "severity": (
+                "Critical"
+                if priority == "Critical"
+                else "High"
+            ),
             "contract": contract_title,
         }
-        for title, contract_title, department, due_date, priority in rows
+        for (
+            title,
+            contract_title,
+            department,
+            due_date,
+            priority
+        ) in rows
     ]
 
 
@@ -414,25 +572,42 @@ def get_audit_summary():
     cursor = conn.cursor()
 
     cursor.execute("""
-        SELECT COUNT(*) FROM compliance_records
-        WHERE checked_on >= CURRENT_DATE - INTERVAL '90 days'
+        SELECT COUNT(*)
+        FROM compliance_records
+        WHERE checked_on >= CURRENT_DATE
+        - INTERVAL '90 days'
     """)
+
     audits_completed = cursor.fetchone()[0]
 
     cursor.execute("""
-        SELECT COUNT(*) FROM compliance_records
-        WHERE compliance_level IN ('Non-Compliant', 'High Risk', 'Delayed')
-        AND checked_on >= CURRENT_DATE - INTERVAL '90 days'
+        SELECT COUNT(*)
+        FROM compliance_records
+        WHERE compliance_level IN (
+            'Non-Compliant',
+            'High Risk',
+            'Delayed'
+        )
+        AND checked_on >= CURRENT_DATE
+        - INTERVAL '90 days'
     """)
+
     findings_raised = cursor.fetchone()[0]
 
     cursor.execute("""
-        SELECT COUNT(*) FROM obligations
-        WHERE status = 'Completed' AND completed_date >= CURRENT_DATE - INTERVAL '90 days'
+        SELECT COUNT(*)
+        FROM obligations
+        WHERE status = 'Completed'
+        AND completed_date >= CURRENT_DATE
+        - INTERVAL '90 days'
     """)
+
     resolved_findings = cursor.fetchone()[0]
 
-    open_findings = max(findings_raised - resolved_findings, 0)
+    open_findings = max(
+        findings_raised - resolved_findings,
+        0
+    )
 
     cursor.close()
     conn.close()
@@ -451,20 +626,37 @@ def get_department_scores():
     cursor = conn.cursor()
 
     cursor.execute("""
-        SELECT u.department,
-               ROUND(100.0 * COUNT(*) FILTER (WHERE o.status = 'Completed') / NULLIF(COUNT(*), 0)) AS score
+        SELECT
+            u.department,
+            ROUND(
+                100.0 *
+                COUNT(*) FILTER (
+                    WHERE o.status = 'Completed'
+                ) /
+                NULLIF(COUNT(*), 0)
+            ) AS score
         FROM obligations o
-        JOIN users u ON u.id = o.assigned_to
+        JOIN users u
+            ON u.id = o.assigned_to
         WHERE u.department IS NOT NULL
         GROUP BY u.department
         ORDER BY score DESC NULLS LAST
     """)
+
     rows = cursor.fetchall()
+
     cursor.close()
     conn.close()
 
     return [
-        {"department": department, "score": int(score) if score is not None else 0}
+        {
+            "department": department,
+            "score": (
+                int(score)
+                if score is not None
+                else 0
+            ),
+        }
         for department, score in rows
     ]
 
@@ -475,28 +667,54 @@ def get_missed_obligations():
     cursor = conn.cursor()
 
     cursor.execute("""
-        SELECT o.title, o.due_date, u.first_name, u.last_name,
-               (CURRENT_DATE - o.due_date) AS days_late
+        SELECT
+            o.title,
+            o.due_date,
+            u.first_name,
+            u.last_name,
+            (CURRENT_DATE - o.due_date) AS days_late
         FROM obligations o
-        LEFT JOIN users u ON u.id = o.assigned_to
-        WHERE o.due_date <= CURRENT_DATE AND o.status != 'Completed'
+        LEFT JOIN users u
+            ON u.id = o.assigned_to
+        WHERE o.due_date <= CURRENT_DATE
+        AND o.status != 'Completed'
         ORDER BY o.due_date ASC
         LIMIT 20
     """)
+
     rows = cursor.fetchall()
+
     cursor.close()
     conn.close()
 
     result = []
-    for title, due_date, first_name, last_name, days_late in rows:
-        owner = f"{first_name or ''} {last_name or ''}".strip() or "Unassigned"
-        status = "Due today" if days_late == 0 else f"{days_late}d late"
+
+    for (
+        title,
+        due_date,
+        first_name,
+        last_name,
+        days_late
+    ) in rows:
+
+        owner = (
+            f"{first_name or ''} "
+            f"{last_name or ''}"
+        ).strip() or "Unassigned"
+
+        status = (
+            "Due today"
+            if days_late == 0
+            else f"{days_late}d late"
+        )
+
         result.append({
             "title": title,
             "due": f"Due {due_date}",
             "owner": owner,
             "status": status,
         })
+
     return result
 
 
@@ -506,16 +724,27 @@ def get_compliance_history():
     cursor = conn.cursor()
 
     cursor.execute("""
-        SELECT cr.checked_on, c.title, o.title, cr.compliance_level, cr.remarks,
-               u.first_name, u.last_name
+        SELECT
+            cr.checked_on,
+            c.title,
+            o.title,
+            cr.compliance_level,
+            cr.remarks,
+            u.first_name,
+            u.last_name
         FROM compliance_records cr
-        JOIN contracts c ON c.id = cr.contract_id
-        JOIN obligations o ON o.id = cr.obligation_id
-        LEFT JOIN users u ON u.id = cr.checked_by
+        JOIN contracts c
+            ON c.id = cr.contract_id
+        JOIN obligations o
+            ON o.id = cr.obligation_id
+        LEFT JOIN users u
+            ON u.id = cr.checked_by
         ORDER BY cr.checked_on DESC
         LIMIT 50
     """)
+
     rows = cursor.fetchall()
+
     cursor.close()
     conn.close()
 
@@ -526,9 +755,20 @@ def get_compliance_history():
             "obligation": obligation_title,
             "complianceLevel": level,
             "remarks": remarks,
-            "checkedBy": f"{first_name or ''} {last_name or ''}".strip() or "Unknown",
+            "checkedBy": (
+                f"{first_name or ''} "
+                f"{last_name or ''}"
+            ).strip() or "Unknown",
         }
-        for checked_on, contract_title, obligation_title, level, remarks, first_name, last_name in rows
+        for (
+            checked_on,
+            contract_title,
+            obligation_title,
+            level,
+            remarks,
+            first_name,
+            last_name
+        ) in rows
     ]
 
 
@@ -538,15 +778,24 @@ def get_compliance_documents():
     cursor = conn.cursor()
 
     cursor.execute("""
-        SELECT cv.document_path, cv.version_number, cv.uploaded_at, c.title,
-               u.first_name, u.last_name
+        SELECT
+            cv.document_path,
+            cv.version_number,
+            cv.uploaded_at,
+            c.title,
+            u.first_name,
+            u.last_name
         FROM contract_versions cv
-        JOIN contracts c ON c.id = cv.contract_id
-        LEFT JOIN users u ON u.id = cv.uploaded_by
+        JOIN contracts c
+            ON c.id = cv.contract_id
+        LEFT JOIN users u
+            ON u.id = cv.uploaded_by
         ORDER BY cv.uploaded_at DESC
         LIMIT 50
     """)
+
     rows = cursor.fetchall()
+
     cursor.close()
     conn.close()
 
@@ -556,9 +805,19 @@ def get_compliance_documents():
             "version": version,
             "uploadedAt": str(uploaded_at),
             "contract": contract_title,
-            "uploadedBy": f"{first_name or ''} {last_name or ''}".strip() or "Unknown",
+            "uploadedBy": (
+                f"{first_name or ''} "
+                f"{last_name or ''}"
+            ).strip() or "Unknown",
         }
-        for path, version, uploaded_at, contract_title, first_name, last_name in rows
+        for (
+            path,
+            version,
+            uploaded_at,
+            contract_title,
+            first_name,
+            last_name
+        ) in rows
     ]
 
 
@@ -568,41 +827,80 @@ def get_compliance_contracts():
     cursor = conn.cursor()
 
     cursor.execute("""
-        SELECT c.id, c.contract_no, c.title, c.category, c.status, c.end_date,
-               latest.compliance_level
+        SELECT
+            c.id,
+            c.contract_no,
+            c.title,
+            c.category,
+            c.status,
+            c.end_date,
+            latest.compliance_level
         FROM contracts c
         LEFT JOIN LATERAL (
-            SELECT compliance_level FROM compliance_records cr
+            SELECT compliance_level
+            FROM compliance_records cr
             WHERE cr.contract_id = c.id
-            ORDER BY cr.checked_on DESC LIMIT 1
+            ORDER BY cr.checked_on DESC
+            LIMIT 1
         ) latest ON true
-        LEFT JOIN users owner ON owner.id = c.owner_id
+        LEFT JOIN users owner
+            ON owner.id = c.owner_id
         ORDER BY c.created_at DESC
         LIMIT 50
     """)
+
     rows = cursor.fetchall()
+
     cursor.close()
     conn.close()
 
     risk_score_map = {
-        "Compliant": 10, "Pending": 30, "Delayed": 50,
-        "Non-Compliant": 75, "High Risk": 90,
+        "Compliant": 10,
+        "Pending": 30,
+        "Delayed": 50,
+        "Non-Compliant": 75,
+        "High Risk": 90,
     }
+
     result = []
-    for contract_id, contract_no, title, category, lifecycle_status, end_date, level in rows:
+
+    for (
+        contract_id,
+        contract_no,
+        title,
+        category,
+        lifecycle_status,
+        end_date,
+        level
+    ) in rows:
+
         if lifecycle_status == "Expired":
             status = "Expired"
-        elif level in ("Non-Compliant", "High Risk"):
+
+        elif level in (
+            "Non-Compliant",
+            "High Risk"
+        ):
             status = "At Risk"
+
         else:
             status = "Compliant"
+
         result.append({
             "id": contract_no,
             "name": title,
-            "vendor": category or "\u2014",
-            "owner": "\u2014",
+            "vendor": category or "—",
+            "owner": "—",
             "status": status,
-            "riskScore": risk_score_map.get(level, 30),
-            "expiryDate": str(end_date) if end_date else "\u2014",
+            "riskScore": risk_score_map.get(
+                level,
+                30
+            ),
+            "expiryDate": (
+                str(end_date)
+                if end_date
+                else "—"
+            ),
         })
+
     return result

@@ -40,7 +40,7 @@ def get_db():
 def get_connection():
     return psycopg2.connect(
         host="localhost",
-        database="contract_obligations",
+        database="contract_obligation_app",
         user="eureka",
         password="9896224545",
         port="5432",

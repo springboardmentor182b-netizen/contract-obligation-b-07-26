@@ -13,7 +13,6 @@ from .service import (
 )
 
 router = APIRouter(
-    prefix="/dashboard",
     tags=["Dashboard"],
 )
 
