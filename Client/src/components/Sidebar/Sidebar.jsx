@@ -4,7 +4,7 @@ import { mainMenu, accountMenu, logoutMenu } from "../../Data/sidebarMenu";
 
 const Sidebar = () => {
   return (
-    <aside className="w-70 bg-[#1B1B1B] flex flex-col justify-between shadow-2xl">
+    <aside className="w-72 bg-[#1B1B1B] flex flex-col justify-between shadow-2xl">
       {/* Top */}
       <div>
 
