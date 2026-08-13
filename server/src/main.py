@@ -19,7 +19,7 @@ from .routers import risk as risk_router
 from .routers import settings
 
 from .auth.security import create_token, get_current_user, hash_password, require_roles, verify_password
-from .database import create_api_key, create_report as create_postgres_report, create_session, create_user, delete_report as delete_postgres_report, delete_user, find_user_by_email, get_preferences, get_report as get_postgres_report, initialize_database, initialize_notifications_table, initialize_reports_table, initialize_sessions_table, initialize_settings_table, list_api_keys, list_reports as list_postgres_reports, list_sessions, list_users as list_database_users, restore_user, revoke_api_key, revoke_session, revoke_session_by_token, update_preferences, update_user, update_user_password
+from .database import create_api_key, create_report as create_postgres_report, create_session, create_user, delete_report as delete_postgres_report, delete_user, find_user_by_email, get_preferences, get_report as get_postgres_report, initialize_core_tables, initialize_database, initialize_notifications_table, initialize_reports_table, initialize_sessions_table, initialize_settings_table, list_api_keys, list_reports as list_postgres_reports, list_sessions, list_users as list_database_users, restore_user, revoke_api_key, revoke_session, revoke_session_by_token, update_preferences, update_user, update_user_password
 from .database.audit_logs import list_audit_logs as list_database_audit_logs
 from .database.notifications import create_notification as create_postgres_notification, list_notifications as list_postgres_notifications, mark_all_notifications_read, mark_notification_read as mark_postgres_notification_read
 from .database.obligations import list_obligations as list_postgres_obligations
@@ -69,6 +69,7 @@ app.add_middleware(
 @app.on_event("startup")
 def startup() -> None:
     initialize_database()
+    initialize_core_tables()
     initialize_notifications_table()
     initialize_reports_table()
     initialize_settings_table()

@@ -6,6 +6,7 @@ from .notifications import initialize_notifications_table
 from .reports import create_report, delete_report, get_report, initialize_reports_table, list_reports
 from .settings import create_api_key, get_preferences, initialize_settings_table, list_api_keys, revoke_api_key, update_preferences
 from .sessions import create_session, initialize_sessions_table, list_sessions, revoke_session, revoke_session_by_token, session_is_active, touch_session
+from .core_tables import initialize_core_tables
 
 __all__ = [
     "Base",
@@ -40,4 +41,5 @@ __all__ = [
     "revoke_session_by_token",
     "session_is_active",
     "touch_session",
+    "initialize_core_tables",
 ]
