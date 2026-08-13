@@ -20,7 +20,7 @@ server/*.sqlite3
 # OS
 .DS_Store
 Thumbs.db
-=======
+
 # Environment variables and secrets
 .env
 .env.*

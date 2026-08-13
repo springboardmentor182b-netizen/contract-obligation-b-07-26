@@ -62,7 +62,7 @@ function ComplianceReports() {
     const download = async (id, format) => {
         try {
             const token = localStorage.getItem("contractiq_token") || localStorage.getItem("token");
-            const response = await fetch(`${import.meta.env.VITE_API_URL || "http://127.0.0.1:8000"}/api/reports/${id}/${format}`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL || ""}/api/reports/${id}/${format}`, {
                 headers: token ? { Authorization: `Bearer ${token}` } : {},
             });
             if (!response.ok) throw new Error("Download failed");
