@@ -3,11 +3,15 @@
 from __future__ import annotations
 
 import json
+import logging
 from typing import Any
 
 from fastapi import HTTPException, status
 
 from ..config import OPENAI_API_KEY, OPENAI_MODEL
+
+
+logger = logging.getLogger(__name__)
 
 
 SUMMARY_SCHEMA = {
@@ -56,7 +60,15 @@ def _generate_json(prompt: str, schema_name: str, schema: dict[str, Any]) -> dic
             detail="AI is not configured. Add OPENAI_API_KEY to server/.env and restart the API.",
         )
     try:
-        from openai import OpenAI
+        from openai import (
+            APIConnectionError,
+            APIStatusError,
+            AuthenticationError,
+            NotFoundError,
+            OpenAI,
+            PermissionDeniedError,
+            RateLimitError,
+        )
 
         response = OpenAI(api_key=OPENAI_API_KEY).responses.create(
             model=OPENAI_MODEL,
@@ -81,7 +93,44 @@ def _generate_json(prompt: str, schema_name: str, schema: dict[str, Any]) -> dic
         ) from exc
     except (json.JSONDecodeError, ValueError) as exc:
         raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail="AI returned an invalid structured response. Please try again.") from exc
+    except AuthenticationError as exc:
+        logger.warning("OpenAI authentication failed: %s", exc)
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail="OpenAI rejected the API key. Update OPENAI_API_KEY in server/.env and restart the API.",
+        ) from exc
+    except PermissionDeniedError as exc:
+        logger.warning("OpenAI permission was denied: %s", exc)
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail="This OpenAI project is not permitted to use the configured model. Check the API project and model access.",
+        ) from exc
+    except NotFoundError as exc:
+        logger.warning("Configured OpenAI model was not found: %s", exc)
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail=f"The configured OpenAI model '{OPENAI_MODEL}' is unavailable. Choose a model available to this API project.",
+        ) from exc
+    except RateLimitError as exc:
+        logger.warning("OpenAI quota or rate limit reached: %s", exc)
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail="OpenAI API quota or rate limit was reached. Add API billing/credits or wait and try again.",
+        ) from exc
+    except APIConnectionError as exc:
+        logger.warning("Could not connect to OpenAI: %s", exc)
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail="The server cannot reach OpenAI. Check that the EC2 instance has outbound internet access.",
+        ) from exc
+    except APIStatusError as exc:
+        logger.warning("OpenAI returned status %s: %s", exc.status_code, exc)
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail="OpenAI rejected the request. Check the API key, billing, model access, and the server logs.",
+        ) from exc
     except Exception as exc:
+        logger.exception("Unexpected OpenAI integration error")
         raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail="The AI service is unavailable. Please try again.") from exc
 
 
