@@ -12,13 +12,13 @@ import {
 
 function NotificationSettings() {
   const [settings, setSettings] = useState({
-    email: true,
+    email: false,
     sms: false,
-    app: true,
-    renewal: true,
-    obligations: true,
-    compliance: true,
-    approval: true,
+    app: false,
+    renewal: false,
+    obligations: false,
+    compliance: false,
+    approval: false,
     digest: false,
   });
 
@@ -96,8 +96,8 @@ function NotificationSettings() {
         {items.map((item) => (
 
           <div
-            className="notification-row"
             key={item.key}
+            className="notification-row"
           >
 
             <div className="notification-left">
