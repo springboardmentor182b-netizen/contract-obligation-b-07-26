@@ -797,6 +797,31 @@ def update_renewal(
         "status": str(payload["status"]).lower().replace(" ", "_") if payload.get("status") else None,
         "remarks": payload.get("remarks"),
     }
+    changes = {key: value for key, value in fields.items() if value is not None}
+    if not changes:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="Provide renewal changes to save")
+
+    assignments = ", ".join(f"{key} = %s" for key in changes)
+    with get_connection() as connection:
+        with connection.cursor(row_factory=dict_row) as cursor:
+            cursor.execute(
+                f"""
+                UPDATE renewals
+                SET {assignments}, updated_at = NOW()
+                WHERE renewal_id = %s
+                RETURNING renewal_id::text AS id, contract_id::text AS contract_id,
+                          renewal_date, reminder_date, status, remarks, updated_at
+                """,
+                (*changes.values(), renewal_id),
+            )
+            renewal = cursor.fetchone()
+
+    if not renewal:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Renewal not found")
+
+    updated = dict(renewal)
+    store.audit("updated", "renewal", renewal_id, current_user["id"], changes)
+    return updated
 
 
 def exported_contracts(search: str | None, status_filter: str | None, category: str | None) -> list[dict[str, Any]]:
