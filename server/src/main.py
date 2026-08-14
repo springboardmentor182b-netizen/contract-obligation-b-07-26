@@ -12,6 +12,8 @@ app = FastAPI(title="Settings API")
 =======
 from src.database.core import Base, engine, SessionLocal
 from src.database.seed import seed_if_empty
+=======
+from src.database.core import Base, engine
 from src.api import register_routes
 from src.exceptions import register_exception_handlers
 from src.logging import configure_logging
@@ -22,11 +24,6 @@ configure_logging()
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     Base.metadata.create_all(bind=engine)
-    db = SessionLocal()
-    try:
-        seed_if_empty(db)
-    finally:
-        db.close()
     yield
 
 
@@ -46,7 +43,7 @@ app.include_router(settings_controller.router)
 @app.get("/")
 def root():
     return {"message": "Settings API Running"}
-=======
+
 register_exception_handlers(app)
 register_routes(app)
 
@@ -55,3 +52,4 @@ register_routes(app)
 def health_check():
     return {"status": "ok"}
 
+   
