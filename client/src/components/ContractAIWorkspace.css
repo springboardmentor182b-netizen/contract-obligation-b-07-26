@@ -1,0 +1,15 @@
+.contract-ai-workspace { background: var(--bg-surface, #fff); border: 1px solid var(--border-color, #dbe3f0); border-radius: 14px; padding: 22px; margin-bottom: 24px; }
+.contract-ai-heading span { color: var(--primary-color, #2563eb); font-size: 12px; font-weight: 700; letter-spacing: .08em; }
+.contract-ai-heading h2 { margin: 4px 0; color: var(--text-primary, #172033); }
+.contract-ai-heading p { margin: 0 0 18px; color: var(--text-secondary, #64748b); }
+.contract-ai-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.contract-ai-card { display: flex; flex-direction: column; gap: 10px; padding: 16px; border: 1px solid var(--border-color, #dbe3f0); border-radius: 10px; }
+.contract-ai-card h3, .contract-ai-card p { margin: 0; }
+.contract-ai-card input, .contract-ai-card select, .contract-ai-card textarea { width: 100%; box-sizing: border-box; padding: 10px; color: inherit; background: var(--bg-surface, #fff); border: 1px solid var(--border-color, #cbd5e1); border-radius: 7px; }
+.contract-ai-card button, .contract-ai-suggestion button { border: 0; border-radius: 7px; padding: 10px 14px; cursor: pointer; background: var(--primary-color, #2563eb); color: #fff; font-weight: 600; }
+.contract-ai-card button:disabled, .contract-ai-suggestion button:disabled { opacity: .65; cursor: not-allowed; }
+.contract-ai-result { background: var(--bg-muted, #f8fafc); padding: 12px; border-radius: 8px; line-height: 1.45; }
+.contract-ai-result p, .contract-ai-result ul { margin: 6px 0 12px; }
+.contract-ai-suggestion { display: flex; justify-content: space-between; gap: 12px; align-items: center; border-top: 1px solid var(--border-color, #e2e8f0); padding-top: 12px; }
+.contract-ai-suggestion p { margin: 4px 0; }.contract-ai-suggestion small { color: var(--text-secondary, #64748b); }.contract-ai-error { color: #b91c1c; margin: 0 0 12px; }
+@media (max-width: 900px) { .contract-ai-grid { grid-template-columns: 1fr; } .contract-ai-suggestion { align-items: flex-start; flex-direction: column; } }

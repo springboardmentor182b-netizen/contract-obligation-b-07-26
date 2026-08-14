@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import csv
+import re
 from datetime import date, datetime, timedelta
 from io import StringIO
 from typing import Any
@@ -445,6 +446,106 @@ def create_contract(payload: ContractCreate, current_user: dict[str, Any] = Depe
                 ),
             )
             return dict(cursor.fetchone())
+
+
+def ai_contract_summary(payload: dict[str, Any]) -> dict[str, Any]:
+    """Return a transparent, offline AI-assisted summary from contract details.
+
+    This deterministic fallback keeps the feature available in EC2 without an
+    external AI key. It can later be replaced by an LLM provider without
+    changing the frontend API.
+    """
+    title = str(payload.get("title") or payload.get("name") or "Untitled contract").strip()
+    counterparty = str(payload.get("counterparty") or payload.get("party") or "the counterparty").strip()
+    category = str(payload.get("category") or "General agreement").strip()
+    description = re.sub(r"\s+", " ", str(payload.get("description") or payload.get("remarks") or "").strip())
+    start_date = payload.get("start_date") or payload.get("effective_date")
+    end_date = payload.get("end_date") or payload.get("expiry_date")
+
+    first_sentence = re.split(r"(?<=[.!?])\s+", description)[0] if description else "No detailed description was provided."
+    key_terms = [f"Category: {category}", f"Counterparty: {counterparty}"]
+    if start_date:
+        key_terms.append(f"Starts: {start_date}")
+    if end_date:
+        key_terms.append(f"Ends: {end_date}")
+
+    text = f"{title} is a {category.lower()} involving {counterparty}. {first_sentence}"
+    risks: list[str] = []
+    searchable = f"{title} {description} {category}".lower()
+    if not end_date:
+        risks.append("No expiry date is recorded; set one to track renewal deadlines.")
+    if any(word in searchable for word in ("data", "privacy", "personal information")):
+        risks.append("Review data-protection and confidentiality responsibilities.")
+    if any(word in searchable for word in ("payment", "invoice", "fee", "value")):
+        risks.append("Confirm payment milestones and approval responsibilities.")
+    if not risks:
+        risks.append("Review approval, delivery, and renewal responsibilities before activation.")
+
+    return {"summary": text, "key_terms": key_terms, "risk_flags": risks}
+
+
+@api_router.post("/api/contracts/ai/summarize")
+def summarize_contract_with_ai(payload: dict[str, Any], _: dict[str, Any] = Depends(get_current_user)) -> dict[str, Any]:
+    if not str(payload.get("title") or payload.get("name") or "").strip():
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="Contract title is required for a summary")
+    return ai_contract_summary(payload)
+
+
+@api_router.post("/api/contracts/{contract_id}/ai/obligations")
+def generate_contract_obligations(contract_id: str, _: dict[str, Any] = Depends(get_current_user)) -> dict[str, Any]:
+    with get_connection() as connection:
+        with connection.cursor(row_factory=dict_row) as cursor:
+            cursor.execute(
+                """
+                SELECT contract_id::text AS id, title, category, description, end_date
+                FROM contracts WHERE contract_id = %s
+                """,
+                (contract_id,),
+            )
+            contract = cursor.fetchone()
+
+    if not contract:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Contract not found")
+
+    record = dict(contract)
+    category = str(record.get("category") or "").lower()
+    description = str(record.get("description") or "").lower()
+    end_date = record.get("end_date")
+    suggestions: list[dict[str, Any]] = [
+        {
+            "title": f"Review obligations for {record['title']}",
+            "obligation_type": "Contract Review",
+            "due_date": str(date.today() + timedelta(days=14)),
+            "priority": "Medium",
+            "description": "Confirm responsibilities, approvals, and delivery commitments.",
+        },
+        {
+            "title": f"Maintain supporting records for {record['title']}",
+            "obligation_type": "Documentation",
+            "due_date": str(date.today() + timedelta(days=30)),
+            "priority": "Low",
+            "description": "Store signed documents, communications, and evidence in the contract repository.",
+        },
+    ]
+    if end_date:
+        reminder_date = end_date - timedelta(days=30)
+        suggestions.append({
+            "title": f"Start renewal review for {record['title']}",
+            "obligation_type": "Renewal Review",
+            "due_date": str(reminder_date),
+            "priority": "High",
+            "description": "Review renewal terms at least 30 days before contract expiry.",
+        })
+    if any(word in f"{category} {description}" for word in ("data", "privacy", "security", "cloud")):
+        suggestions.append({
+            "title": f"Complete compliance review for {record['title']}",
+            "obligation_type": "Compliance Review",
+            "due_date": str(date.today() + timedelta(days=21)),
+            "priority": "High",
+            "description": "Validate data protection, security, and confidentiality obligations.",
+        })
+
+    return {"contract_id": contract_id, "contract_title": record["title"], "suggestions": suggestions}
 
 
 @api_router.post("/api/contracts/import", status_code=status.HTTP_201_CREATED)
