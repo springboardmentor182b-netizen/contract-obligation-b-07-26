@@ -23,6 +23,10 @@ TOKEN_SECRET = os.getenv(
 )
 TOKEN_TTL_SECONDS = int(os.getenv("TOKEN_TTL_SECONDS", "28800"))
 
+# Optional server-side AI configuration. Never expose this key to the React app.
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "").strip()
+OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-5.4-nano").strip()
+
 # Compatibility settings used by older modules in the project. Defaults allow
 # local development to start when these optional environment variables are absent.
 SECRET_KEY = os.getenv("SECRET_KEY", TOKEN_SECRET)

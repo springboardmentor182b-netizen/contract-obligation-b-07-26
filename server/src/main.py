@@ -23,6 +23,7 @@ from .auth.security import create_token, get_current_user, hash_password, requir
 from .database import create_api_key, create_report as create_postgres_report, create_session, create_user, delete_report as delete_postgres_report, delete_user, find_user_by_email, get_preferences, get_report as get_postgres_report, initialize_core_tables, initialize_database, initialize_notifications_table, initialize_reports_table, initialize_sessions_table, initialize_settings_table, list_api_keys, list_reports as list_postgres_reports, list_sessions, list_users as list_database_users, restore_user, revoke_api_key, revoke_session, revoke_session_by_token, update_preferences, update_user, update_user_password
 from .database.audit_logs import list_audit_logs as list_database_audit_logs
 from .database.notifications import create_notification as create_postgres_notification, list_notifications as list_postgres_notifications, mark_all_notifications_read, mark_notification_read as mark_postgres_notification_read
+from .services.contract_ai_service import generate_obligations as generate_ai_obligations, is_configured as ai_is_configured, summarize_contract as summarize_with_openai
 from .database.obligations import list_obligations as list_postgres_obligations
 from .database.session import Base, engine
 from .database.users import get_connection
@@ -488,7 +489,9 @@ def ai_contract_summary(payload: dict[str, Any]) -> dict[str, Any]:
 def summarize_contract_with_ai(payload: dict[str, Any], _: dict[str, Any] = Depends(get_current_user)) -> dict[str, Any]:
     if not str(payload.get("title") or payload.get("name") or "").strip():
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="Contract title is required for a summary")
-    return ai_contract_summary(payload)
+    if ai_is_configured():
+        return {**summarize_with_openai(payload), "provider": "OpenAI"}
+    return {**ai_contract_summary(payload), "provider": "Local fallback"}
 
 
 @api_router.post("/api/contracts/{contract_id}/ai/obligations")
@@ -508,6 +511,13 @@ def generate_contract_obligations(contract_id: str, _: dict[str, Any] = Depends(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Contract not found")
 
     record = dict(contract)
+    if ai_is_configured():
+        return {
+            "contract_id": contract_id,
+            "contract_title": record["title"],
+            "suggestions": generate_ai_obligations(record),
+            "provider": "OpenAI",
+        }
     category = str(record.get("category") or "").lower()
     description = str(record.get("description") or "").lower()
     end_date = record.get("end_date")

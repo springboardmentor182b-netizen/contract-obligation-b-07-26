@@ -9,6 +9,7 @@ import Calendar from "../components/Calendar/Calendar";
 import UpcomingDeadlines from "../components/Dashboard/UpcomingDeadlines";
 import WeeklyChart from "../components/Charts/WeeklyChart";
 import AddObligationModal from "../components/AddObligationModal";
+import ObligationAIWorkspace from "../components/ObligationAIWorkspace";
 import Navbar from "../layout/Navbar";
 import PageContainer from "../layout/PageContainer";
 import Sidebar from "../layout/Sidebar";
@@ -175,6 +176,8 @@ function ObligationTracker() {
     obligations={obligations}
 
 />
+
+            <ObligationAIWorkspace onCreated={loadObligations} />
 
             <div className="kpi-row">
 

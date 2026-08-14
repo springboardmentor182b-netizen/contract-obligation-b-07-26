@@ -10,6 +10,7 @@
 .contract-ai-card button:disabled, .contract-ai-suggestion button:disabled { opacity: .65; cursor: not-allowed; }
 .contract-ai-result { background: var(--bg-muted, #f8fafc); padding: 12px; border-radius: 8px; line-height: 1.45; }
 .contract-ai-result p, .contract-ai-result ul { margin: 6px 0 12px; }
+.ai-provider { display: inline-block; width: fit-content; margin: 8px 0; padding: 3px 8px; border-radius: 999px; background: var(--bg-muted, #eef2ff); color: var(--primary-color, #2563eb); font-size: 12px; font-weight: 700; }
 .contract-ai-suggestion { display: flex; justify-content: space-between; gap: 12px; align-items: center; border-top: 1px solid var(--border-color, #e2e8f0); padding-top: 12px; }
 .contract-ai-suggestion p { margin: 4px 0; }.contract-ai-suggestion small { color: var(--text-secondary, #64748b); }.contract-ai-error { color: #b91c1c; margin: 0 0 12px; }
 @media (max-width: 900px) { .contract-ai-grid { grid-template-columns: 1fr; } .contract-ai-suggestion { align-items: flex-start; flex-direction: column; } }
