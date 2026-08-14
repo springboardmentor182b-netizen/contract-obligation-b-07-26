@@ -8,7 +8,7 @@ import CategoryTabs from "../components/CategoryTabs";
 import ContractTable from "../components/ContractTable";
 import NewContractModal from "../components/NewContractModal";
 import ContractAIWorkspace from "../components/ContractAIWorkspace";
-import { fetchContracts, createContract, updateContract, deleteContract, createObligation } from "../api";
+import { fetchContracts, createContract, updateContract, deleteContract } from "../api";
 import "./ContractRepository.css";
 
 const ContractRepository = () => {
@@ -119,11 +119,6 @@ const ContractRepository = () => {
     setShowModal(true);
   };
 
-  const handleCreateGeneratedObligation = async (suggestion) => {
-    await createObligation(suggestion);
-    await fetchContractsData();
-  };
-
   return (
     <div className="app-shell contracts-page-shell">
       <Sidebar
@@ -141,10 +136,7 @@ const ContractRepository = () => {
             onCategoryChange={setCategoryFilter}
           />
 
-          <ContractAIWorkspace
-            contracts={contracts}
-            onCreateObligation={handleCreateGeneratedObligation}
-          />
+          <ContractAIWorkspace contracts={contracts} />
 
           <StatusTabs
             selectedStatus={statusFilter}

@@ -487,11 +487,29 @@ def ai_contract_summary(payload: dict[str, Any]) -> dict[str, Any]:
 
 @api_router.post("/api/contracts/ai/summarize")
 def summarize_contract_with_ai(payload: dict[str, Any], _: dict[str, Any] = Depends(get_current_user)) -> dict[str, Any]:
-    if not str(payload.get("title") or payload.get("name") or "").strip():
+    contract_id = str(payload.get("contract_id") or "").strip()
+    source = payload
+    if contract_id:
+        with get_connection() as connection:
+            with connection.cursor(row_factory=dict_row) as cursor:
+                cursor.execute(
+                    """
+                    SELECT contract_id::text AS id, title, contract_number, category, description,
+                           start_date, end_date, status
+                    FROM contracts WHERE contract_id = %s
+                    """,
+                    (contract_id,),
+                )
+                contract = cursor.fetchone()
+        if not contract:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Contract not found")
+        source = dict(contract)
+
+    if not str(source.get("title") or source.get("name") or "").strip():
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="Contract title is required for a summary")
     if ai_is_configured():
-        return {**summarize_with_openai(payload), "provider": "OpenAI"}
-    return {**ai_contract_summary(payload), "provider": "Local fallback"}
+        return {**summarize_with_openai(source), "provider": "OpenAI"}
+    return {**ai_contract_summary(source), "provider": "Local fallback"}
 
 
 @api_router.post("/api/contracts/{contract_id}/ai/obligations")
