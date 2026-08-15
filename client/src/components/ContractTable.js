@@ -1,9 +1,9 @@
 import React from "react";
-import { FiEdit2, FiTrash2 } from "react-icons/fi";
+import { FiEdit2, FiEye, FiTrash2 } from "react-icons/fi";
 import StatusBadge from "./StatusBadge";
 import "./ContractTable.css";
 
-const ContractTable = ({ contracts, onEdit, onDelete }) => {
+const ContractTable = ({ contracts, onView, onEdit, onDelete }) => {
   const displayData = contracts;
 
   return (
@@ -24,8 +24,9 @@ const ContractTable = ({ contracts, onEdit, onDelete }) => {
                 <td>{row.value ? `$${Number(row.value).toLocaleString()}` : "-"}</td>
                 <td>{row.expiry ? new Date(row.expiry).toLocaleDateString() : "-"}</td><td>{row.version}</td>
                 <td><div className="action-btns">
-                  <button className="action-icon-btn" onClick={() => onEdit(row)}><FiEdit2 /></button>
-                  <button className="action-icon-btn delete-btn" onClick={() => onDelete(row.id)}><FiTrash2 /></button>
+                  <button className="action-icon-btn" type="button" title="View contract" aria-label={`View ${row.name}`} onClick={() => onView(row)}><FiEye /></button>
+                  <button className="action-icon-btn" type="button" title="Edit contract" aria-label={`Edit ${row.name}`} onClick={() => onEdit(row)}><FiEdit2 /></button>
+                  <button className="action-icon-btn delete-btn" type="button" title="Delete contract" aria-label={`Delete ${row.name}`} onClick={() => onDelete(row.id)}><FiTrash2 /></button>
                 </div></td>
               </tr>
             )) : <tr><td colSpan="8" style={{ textAlign: "center", padding: "20px" }}>No contracts found.</td></tr>}

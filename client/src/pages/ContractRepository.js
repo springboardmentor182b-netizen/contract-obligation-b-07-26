@@ -6,6 +6,7 @@ import ContractHeader from "../components/ContractHeader";
 import StatusTabs from "../components/StatusTabs";
 import CategoryTabs from "../components/CategoryTabs";
 import ContractTable from "../components/ContractTable";
+import ContractViewModal from "../components/ContractViewModal";
 import NewContractModal from "../components/NewContractModal";
 import ContractAIWorkspace from "../components/ContractAIWorkspace";
 import { fetchContracts, createContract, updateContract, deleteContract } from "../api";
@@ -19,6 +20,7 @@ const ContractRepository = () => {
 
   const [showModal, setShowModal] = useState(false);
   const [selectedContract, setSelectedContract] = useState(null);
+  const [viewedContract, setViewedContract] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -174,6 +176,7 @@ const ContractRepository = () => {
             ) : (
               <ContractTable
                 contracts={contracts}
+                onView={setViewedContract}
                 onEdit={handleEditContract}
                 onDelete={handleDeleteContract}
               />
@@ -193,6 +196,7 @@ const ContractRepository = () => {
         contract={selectedContract}
         isEditing={isEditing}
       />
+      <ContractViewModal contract={viewedContract} onClose={() => setViewedContract(null)} />
     </div>
   );
 };
