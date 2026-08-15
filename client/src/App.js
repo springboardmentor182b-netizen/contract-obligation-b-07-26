@@ -24,6 +24,19 @@ function ProtectedDashboard() {
   return token ? React.createElement(Home) : React.createElement(Navigate, { to: '/login', replace: true })
 }
 
+function HomeRedirect() {
+  return React.createElement(Navigate, {
+    to: isAuthenticated() ? '/dashboard' : '/login',
+    replace: true,
+  })
+}
+
+function LoginRoute() {
+  return isAuthenticated()
+    ? React.createElement(Navigate, { to: '/dashboard', replace: true })
+    : React.createElement(Auth)
+}
+
 function LegacyApp() {
   return React.createElement(
     BrowserRouter,
@@ -33,14 +46,11 @@ function LegacyApp() {
       null,
       React.createElement(Route, {
         path: '/',
-        element: React.createElement(Navigate, {
-          to: '/login',
-          replace: true,
-        }),
+        element: React.createElement(HomeRedirect),
       }),
       React.createElement(Route, {
         path: '/login',
-        element: React.createElement(Auth),
+        element: React.createElement(LoginRoute),
       }),
       React.createElement(Route, {
         path: '/dashboard',
@@ -193,14 +203,11 @@ export default function App() {
         null,
         React.createElement(Route, {
           path: '/',
-          element: React.createElement(Navigate, {
-            to: '/login',
-            replace: true,
-          }),
+          element: React.createElement(HomeRedirect),
         }),
         React.createElement(Route, {
           path: '/login',
-          element: React.createElement(Auth),
+          element: React.createElement(LoginRoute),
         }),
         React.createElement(Route, {
           path: '/dashboard',

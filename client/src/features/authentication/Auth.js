@@ -10,7 +10,10 @@ import { canSubmitLogin, canSubmitPasswordReset, canSubmitRegistration } from '.
 
 export function Auth() {
   const [mode, setMode] = useState('login')
-  const [formData, setFormData] = useState(emptyCredentials)
+  const [formData, setFormData] = useState(() => ({
+    ...emptyCredentials,
+    email: window.localStorage.getItem('contractiq_remembered_email') || '',
+  }))
   const [registrationData, setRegistrationData] = useState(emptyRegistration)
   const [passwordResetData, setPasswordResetData] = useState(emptyPasswordReset)
   const [rememberMe, setRememberMe] = useState(false)
@@ -63,16 +66,18 @@ export function Auth() {
     try {
       const result = await login(API_BASE_URL, formData)
 
+      // A signed-in user remains signed in when they reopen the application.
+      // Logout (or token expiry) is the explicit end of the session.
+      window.localStorage.setItem('contractiq_token', result.access_token)
+      window.localStorage.setItem('contractiq_role', formData.role)
       if (rememberMe) {
-        window.localStorage.setItem('contractiq_token', result.access_token)
-        window.localStorage.setItem('contractiq_role', formData.role)
+        window.localStorage.setItem('contractiq_remembered_email', formData.email.trim().toLowerCase())
       } else {
-        window.sessionStorage.setItem('contractiq_token', result.access_token)
-        window.sessionStorage.setItem('contractiq_role', formData.role)
+        window.localStorage.removeItem('contractiq_remembered_email')
       }
 
       setStatus('success')
-      setMessage(`Login successful as ${formData.role}. Token saved for the current frontend session.`)
+      setMessage(`Login successful as ${formData.role}.`)
       window.location.assign('/dashboard')
     } catch (error) {
       setStatus('error')
