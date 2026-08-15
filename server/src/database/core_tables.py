@@ -25,6 +25,10 @@ CREATE TABLE IF NOT EXISTS contracts (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
+-- Supports contract values for both new databases and existing RDS databases.
+ALTER TABLE contracts
+ADD COLUMN IF NOT EXISTS contract_value NUMERIC(14, 2);
+
 CREATE TABLE IF NOT EXISTS obligations (
     obligation_id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     contract_id UUID REFERENCES contracts(contract_id) ON DELETE CASCADE,

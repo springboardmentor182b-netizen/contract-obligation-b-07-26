@@ -410,7 +410,7 @@ def list_contracts(
                     COALESCE(description, '-') AS party,
                     status,
                     end_date AS expiry,
-                    NULL::numeric AS value,
+                    contract_value AS value,
                     '1.0' AS version
                 FROM contracts
                 {where_clause}
@@ -430,19 +430,19 @@ def create_contract(payload: ContractCreate, current_user: dict[str, Any] = Depe
                 """
                 INSERT INTO contracts (
                     title, contract_number, category, description, start_date,
-                    end_date, status, uploaded_by, assigned_to
+                    end_date, status, contract_value, uploaded_by, assigned_to
                 )
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 RETURNING contract_id::text AS id, title AS name,
                           COALESCE(contract_number, contract_id::text) AS contract_id,
                           category, COALESCE(category, 'Unassigned') AS department,
                           COALESCE(description, '-') AS party, status,
-                          end_date AS expiry, NULL::numeric AS value, '1.0' AS version
+                          end_date AS expiry, contract_value AS value, '1.0' AS version
                 """,
                 (
                     data["title"], data.get("contract_number"), data["category"],
                     data.get("counterparty"), data.get("effective_date"),
-                    data.get("expiry_date"), data["status"], current_user["id"],
+                    data.get("expiry_date"), data["status"], data.get("value"), current_user["id"],
                     data.get("owner_id") or current_user["id"],
                 ),
             )
@@ -590,8 +590,8 @@ def import_contracts(payload: list[dict[str, Any]], current_user: dict[str, Any]
                     continue
                 status_value = str(item.get("status") or "Draft")
                 cursor.execute("""
-                    INSERT INTO contracts (title, contract_number, category, description, start_date, end_date, status, uploaded_by, assigned_to)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    INSERT INTO contracts (title, contract_number, category, description, start_date, end_date, status, contract_value, uploaded_by, assigned_to)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                     RETURNING contract_id::text AS id, title, contract_number, end_date
                 """, (
                     title, str(item.get("contract_number") or "").strip() or None,
@@ -599,7 +599,7 @@ def import_contracts(payload: list[dict[str, Any]], current_user: dict[str, Any]
                     str(item.get("counterparty") or item.get("description") or "").strip() or None,
                     item.get("effective_date") or item.get("start_date") or None,
                     item.get("expiry_date") or item.get("end_date") or None,
-                    status_value, current_user["id"], current_user["id"],
+                    status_value, item.get("value") or None, current_user["id"], current_user["id"],
                 ))
                 contract = dict(cursor.fetchone())
                 due_date = contract.get("end_date") or date.today() + timedelta(days=30)
@@ -679,7 +679,7 @@ def update_contract(
         "title": "title = %s", "contract_number": "contract_number = %s",
         "category": "category = %s", "counterparty": "description = %s",
         "effective_date": "start_date = %s", "expiry_date": "end_date = %s",
-        "status": "status = %s",
+        "status": "status = %s", "value": "contract_value = %s",
     }
     keys = [key for key in data if key in fields]
     if not keys:
@@ -693,7 +693,7 @@ def update_contract(
                               COALESCE(contract_number, contract_id::text) AS contract_id,
                               category, COALESCE(category, 'Unassigned') AS department,
                               COALESCE(description, '-') AS party, status,
-                              end_date AS expiry, NULL::numeric AS value, '1.0' AS version""",
+                              end_date AS expiry, contract_value AS value, '1.0' AS version""",
                 (*[data[key] for key in keys], contract_id),
             )
             contract = cursor.fetchone()
@@ -969,7 +969,7 @@ def exported_contracts(search: str | None, status_filter: str | None, category: 
     with get_connection() as connection:
         with connection.cursor(row_factory=dict_row) as cursor:
             cursor.execute(f"""
-                SELECT contract_number, title, category, description, status, start_date, end_date
+                SELECT contract_number, title, category, description, status, start_date, end_date, contract_value AS value
                 FROM contracts {where_clause} ORDER BY created_at DESC NULLS LAST, contract_id
             """, parameters)
             return [dict(record) for record in cursor.fetchall()]
@@ -983,8 +983,8 @@ def export_contracts_csv(
     _: dict[str, Any] = Depends(get_current_user),
 ) -> Response:
     contracts = exported_contracts(search, status_filter, category)
-    return csv_download("contracts.csv", ["Contract Number", "Title", "Category", "Description", "Status", "Start Date", "End Date"], [
-        [item.get("contract_number"), item.get("title"), item.get("category"), item.get("description"), item.get("status"), item.get("start_date"), item.get("end_date")]
+    return csv_download("contracts.csv", ["Contract Number", "Title", "Category", "Description", "Status", "Start Date", "End Date", "Value"], [
+        [item.get("contract_number"), item.get("title"), item.get("category"), item.get("description"), item.get("status"), item.get("start_date"), item.get("end_date"), item.get("value")]
         for item in contracts
     ])
 
@@ -997,8 +997,8 @@ def export_contracts_excel(
     _: dict[str, Any] = Depends(get_current_user),
 ) -> Response:
     contracts = exported_contracts(search, status_filter, category)
-    return csv_download("contracts.xls", ["Contract Number", "Title", "Category", "Description", "Status", "Start Date", "End Date"], [
-        [item.get("contract_number"), item.get("title"), item.get("category"), item.get("description"), item.get("status"), item.get("start_date"), item.get("end_date")]
+    return csv_download("contracts.xls", ["Contract Number", "Title", "Category", "Description", "Status", "Start Date", "End Date", "Value"], [
+        [item.get("contract_number"), item.get("title"), item.get("category"), item.get("description"), item.get("status"), item.get("start_date"), item.get("end_date"), item.get("value")]
         for item in contracts
     ], "application/vnd.ms-excel")
     changes = {key: value for key, value in fields.items() if value is not None}
