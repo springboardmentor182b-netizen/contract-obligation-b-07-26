@@ -113,6 +113,26 @@ def parse_date(value: str | None) -> date | None:
     return date.fromisoformat(value) if value else None
 
 
+def record_database_audit(action: str, module: str, entity_id: str, user_id: str) -> None:
+    """Store an audit entry in PostgreSQL, which powers the Audit Logs page."""
+    with get_connection() as connection:
+        with connection.cursor() as cursor:
+            cursor.execute(
+                """
+                INSERT INTO audit_logs (audit_id, user_id, action, module, new_value, created_at)
+                VALUES (gen_random_uuid(), %s, %s, %s, jsonb_build_object('entity_id', %s), NOW())
+                """,
+                (user_id, action, module, entity_id),
+            )
+            cursor.execute(
+                """
+                INSERT INTO activities (activity_id, user_id, activity, activity_time)
+                VALUES (gen_random_uuid(), %s, %s, NOW())
+                """,
+                (user_id, f"{action.title()} {module}"),
+            )
+
+
 def csv_download(filename: str, header: list[str], rows: list[list[Any]], media_type: str = "text/csv") -> Response:
     output = StringIO()
     writer = csv.writer(output)
@@ -424,6 +444,7 @@ def list_contracts(
 @api_router.post("/api/contracts", status_code=status.HTTP_201_CREATED)
 def create_contract(payload: ContractCreate, current_user: dict[str, Any] = Depends(get_current_user)) -> dict[str, Any]:
     data = model_payload(payload)
+    owner_id = data.get("owner_id") or current_user["id"]
     with get_connection() as connection:
         with connection.cursor(row_factory=dict_row) as cursor:
             cursor.execute(
@@ -443,10 +464,20 @@ def create_contract(payload: ContractCreate, current_user: dict[str, Any] = Depe
                     data["title"], data.get("contract_number"), data["category"],
                     data.get("counterparty"), data.get("effective_date"),
                     data.get("expiry_date"), data["status"], data.get("value"), current_user["id"],
-                    data.get("owner_id") or current_user["id"],
+                    owner_id,
                 ),
             )
-            return dict(cursor.fetchone())
+            contract = dict(cursor.fetchone())
+    record_database_audit("created", "contract", contract["id"], current_user["id"])
+    if owner_id != current_user["id"]:
+        create_postgres_notification({
+            "recipient_user_id": owner_id,
+            "related_id": contract["id"],
+            "related_type": "contract",
+            "title": "Contract assigned to you",
+            "message": f"You were assigned as the owner of {contract['name']}.",
+        })
+    return contract
 
 
 def ai_contract_summary(payload: dict[str, Any]) -> dict[str, Any]:
@@ -679,7 +710,7 @@ def update_contract(
         "title": "title = %s", "contract_number": "contract_number = %s",
         "category": "category = %s", "counterparty": "description = %s",
         "effective_date": "start_date = %s", "expiry_date": "end_date = %s",
-        "status": "status = %s", "value": "contract_value = %s",
+        "status": "status = %s", "value": "contract_value = %s", "owner_id": "assigned_to = %s",
     }
     keys = [key for key in data if key in fields]
     if not keys:
@@ -699,16 +730,27 @@ def update_contract(
             contract = cursor.fetchone()
     if not contract:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Contract not found")
-    return dict(contract)
+    result = dict(contract)
+    record_database_audit("updated", "contract", contract_id, current_user["id"])
+    if data.get("owner_id") and data["owner_id"] != current_user["id"]:
+        create_postgres_notification({
+            "recipient_user_id": data["owner_id"],
+            "related_id": contract_id,
+            "related_type": "contract",
+            "title": "Contract assigned to you",
+            "message": f"You were assigned as the owner of {result['name']}.",
+        })
+    return result
 
 
 @api_router.delete("/api/contracts/{contract_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_contract(contract_id: str, _: dict[str, Any] = Depends(get_current_user)) -> None:
+def delete_contract(contract_id: str, current_user: dict[str, Any] = Depends(get_current_user)) -> None:
     with get_connection() as connection:
         with connection.cursor() as cursor:
             cursor.execute("DELETE FROM contracts WHERE contract_id = %s", (contract_id,))
             if cursor.rowcount == 0:
                 raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Contract not found")
+    record_database_audit("deleted", "contract", contract_id, current_user["id"])
 
 
 @api_router.post("/api/contracts/{contract_id}/archive", response_model=APIRecord)
@@ -797,6 +839,14 @@ def create_obligation(payload: dict[str, Any], current_user: dict[str, Any] = De
             ))
             obligation = dict(cursor.fetchone())
     store.audit("created", "obligation", obligation["id"], current_user["id"])
+    if owner_id:
+        create_postgres_notification({
+            "recipient_user_id": owner_id,
+            "related_id": obligation["id"],
+            "related_type": "obligation",
+            "title": "Obligation assigned to you",
+            "message": f"{obligation['title']} is due on {obligation['due_date']}.",
+        })
     return obligation
 
 
@@ -911,6 +961,13 @@ def create_renewal(payload: dict[str, Any], current_user: dict[str, Any] = Depen
             ))
             renewal = dict(cursor.fetchone())
     store.audit("created", "renewal", renewal["id"], current_user["id"])
+    create_postgres_notification({
+        "recipient_user_id": current_user["id"],
+        "related_id": contract_id,
+        "related_type": "renewal",
+        "title": "Renewal scheduled",
+        "message": f"A renewal was scheduled for {renewal_date}.",
+    })
     return renewal
 
 

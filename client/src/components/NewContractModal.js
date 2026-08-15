@@ -11,6 +11,7 @@ const defaultForm = {
   value: "",
   expiry: "",
   version: "v1.0",
+  owner_id: "",
 };
 
 const NewContractModal = ({
@@ -18,6 +19,7 @@ const NewContractModal = ({
   onClose,
   onSave,
   contract,
+  users = [],
   isEditing,
 }) => {
   const [formData, setFormData] = useState(defaultForm);
@@ -36,6 +38,7 @@ const NewContractModal = ({
           ? contract.expiry.substring(0, 10)
           : "",
         version: contract.version || "v1.0",
+        owner_id: "",
       });
     } else {
       setFormData(defaultForm);
@@ -66,6 +69,7 @@ const NewContractModal = ({
 
     onSave({
       ...formData,
+      owner_id: formData.owner_id || undefined,
       value: Number(formData.value),
       id: contract?.id,
     });
@@ -87,6 +91,11 @@ const NewContractModal = ({
           onChange={handleChange}
           disabled={isEditing}
         />
+
+        <select name="owner_id" value={formData.owner_id} onChange={handleChange}>
+          <option value="">Assign to me (default)</option>
+          {users.map((user) => <option key={user.id} value={user.id}>{user.name} — {user.role}</option>)}
+        </select>
 
         <input
           type="text"

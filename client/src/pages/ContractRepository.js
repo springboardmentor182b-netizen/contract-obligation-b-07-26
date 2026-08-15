@@ -9,11 +9,12 @@ import ContractTable from "../components/ContractTable";
 import ContractViewModal from "../components/ContractViewModal";
 import NewContractModal from "../components/NewContractModal";
 import ContractAIWorkspace from "../components/ContractAIWorkspace";
-import { fetchContracts, createContract, updateContract, deleteContract } from "../api";
+import { fetchContracts, fetchUsers, createContract, updateContract, deleteContract } from "../api";
 import "./ContractRepository.css";
 
 const ContractRepository = () => {
   const [contracts, setContracts] = useState([]);
+  const [users, setUsers] = useState([]);
   const [statusFilter, setStatusFilter] = useState("All");
   const [categoryFilter, setCategoryFilter] = useState("All");
   const [searchTerm, setSearchTerm] = useState("");
@@ -57,6 +58,10 @@ const ContractRepository = () => {
         setDashboard(dashboardData);
       })
       .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    fetchUsers().then((rows) => setUsers(Array.isArray(rows) ? rows : [])).catch(() => setUsers([]));
   }, []);
 
   const toggleSidebar = () => {
@@ -194,6 +199,7 @@ const ContractRepository = () => {
         }}
         onSave={handleSaveContract}
         contract={selectedContract}
+        users={users}
         isEditing={isEditing}
       />
       <ContractViewModal contract={viewedContract} onClose={() => setViewedContract(null)} />
