@@ -1,5 +1,5 @@
 from __future__ import annotations
-
+from .routers import chat as chat_router
 import csv
 from datetime import date, datetime, timedelta
 from io import StringIO
