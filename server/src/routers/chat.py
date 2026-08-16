@@ -38,6 +38,13 @@ class ChatResponse(BaseModel):
 
 
 def gather_context(user_id: str) -> str:
+    """
+    Pulls a compact snapshot of contracts/obligations/renewals so the model
+    answers from real data instead of guessing. Kept intentionally small
+    (recent + upcoming records only) to stay well under context limits —
+    if your dataset grows large, this is the place to add a search/filter
+    step instead of dumping everything.
+    """
     with get_connection() as connection:
         with connection.cursor(row_factory=dict_row) as cursor:
             cursor.execute("""
@@ -112,6 +119,9 @@ def ask(payload: ChatRequest, current_user: dict[str, Any] = Depends(get_current
         "not long paragraphs.\n\n" + context
     )
 
+    # Groq's API follows the OpenAI chat-completions message format: the
+    # system prompt is just the first message in the array, not a separate
+    # parameter (unlike Anthropic's SDK).
     messages = [{"role": "system", "content": system_prompt}]
     messages.extend({"role": m.role, "content": m.content} for m in payload.history)
     messages.append({"role": "user", "content": payload.message})
@@ -124,7 +134,7 @@ def ask(payload: ChatRequest, current_user: dict[str, Any] = Depends(get_current
             messages=messages,
             max_tokens=1024,
         )
-    except Exception as error:
+    except Exception as error:  # noqa: BLE001 — surface any provider error as a clean 502
         raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail=f"AI request failed: {error}")
 
     reply_text = response.choices[0].message.content
