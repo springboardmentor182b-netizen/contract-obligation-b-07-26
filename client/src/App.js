@@ -1,5 +1,5 @@
 import React from 'react'
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 
 import './App.css'
 import Settings from './pages/Settings/Settings'
@@ -16,6 +16,7 @@ import UserManagement from './pages/UserManagement'
 import ContractRepository from './pages/ContractRepository'
 import Profile from './pages/Profile/Profile'
 import { Auth } from './features/authentication/Auth'
+import ChatWidget from './features/chat-assistant/ChatWidget'
 
 function ProtectedDashboard() {
   const token = window.localStorage.getItem('contractiq_token')
@@ -144,6 +145,11 @@ function isAuthenticated() {
     || window.localStorage.getItem('access_token'))
 }
 
+function AppChatWidget() {
+  useLocation()
+  return isAuthenticated() ? React.createElement(ChatWidget) : null
+}
+
 export default function App() {
   React.useEffect(() => {
     const applyAccent = (accent) => {
@@ -262,6 +268,7 @@ export default function App() {
           }),
         }),
       ),
+      React.createElement(AppChatWidget),
     ),
   )
 }
