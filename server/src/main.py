@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import csv
+import logging
 import re
 from datetime import date, datetime, timedelta
 from io import StringIO
@@ -51,6 +52,9 @@ from .schemas import (
     UserUpdate,
 )
 from .storage import store
+
+
+logger = logging.getLogger(__name__)
 
 app = FastAPI(
     title="ContractIQ: Contract Obligation Tracking API",
@@ -115,22 +119,34 @@ def parse_date(value: str | None) -> date | None:
 
 def record_database_audit(action: str, module: str, entity_id: str, user_id: str) -> None:
     """Store an audit entry in PostgreSQL, which powers the Audit Logs page."""
-    with get_connection() as connection:
-        with connection.cursor() as cursor:
-            cursor.execute(
-                """
-                INSERT INTO audit_logs (audit_id, user_id, action, module, new_value, created_at)
-                VALUES (gen_random_uuid(), %s, %s, %s, jsonb_build_object('entity_id', %s), NOW())
-                """,
-                (user_id, action, module, entity_id),
-            )
-            cursor.execute(
-                """
-                INSERT INTO activities (activity_id, user_id, activity, activity_time)
-                VALUES (gen_random_uuid(), %s, %s, NOW())
-                """,
-                (user_id, f"{action.title()} {module}"),
-            )
+    try:
+        with get_connection() as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """
+                    INSERT INTO audit_logs (audit_id, user_id, action, module, new_value, created_at)
+                    VALUES (gen_random_uuid(), %s, %s, %s, jsonb_build_object('entity_id', %s), NOW())
+                    """,
+                    (user_id, action, module, entity_id),
+                )
+    except Exception:
+        logger.exception("Could not write the PostgreSQL audit record for %s %s", action, module)
+        return
+
+    # Activities are supplementary dashboard data. A legacy activities-table
+    # mismatch must not make a successfully saved contract return HTTP 500.
+    try:
+        with get_connection() as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """
+                    INSERT INTO activities (activity_id, user_id, activity, activity_time)
+                    VALUES (gen_random_uuid(), %s, %s, NOW())
+                    """,
+                    (user_id, f"{action.title()} {module}"),
+                )
+    except Exception:
+        logger.exception("Could not write the supplementary activity for %s %s", action, module)
 
 
 def csv_download(filename: str, header: list[str], rows: list[list[Any]], media_type: str = "text/csv") -> Response:
