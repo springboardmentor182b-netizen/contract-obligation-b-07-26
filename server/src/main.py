@@ -1,5 +1,6 @@
 from __future__ import annotations
 from .routers import chat as chat_router
+
 import csv
 from datetime import date, datetime, timedelta
 from io import StringIO
@@ -72,6 +73,9 @@ app.add_middleware(
 
 @app.on_event("startup")
 def startup() -> None:
+    from .database.users import ensure_database_exists
+
+    ensure_database_exists()
     initialize_database()
     initialize_core_tables()
     initialize_notifications_table()
