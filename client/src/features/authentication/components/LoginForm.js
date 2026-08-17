@@ -38,7 +38,7 @@ export function LoginForm({
           type="password"
           value={formData.password}
         />
-        <span className="field-hint">Use 8+ characters with uppercase, lowercase, and a special character.</span>
+        <span className="field-hint">Use 6+ characters.</span>
       </label>
 
       <label className="field">

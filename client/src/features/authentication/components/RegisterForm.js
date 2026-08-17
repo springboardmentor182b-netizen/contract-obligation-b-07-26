@@ -40,7 +40,7 @@ export function RegisterForm({ canRegister, message, onChange, onSubmit, onSwitc
           type="password"
           value={registrationData.password}
         />
-        <span className="field-hint">Use 8+ characters with uppercase, lowercase, and a special character.</span>
+        <span className="field-hint">Use 6+ characters.</span>
       </label>
 
       <label className="field">

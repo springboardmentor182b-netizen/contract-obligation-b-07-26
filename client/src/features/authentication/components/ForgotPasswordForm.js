@@ -34,7 +34,7 @@ export function ForgotPasswordForm({
           type="password"
           value={passwordResetData.new_password}
         />
-        <span className="field-hint">Use 8+ characters with uppercase, lowercase, and a special character.</span>
+        <span className="field-hint">Use 6+ characters.</span>
       </label>
 
       <StatusMessage message={message} status={status} />

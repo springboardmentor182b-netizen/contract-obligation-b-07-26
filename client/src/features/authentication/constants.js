@@ -1,4 +1,7 @@
-export const API_BASE_URL = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || 'https://contractiq-server.onrender.com'
+export const API_BASE_URL =
+  import.meta.env.VITE_API_URL ||
+  import.meta.env.VITE_API_BASE_URL ||
+  'https://contractiq-server.onrender.com'
 
 export const emptyCredentials = {
   email: '',
@@ -27,3 +30,12 @@ export const roles = [
   'Department Head',
   'Employee',
 ]
+
+export const roleApiValues = {
+  'Administrator': 'administrator',
+  'Legal Manager': 'legal_manager',
+  'Compliance Officer': 'compliance_officer',
+  'Contract Manager': 'contract_manager',
+  'Department Head': 'user',
+  'Employee': 'user',
+}

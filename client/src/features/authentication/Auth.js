@@ -2,7 +2,13 @@ import { useMemo, useState } from 'react'
 import { ForgotPasswordForm } from './components/ForgotPasswordForm'
 import { LoginForm } from './components/LoginForm'
 import { RegisterForm } from './components/RegisterForm'
-import { API_BASE_URL, emptyCredentials, emptyPasswordReset, emptyRegistration } from './constants'
+import {
+  API_BASE_URL,
+  emptyCredentials,
+  emptyPasswordReset,
+  emptyRegistration,
+  roleApiValues,
+} from './constants'
 import { forgotPassword } from './services/forgotPassword'
 import { login } from './services/login'
 import { signup } from './services/signup'
@@ -51,7 +57,7 @@ export function Auth() {
 
     if (!canSubmit) {
       setStatus('error')
-      setMessage('Enter a valid email, select a role, and use a stronger password.')
+      setMessage('Enter a valid email, select a role, and use a password with 6+ characters.')
       return
     }
 
@@ -59,7 +65,10 @@ export function Auth() {
     setMessage('')
 
     try {
-      const result = await login(API_BASE_URL, formData)
+      const result = await login(API_BASE_URL, {
+        ...formData,
+        role: roleApiValues[formData.role] || formData.role,
+     })
 
       if (rememberMe) {
         window.localStorage.setItem('contractiq_token', result.access_token)
@@ -73,7 +82,7 @@ export function Auth() {
 
       setStatus('success')
       setMessage(`Login successful as ${formData.role}. Token saved for the current frontend session.`)
-      window.location.assign('/dashboard')
+      window.location.assign('/settings') // Redirect to the settings page after successful login
     } catch (error) {
       setStatus('error')
       setMessage(error.message)
@@ -85,7 +94,7 @@ export function Auth() {
 
     if (!canRegister) {
       setStatus('error')
-      setMessage('Enter your name, valid email, selected role, and a stronger password.')
+      setMessage('Enter your name, valid email, selected role, and a password with 6+ characters.')
       return
     }
 
@@ -94,8 +103,9 @@ export function Auth() {
 
     try {
       await signup(API_BASE_URL, {
-        ...registrationData,
-        department: registrationData.department || null,
+         ...registrationData,
+         role: roleApiValues[registrationData.role],
+         department: registrationData.department || null,
       })
 
       setFormData({
@@ -117,7 +127,7 @@ export function Auth() {
 
     if (!canResetPassword) {
       setStatus('error')
-      setMessage('Enter your registered email and a stronger new password.')
+      setMessage('Enter your registered email and a new password with 6+ characters.')
       return
     }
 

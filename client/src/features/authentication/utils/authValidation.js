@@ -1,18 +1,26 @@
-export const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*[^A-Za-z0-9]).{8,}$/
+export const passwordPattern = /^.{6,}$/
 
 export function canSubmitLogin(formData, roleTouched) {
-  return formData.email.includes('@') && passwordPattern.test(formData.password) && roleTouched && Boolean(formData.role)
+  return (
+    formData.email.includes('@') &&
+    formData.password.length >= 6 &&
+    roleTouched &&
+    Boolean(formData.role)
+  )
 }
 
 export function canSubmitRegistration(registrationData) {
   return (
     registrationData.name.trim().length >= 2 &&
     registrationData.email.includes('@') &&
-    passwordPattern.test(registrationData.password) &&
+    registrationData.password.length >= 6 &&
     Boolean(registrationData.role)
   )
 }
 
 export function canSubmitPasswordReset(passwordResetData) {
-  return passwordResetData.email.includes('@') && passwordPattern.test(passwordResetData.new_password)
+  return (
+    passwordResetData.email.includes('@') &&
+    passwordResetData.new_password.length >= 6
+  )
 }
