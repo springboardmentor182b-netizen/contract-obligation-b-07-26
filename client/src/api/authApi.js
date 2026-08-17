@@ -5,6 +5,17 @@ const API = axios.create({
     baseURL: `${API_BASE_URL}/api`,
 });
 
+// Add authentication token to requests
+API.interceptors.request.use((config) => {
+    const token = localStorage.getItem('contractiq_token') || sessionStorage.getItem('contractiq_token');
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+}, (error) => {
+    return Promise.reject(error);
+});
+
 // Register
 export const registerUser = async (userData) => {
     const response = await API.post(

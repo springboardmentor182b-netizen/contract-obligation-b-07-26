@@ -1,4 +1,4 @@
-export const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://contractiq-server.onrender.com'
+export const API_BASE_URL = import.meta.env.VITE_API_URL || import.meta.env.VITE_API_BASE_URL || 'https://contractiq-server.onrender.com'
 
 export const emptyCredentials = {
   email: '',

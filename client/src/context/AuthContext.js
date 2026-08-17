@@ -12,12 +12,12 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
 
     const [token, setToken] = useState(
-        localStorage.getItem("token") || null
+        localStorage.getItem("contractiq_token") || sessionStorage.getItem("contractiq_token") || null
     );
 
     useEffect(() => {
 
-        const storedUser = localStorage.getItem("user");
+        const storedUser = localStorage.getItem("contractiq_user") || sessionStorage.getItem("contractiq_user");
 
         if (storedUser) {
 
@@ -33,10 +33,10 @@ export const AuthProvider = ({ children }) => {
 
         setToken(accessToken);
 
-        localStorage.setItem("token", accessToken);
+        localStorage.setItem("contractiq_token", accessToken);
 
         localStorage.setItem(
-            "user",
+            "contractiq_user",
             JSON.stringify(userData)
         );
 
@@ -48,9 +48,13 @@ export const AuthProvider = ({ children }) => {
 
         setToken(null);
 
-        localStorage.removeItem("token");
+        localStorage.removeItem("contractiq_token");
 
-        localStorage.removeItem("user");
+        localStorage.removeItem("contractiq_user");
+
+        sessionStorage.removeItem("contractiq_token");
+
+        sessionStorage.removeItem("contractiq_user");
 
     };
 

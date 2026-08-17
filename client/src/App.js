@@ -20,8 +20,7 @@ import { Auth } from './features/authentication/Auth'
 function isAuthenticated() {
   return Boolean(
     window.localStorage.getItem('contractiq_token') ||
-    window.sessionStorage.getItem('contractiq_token') ||
-    window.localStorage.getItem('access_token')
+    window.sessionStorage.getItem('contractiq_token')
   )
 }
 
