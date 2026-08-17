@@ -863,3 +863,4 @@ def list_activities(_: dict[str, Any] = Depends(get_current_user)) -> list[dict[
 
 
 app.include_router(api_router)
+app.include_router(settings.router, prefix="/api/settings", tags=["Settings"])
