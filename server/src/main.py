@@ -60,6 +60,9 @@ app = FastAPI(
     title="ContractIQ: Contract Obligation Tracking API",
     version="1.0.0",
     description="Backend API for contracts, obligations, renewals, compliance, notifications, reports, audit logs, and settings.",
+    docs_url=None,
+    redoc_url=None,
+    openapi_url=None,
 )
 api_router = APIRouter()
 
