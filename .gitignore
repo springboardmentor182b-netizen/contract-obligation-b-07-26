@@ -1,3 +1,12 @@
+# Python cache
+__pycache__/
+*.py[cod]
+
+# Temporary API/test files
+client/register-test.json
+register-test.json
+server/login-test.json
+openapi.json
 # Ignore client dependencies
 client/node_modules/
 client/dist/
