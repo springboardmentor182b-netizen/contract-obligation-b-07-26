@@ -13,7 +13,7 @@ from .settings import (
     SettingsAppearanceBase, SettingsAppearanceUpdate, SettingsAppearanceResponse,
     SettingsOrganizationBase, SettingsOrganizationUpdate, SettingsOrganizationResponse
 )
-from .user import UserBase, UserCreate, UserUpdate, UserResponse
+from .user import UserBase, UserUpdate, UserResponse
 from .contract import ContractBase, ContractCreate, ContractUpdate, ContractResponse
 
 # Additional schemas needed by main.py
@@ -23,6 +23,13 @@ class Role(str, Enum):
     contract_manager = "contract_manager"
     compliance_officer = "compliance_officer"
     user = "user"
+
+class UserCreate(BaseModel):
+    name: str
+    email: EmailStr
+    password: str
+    role: Role = Role.user
+    department: Optional[str] = None
 
 class ContractStatus(str, Enum):
     active = "active"
@@ -48,6 +55,8 @@ class ComplianceLevel(str, Enum):
     high = "high"
     medium = "medium"
     low = "low"
+
+
 
 class APIRecord(BaseModel):
     id: str
