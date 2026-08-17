@@ -1,85 +1,183 @@
 from sqlalchemy.orm import Session
 from src.models.settings import (
-    SettingsProfile, SettingsSecurity, SettingsNotifications,
-    SettingsAppearance, SettingsOrganization
+    SettingsProfile,
+    SettingsSecurity,
+    SettingsNotifications,
+    SettingsAppearance,
+    SettingsOrganization,
 )
+from src.models.user import User
 from src.schemas.settings import (
-    SettingsProfileUpdate, SettingsSecurityUpdate,
-    SettingsNotificationsUpdate, SettingsAppearanceUpdate,
-    SettingsOrganizationUpdate
+    SettingsProfileUpdate,
+    SettingsSecurityUpdate,
+    SettingsNotificationsUpdate,
+    SettingsAppearanceUpdate,
+    SettingsOrganizationUpdate,
 )
 import hashlib
 
-# Profile CRUD Operations
-def get_profile(db: Session, profile_id: int = 1):
-    profile = db.query(SettingsProfile).filter(SettingsProfile.id == profile_id).first()
-    if not profile:
-        # Create a default profile if it doesn't exist
-        profile = SettingsProfile(
-            id=profile_id,
-            first_name="",
-            last_name="",
-            email="default@example.com",
-            phone="",
-            job_title="",
-            department="",
-            timezone="UTC",
-            profile_image=""
-        )
-        db.add(profile)
-        db.commit()
-        db.refresh(profile)
-    return profile
 
-def update_profile(db: Session, profile_data: SettingsProfileUpdate, profile_id: int = 1):
-    profile = get_profile(db, profile_id)
-    
-    update_data = profile_data.model_dump(exclude_unset=True)
-    for key, value in update_data.items():
-        setattr(profile, key, value)
-    
+# ============================================================
+# PROFILE
+# ============================================================
+
+def get_profile(
+    db: Session,
+    profile_id: int,
+    current_user: dict | None = None,
+):
+    """
+    Get the settings profile for the authenticated user.
+
+    The profile ID is the same as the authenticated user's ID.
+    If the settings profile doesn't exist, create it from the
+    actual User record.
+    """
+
+    profile = (
+        db.query(SettingsProfile)
+        .filter(SettingsProfile.id == profile_id)
+        .first()
+    )
+
+    if profile:
+        return profile
+
+    # Get the actual user from the users table
+    user = (
+        db.query(User)
+        .filter(User.id == profile_id)
+        .first()
+    )
+
+    if not user:
+        return None
+
+    # Use first_name / last_name if available.
+    # Otherwise split full_name.
+    first_name = user.first_name or ""
+    last_name = user.last_name or ""
+
+    if not first_name and not last_name and user.full_name:
+        name_parts = user.full_name.strip().split(" ", 1)
+
+        first_name = name_parts[0] if name_parts else ""
+        last_name = name_parts[1] if len(name_parts) > 1 else ""
+
+    # Create settings profile using actual user information
+    profile = SettingsProfile(
+        id=user.id,
+        first_name=first_name,
+        last_name=last_name,
+        email=user.email,
+        phone=user.phone or "",
+        job_title=user.designation or "",
+        department=user.department or "",
+        timezone="UTC",
+        profile_image="",
+    )
+
+    db.add(profile)
     db.commit()
     db.refresh(profile)
+
     return profile
 
-# Security CRUD Operations
-def get_security(db: Session, user_id: int = 1):
-    security = db.query(SettingsSecurity).filter(SettingsSecurity.user_id == user_id).first()
+
+def update_profile(
+    db: Session,
+    profile_data: SettingsProfileUpdate,
+    profile_id: int,
+    current_user: dict | None = None,
+):
+    """
+    Update the authenticated user's settings profile.
+    """
+
+    profile = get_profile(
+        db,
+        profile_id=profile_id,
+        current_user=current_user,
+    )
+
+    if not profile:
+        return None
+
+    update_data = profile_data.model_dump(exclude_unset=True)
+
+    for key, value in update_data.items():
+        setattr(profile, key, value)
+
+    db.commit()
+    db.refresh(profile)
+
+    return profile
+
+
+# ============================================================
+# SECURITY
+# ============================================================
+
+def get_security(db: Session, user_id: int):
+    security = (
+        db.query(SettingsSecurity)
+        .filter(SettingsSecurity.user_id == user_id)
+        .first()
+    )
+
     if not security:
-        # Create default security settings
         security = SettingsSecurity(
             user_id=user_id,
-            two_fa_enabled=False
+            two_fa_enabled=False,
         )
+
         db.add(security)
         db.commit()
         db.refresh(security)
+
     return security
 
-def update_security(db: Session, security_data: SettingsSecurityUpdate, user_id: int = 1):
+
+def update_security(
+    db: Session,
+    security_data: SettingsSecurityUpdate,
+    user_id: int,
+):
     security = get_security(db, user_id)
-    
+
     update_data = security_data.model_dump(exclude_unset=True)
-    
+
     # Handle password change
     if "new_password" in update_data and update_data["new_password"]:
-        # In production, use proper password hashing (bcrypt, argon2, etc.)
-        security.password_hash = hashlib.sha256(update_data["new_password"].encode()).hexdigest()
-        del update_data["new_password"]
-        del update_data["current_password"]
-    
+
+        security.password_hash = hashlib.sha256(
+            update_data["new_password"].encode()
+        ).hexdigest()
+
+        update_data.pop("new_password", None)
+        update_data.pop("current_password", None)
+
     for key, value in update_data.items():
         setattr(security, key, value)
-    
+
     db.commit()
     db.refresh(security)
+
     return security
 
-# Notifications CRUD Operations
-def get_notifications(db: Session, user_id: int = 1):
-    notifications = db.query(SettingsNotifications).filter(SettingsNotifications.user_id == user_id).first()
+
+# ============================================================
+# NOTIFICATIONS
+# ============================================================
+
+def get_notifications(db: Session, user_id: int):
+    notifications = (
+        db.query(SettingsNotifications)
+        .filter(SettingsNotifications.user_id == user_id)
+        .first()
+    )
+
     if not notifications:
-        # Create default notification settings
         notifications = SettingsNotifications(
             user_id=user_id,
             email_notifications=True,
@@ -89,58 +187,92 @@ def get_notifications(db: Session, user_id: int = 1):
             obligations=True,
             compliance=True,
             approvals=True,
-            digest=False
+            digest=False,
         )
+
         db.add(notifications)
         db.commit()
         db.refresh(notifications)
+
     return notifications
 
-def update_notifications(db: Session, notifications_data: SettingsNotificationsUpdate, user_id: int = 1):
+
+def update_notifications(
+    db: Session,
+    notifications_data: SettingsNotificationsUpdate,
+    user_id: int,
+):
     notifications = get_notifications(db, user_id)
-    
+
     update_data = notifications_data.model_dump(exclude_unset=True)
+
     for key, value in update_data.items():
         setattr(notifications, key, value)
-    
+
     db.commit()
     db.refresh(notifications)
+
     return notifications
 
-# Appearance CRUD Operations
-def get_appearance(db: Session, user_id: int = 1):
-    appearance = db.query(SettingsAppearance).filter(SettingsAppearance.user_id == user_id).first()
+
+# ============================================================
+# APPEARANCE
+# ============================================================
+
+def get_appearance(db: Session, user_id: int):
+    appearance = (
+        db.query(SettingsAppearance)
+        .filter(SettingsAppearance.user_id == user_id)
+        .first()
+    )
+
     if not appearance:
-        # Create default appearance settings
         appearance = SettingsAppearance(
             user_id=user_id,
             theme="light",
             accent_color="#3b82f6",
             compact_mode=False,
             language="en",
-            date_format="MMM D, YYYY"
+            date_format="MMM D, YYYY",
         )
+
         db.add(appearance)
         db.commit()
         db.refresh(appearance)
+
     return appearance
 
-def update_appearance(db: Session, appearance_data: SettingsAppearanceUpdate, user_id: int = 1):
+
+def update_appearance(
+    db: Session,
+    appearance_data: SettingsAppearanceUpdate,
+    user_id: int,
+):
     appearance = get_appearance(db, user_id)
-    
+
     update_data = appearance_data.model_dump(exclude_unset=True)
+
     for key, value in update_data.items():
         setattr(appearance, key, value)
-    
+
     db.commit()
     db.refresh(appearance)
+
     return appearance
 
-# Organization CRUD Operations
-def get_organization(db: Session, user_id: int = 1):
-    organization = db.query(SettingsOrganization).filter(SettingsOrganization.user_id == user_id).first()
+
+# ============================================================
+# ORGANIZATION
+# ============================================================
+
+def get_organization(db: Session, user_id: int):
+    organization = (
+        db.query(SettingsOrganization)
+        .filter(SettingsOrganization.user_id == user_id)
+        .first()
+    )
+
     if not organization:
-        # Create default organization settings
         organization = SettingsOrganization(
             user_id=user_id,
             company_name="ContractIQ Inc.",
@@ -148,20 +280,29 @@ def get_organization(db: Session, user_id: int = 1):
             billing_plan="Enterprise — 25 seats",
             data_region="US East (N. Virginia)",
             organization_timezone="America/New_York (UTC-5)",
-            support_contact="support@contractiq.com"
+            support_contact="support@contractiq.com",
         )
+
         db.add(organization)
         db.commit()
         db.refresh(organization)
+
     return organization
 
-def update_organization(db: Session, organization_data: SettingsOrganizationUpdate, user_id: int = 1):
+
+def update_organization(
+    db: Session,
+    organization_data: SettingsOrganizationUpdate,
+    user_id: int,
+):
     organization = get_organization(db, user_id)
-    
+
     update_data = organization_data.model_dump(exclude_unset=True)
+
     for key, value in update_data.items():
         setattr(organization, key, value)
-    
+
     db.commit()
     db.refresh(organization)
+
     return organization

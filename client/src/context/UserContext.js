@@ -24,8 +24,16 @@ export const UserProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    fetchUserData();
-  }, []);
+   const token =
+     localStorage.getItem('contractiq_token') ||
+     sessionStorage.getItem('contractiq_token');
+
+   if (token) {
+     fetchUserData();
+   } else {
+     setIsLoading(false);
+   }
+ }, []);
 
   const refreshUser = () => {
     return fetchUserData();
