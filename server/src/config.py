@@ -17,6 +17,13 @@ if not DATABASE_URL:
         "DATABASE_URL is not configured. Add it to server/.env."
     )
 
+# Older deployment files may use ``postgresql://``.  SQLAlchemy maps that
+# scheme to psycopg2 by default, while ContractIQ installs Psycopg 3.
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+psycopg://", 1)
+elif DATABASE_URL.startswith("postgresql://"):
+    DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+psycopg://", 1)
+
 TOKEN_SECRET = os.getenv(
     "TOKEN_SECRET",
     "replace-this-secret-in-production",
