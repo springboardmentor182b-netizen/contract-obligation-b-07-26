@@ -1,4 +1,5 @@
 from __future__ import annotations
+from .routers import chat as chat_router
 
 import csv
 import logging
@@ -81,6 +82,9 @@ app.add_middleware(
 
 @app.on_event("startup")
 def startup() -> None:
+    from .database.users import ensure_database_exists
+
+    ensure_database_exists()
     initialize_database()
     initialize_core_tables()
     initialize_notifications_table()
@@ -1807,3 +1811,4 @@ def list_activities(_: dict[str, Any] = Depends(get_current_user)) -> list[dict[
 
 
 app.include_router(api_router)
+app.include_router(chat_router.router)
