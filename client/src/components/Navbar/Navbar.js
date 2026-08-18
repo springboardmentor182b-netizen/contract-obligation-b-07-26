@@ -3,9 +3,15 @@ import { FiSearch, FiBell, FiChevronDown } from 'react-icons/fi';
 import './Navbar.css';
 import Breadcrumb from './Breadcrumb';
 import { useUser } from '../../context/UserContext';
+import { roleDisplayNames } from '../../features/authentication/constants';
 
 const Navbar = () => {
   const { userData, getInitials } = useUser();
+
+  const getDisplayRole = () => {
+    if (!userData || !userData.role) return 'No Role';
+    return roleDisplayNames[userData.role] || userData.job_title || 'No Role';
+  };
 
   return (
     <header className="global-navbar">
@@ -30,7 +36,7 @@ const Navbar = () => {
             <span className="user-name">
               {userData ? `${userData.first_name || ''} ${userData.last_name || ''}`.trim() || 'User' : 'Loading...'}
             </span>
-            <span className="user-role">{userData ? userData.job_title || 'No Role' : '...'}</span>
+            <span className="user-role">{getDisplayRole()}</span>
           </div>
           <FiChevronDown className="dropdown-icon" />
         </div>

@@ -31,41 +31,19 @@ def get_profile(
     Get the settings profile for the authenticated user.
 
     The profile_id is the UUID from the users table.
-    If the settings profile doesn't exist, create it from the
-    actual User record from the PostgreSQL users table.
+    Returns user data directly from the PostgreSQL users table
+    to avoid schema issues with settings_profiles table.
     """
 
-    # Get the actual user from the PostgreSQL users table first
-    user = find_user_by_id(profile_id)
+    # Get the actual user from the PostgreSQL users table
+    try:
+        user = find_user_by_id(profile_id)
+    except Exception as e:
+        print(f"Error finding user: {e}")
+        return None
 
     if not user:
         return None
-
-    # Try to find existing profile by user_id (new schema)
-    try:
-        profile = (
-            db.query(SettingsProfile)
-            .filter(SettingsProfile.user_id == profile_id)
-            .first()
-        )
-        if profile:
-            return profile
-    except Exception:
-        # Column might not exist, continue to try by id
-        pass
-
-    # Try to find existing profile by id (old schema)
-    try:
-        profile = (
-            db.query(SettingsProfile)
-            .filter(SettingsProfile.id == profile_id)
-            .first()
-        )
-        if profile:
-            return profile
-    except Exception:
-        # Column might have different type, continue to create
-        pass
 
     # Split full_name into first_name and last_name
     full_name = user.get("name", "")
@@ -73,49 +51,22 @@ def get_profile(
     first_name = name_parts[0] if name_parts else ""
     last_name = name_parts[1] if len(name_parts) > 1 else ""
 
-    # Create settings profile using actual user information
-    # Try with user_id column first
-    try:
-        profile = SettingsProfile(
-            id=profile_id,  # Use the UUID as the id
-            user_id=profile_id,  # Also store in user_id for clarity
-            first_name=first_name,
-            last_name=last_name,
-            email=user.get("email", ""),
-            phone=user.get("phone", ""),
-            job_title="",
-            department=user.get("department", ""),
-            timezone="UTC",
-            profile_image="",
-        )
-        db.add(profile)
-        db.commit()
-        db.refresh(profile)
-        return profile
-    except Exception as e:
-        db.rollback()
-        # If user_id column doesn't exist, try without it
-        try:
-            profile = SettingsProfile(
-                id=profile_id,
-                first_name=first_name,
-                last_name=last_name,
-                email=user.get("email", ""),
-                phone=user.get("phone", ""),
-                job_title="",
-                department=user.get("department", ""),
-                timezone="UTC",
-                profile_image="",
-            )
-            db.add(profile)
-            db.commit()
-            db.refresh(profile)
-            return profile
-        except Exception as e2:
-            db.rollback()
-            # If both fail, return None
-            print(f"Error creating profile: {e2}")
-            return None
+    # Return a profile object with user data directly
+    # This avoids any database schema issues with settings_profiles table
+    class UserProfile:
+        def __init__(self):
+            self.id = profile_id
+            self.first_name = first_name
+            self.last_name = last_name
+            self.email = user.get("email", "")
+            self.phone = user.get("phone", "")
+            self.job_title = ""
+            self.department = user.get("department", "")
+            self.timezone = "UTC"
+            self.profile_image = ""
+            self.role = user.get("role", "")
+    
+    return UserProfile()
 
 
 def update_profile(

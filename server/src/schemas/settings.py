@@ -11,6 +11,7 @@ class SettingsProfileBase(BaseModel):
     department: Optional[str] = None
     timezone: Optional[str] = None
     profile_image: Optional[str] = None
+    role: Optional[str] = None
 
 class SettingsProfileCreate(SettingsProfileBase):
     pass
@@ -24,6 +25,7 @@ class SettingsProfileUpdate(BaseModel):
     department: Optional[str] = None
     timezone: Optional[str] = None
     profile_image: Optional[str] = None
+    role: Optional[str] = None
 
 class SettingsProfileResponse(SettingsProfileBase):
     id: str

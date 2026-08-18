@@ -39,3 +39,12 @@ export const roleApiValues = {
   'Department Head': 'user',
   'Employee': 'user',
 }
+
+export const roleDisplayNames = {
+  'administrator': 'Administrator',
+  'legal_manager': 'Legal Manager',
+  'compliance_officer': 'Compliance Officer',
+  'contract_manager': 'Contract Manager',
+  'department_head': 'Department Head',
+  'employee': 'Employee',
+}

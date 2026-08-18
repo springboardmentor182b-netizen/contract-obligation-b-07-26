@@ -15,9 +15,15 @@ import {
 } from 'react-icons/fi';
 import './Sidebar.css';
 import { useUser } from '../../context/UserContext';
+import { roleDisplayNames } from '../../features/authentication/constants';
 
 const Sidebar = () => {
   const { userData, getInitials } = useUser();
+
+  const getDisplayRole = () => {
+    if (!userData || !userData.role) return 'No Role';
+    return roleDisplayNames[userData.role] || userData.job_title || 'No Role';
+  };
 
   const menuItems = [
     { name: 'Dashboard', icon: <FiPieChart />, path: '/dashboard' },
@@ -60,7 +66,7 @@ const Sidebar = () => {
             <span className="sidebar-user-name">
               {userData ? `${userData.first_name || ''} ${userData.last_name || ''}`.trim() || 'User' : 'Loading...'}
             </span>
-            <span className="sidebar-user-role">{userData ? userData.job_title || 'No Role' : '...'}</span>
+            <span className="sidebar-user-role">{getDisplayRole()}</span>
           </div>
         </div>
         <button className="sidebar-collapse-btn">
