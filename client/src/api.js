@@ -109,6 +109,10 @@ export function fetchContractStats() {
   return get(`${BASE}/contracts/stats/summary`);
 }
 
+export function fetchUsers() {
+  return get(`${BASE}/users`);
+}
+
 /**
  * Create a new contract.
  */

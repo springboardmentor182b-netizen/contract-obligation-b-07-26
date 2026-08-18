@@ -97,10 +97,6 @@ export default function Navbar({ onNewContract, onImportComplete }) {
         <button className="primary-button" type="button" onClick={onNewContract}>
           New Contract
         </button>
-        <label className="search-box">
-          <span className="search-symbol" aria-hidden="true" />
-          <input type="search" placeholder="Search..." aria-label="Search" />
-        </label>
         <Link className="notification-button" to="/notifications" aria-label="Notifications">
           <Bell size={20} strokeWidth={1.8} aria-hidden="true" />
           <span className="notification-dot" />

@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import csv
+import logging
+import re
 from datetime import date, datetime, timedelta
 from io import StringIO
 from typing import Any
@@ -22,6 +24,7 @@ from .auth.security import create_token, get_current_user, hash_password, requir
 from .database import create_api_key, create_report as create_postgres_report, create_session, create_user, delete_report as delete_postgres_report, delete_user, find_user_by_email, get_preferences, get_report as get_postgres_report, initialize_core_tables, initialize_database, initialize_notifications_table, initialize_reports_table, initialize_sessions_table, initialize_settings_table, list_api_keys, list_reports as list_postgres_reports, list_sessions, list_users as list_database_users, restore_user, revoke_api_key, revoke_session, revoke_session_by_token, update_preferences, update_user, update_user_password
 from .database.audit_logs import list_audit_logs as list_database_audit_logs
 from .database.notifications import create_notification as create_postgres_notification, list_notifications as list_postgres_notifications, mark_all_notifications_read, mark_notification_read as mark_postgres_notification_read
+from .services.contract_ai_service import generate_obligations as generate_ai_obligations, is_configured as ai_is_configured, summarize_contract as summarize_with_openai
 from .database.obligations import list_obligations as list_postgres_obligations
 from .database.session import Base, engine
 from .database.users import get_connection
@@ -50,10 +53,16 @@ from .schemas import (
 )
 from .storage import store
 
+
+logger = logging.getLogger(__name__)
+
 app = FastAPI(
     title="ContractIQ: Contract Obligation Tracking API",
     version="1.0.0",
     description="Backend API for contracts, obligations, renewals, compliance, notifications, reports, audit logs, and settings.",
+    docs_url=None,
+    redoc_url=None,
+    openapi_url=None,
 )
 api_router = APIRouter()
 
@@ -109,6 +118,38 @@ def parse_date(value: str | None) -> date | None:
     if isinstance(value, date):
         return value
     return date.fromisoformat(value) if value else None
+
+
+def record_database_audit(action: str, module: str, entity_id: str, user_id: str) -> None:
+    """Store an audit entry in PostgreSQL, which powers the Audit Logs page."""
+    try:
+        with get_connection() as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """
+                    INSERT INTO audit_logs (audit_id, user_id, action, module, new_value, created_at)
+                    VALUES (gen_random_uuid(), %s, %s, %s, jsonb_build_object('entity_id', %s), NOW())
+                    """,
+                    (user_id, action, module, entity_id),
+                )
+    except Exception:
+        logger.exception("Could not write the PostgreSQL audit record for %s %s", action, module)
+        return
+
+    # Activities are supplementary dashboard data. A legacy activities-table
+    # mismatch must not make a successfully saved contract return HTTP 500.
+    try:
+        with get_connection() as connection:
+            with connection.cursor() as cursor:
+                cursor.execute(
+                    """
+                    INSERT INTO activities (activity_id, user_id, activity, activity_time)
+                    VALUES (gen_random_uuid(), %s, %s, NOW())
+                    """,
+                    (user_id, f"{action.title()} {module}"),
+                )
+    except Exception:
+        logger.exception("Could not write the supplementary activity for %s %s", action, module)
 
 
 def csv_download(filename: str, header: list[str], rows: list[list[Any]], media_type: str = "text/csv") -> Response:
@@ -408,7 +449,7 @@ def list_contracts(
                     COALESCE(description, '-') AS party,
                     status,
                     end_date AS expiry,
-                    NULL::numeric AS value,
+                    contract_value AS value,
                     '1.0' AS version
                 FROM contracts
                 {where_clause}
@@ -422,29 +463,167 @@ def list_contracts(
 @api_router.post("/api/contracts", status_code=status.HTTP_201_CREATED)
 def create_contract(payload: ContractCreate, current_user: dict[str, Any] = Depends(get_current_user)) -> dict[str, Any]:
     data = model_payload(payload)
+    owner_id = data.get("owner_id") or current_user["id"]
     with get_connection() as connection:
         with connection.cursor(row_factory=dict_row) as cursor:
             cursor.execute(
                 """
                 INSERT INTO contracts (
                     title, contract_number, category, description, start_date,
-                    end_date, status, uploaded_by, assigned_to
+                    end_date, status, contract_value, uploaded_by, assigned_to
                 )
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                 RETURNING contract_id::text AS id, title AS name,
                           COALESCE(contract_number, contract_id::text) AS contract_id,
                           category, COALESCE(category, 'Unassigned') AS department,
                           COALESCE(description, '-') AS party, status,
-                          end_date AS expiry, NULL::numeric AS value, '1.0' AS version
+                          end_date AS expiry, contract_value AS value, '1.0' AS version
                 """,
                 (
                     data["title"], data.get("contract_number"), data["category"],
                     data.get("counterparty"), data.get("effective_date"),
-                    data.get("expiry_date"), data["status"], current_user["id"],
-                    data.get("owner_id") or current_user["id"],
+                    data.get("expiry_date"), data["status"], data.get("value"), current_user["id"],
+                    owner_id,
                 ),
             )
-            return dict(cursor.fetchone())
+            contract = dict(cursor.fetchone())
+    record_database_audit("created", "contract", contract["id"], current_user["id"])
+    if owner_id != current_user["id"]:
+        create_postgres_notification({
+            "recipient_user_id": owner_id,
+            "related_id": contract["id"],
+            "related_type": "contract",
+            "title": "Contract assigned to you",
+            "message": f"You were assigned as the owner of {contract['name']}.",
+        })
+    return contract
+
+
+def ai_contract_summary(payload: dict[str, Any]) -> dict[str, Any]:
+    """Return a transparent, offline AI-assisted summary from contract details.
+
+    This deterministic fallback keeps the feature available in EC2 without an
+    external AI key. It can later be replaced by an LLM provider without
+    changing the frontend API.
+    """
+    title = str(payload.get("title") or payload.get("name") or "Untitled contract").strip()
+    counterparty = str(payload.get("counterparty") or payload.get("party") or "the counterparty").strip()
+    category = str(payload.get("category") or "General agreement").strip()
+    description = re.sub(r"\s+", " ", str(payload.get("description") or payload.get("remarks") or "").strip())
+    start_date = payload.get("start_date") or payload.get("effective_date")
+    end_date = payload.get("end_date") or payload.get("expiry_date")
+
+    first_sentence = re.split(r"(?<=[.!?])\s+", description)[0] if description else "No detailed description was provided."
+    key_terms = [f"Category: {category}", f"Counterparty: {counterparty}"]
+    if start_date:
+        key_terms.append(f"Starts: {start_date}")
+    if end_date:
+        key_terms.append(f"Ends: {end_date}")
+
+    text = f"{title} is a {category.lower()} involving {counterparty}. {first_sentence}"
+    risks: list[str] = []
+    searchable = f"{title} {description} {category}".lower()
+    if not end_date:
+        risks.append("No expiry date is recorded; set one to track renewal deadlines.")
+    if any(word in searchable for word in ("data", "privacy", "personal information")):
+        risks.append("Review data-protection and confidentiality responsibilities.")
+    if any(word in searchable for word in ("payment", "invoice", "fee", "value")):
+        risks.append("Confirm payment milestones and approval responsibilities.")
+    if not risks:
+        risks.append("Review approval, delivery, and renewal responsibilities before activation.")
+
+    return {"summary": text, "key_terms": key_terms, "risk_flags": risks}
+
+
+@api_router.post("/api/contracts/ai/summarize")
+def summarize_contract_with_ai(payload: dict[str, Any], _: dict[str, Any] = Depends(get_current_user)) -> dict[str, Any]:
+    contract_id = str(payload.get("contract_id") or "").strip()
+    source = payload
+    if contract_id:
+        with get_connection() as connection:
+            with connection.cursor(row_factory=dict_row) as cursor:
+                cursor.execute(
+                    """
+                    SELECT contract_id::text AS id, title, contract_number, category, description,
+                           start_date, end_date, status
+                    FROM contracts WHERE contract_id = %s
+                    """,
+                    (contract_id,),
+                )
+                contract = cursor.fetchone()
+        if not contract:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Contract not found")
+        source = dict(contract)
+
+    if not str(source.get("title") or source.get("name") or "").strip():
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_CONTENT, detail="Contract title is required for a summary")
+    if ai_is_configured():
+        return {**summarize_with_openai(source), "provider": "OpenAI"}
+    return {**ai_contract_summary(source), "provider": "Local fallback"}
+
+
+@api_router.post("/api/contracts/{contract_id}/ai/obligations")
+def generate_contract_obligations(contract_id: str, _: dict[str, Any] = Depends(get_current_user)) -> dict[str, Any]:
+    with get_connection() as connection:
+        with connection.cursor(row_factory=dict_row) as cursor:
+            cursor.execute(
+                """
+                SELECT contract_id::text AS id, title, category, description, end_date
+                FROM contracts WHERE contract_id = %s
+                """,
+                (contract_id,),
+            )
+            contract = cursor.fetchone()
+
+    if not contract:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Contract not found")
+
+    record = dict(contract)
+    if ai_is_configured():
+        return {
+            "contract_id": contract_id,
+            "contract_title": record["title"],
+            "suggestions": generate_ai_obligations(record),
+            "provider": "OpenAI",
+        }
+    category = str(record.get("category") or "").lower()
+    description = str(record.get("description") or "").lower()
+    end_date = record.get("end_date")
+    suggestions: list[dict[str, Any]] = [
+        {
+            "title": f"Review obligations for {record['title']}",
+            "obligation_type": "Contract Review",
+            "due_date": str(date.today() + timedelta(days=14)),
+            "priority": "Medium",
+            "description": "Confirm responsibilities, approvals, and delivery commitments.",
+        },
+        {
+            "title": f"Maintain supporting records for {record['title']}",
+            "obligation_type": "Documentation",
+            "due_date": str(date.today() + timedelta(days=30)),
+            "priority": "Low",
+            "description": "Store signed documents, communications, and evidence in the contract repository.",
+        },
+    ]
+    if end_date:
+        reminder_date = end_date - timedelta(days=30)
+        suggestions.append({
+            "title": f"Start renewal review for {record['title']}",
+            "obligation_type": "Renewal Review",
+            "due_date": str(reminder_date),
+            "priority": "High",
+            "description": "Review renewal terms at least 30 days before contract expiry.",
+        })
+    if any(word in f"{category} {description}" for word in ("data", "privacy", "security", "cloud")):
+        suggestions.append({
+            "title": f"Complete compliance review for {record['title']}",
+            "obligation_type": "Compliance Review",
+            "due_date": str(date.today() + timedelta(days=21)),
+            "priority": "High",
+            "description": "Validate data protection, security, and confidentiality obligations.",
+        })
+
+    return {"contract_id": contract_id, "contract_title": record["title"], "suggestions": suggestions}
 
 
 @api_router.post("/api/contracts/import", status_code=status.HTTP_201_CREATED)
@@ -461,8 +640,8 @@ def import_contracts(payload: list[dict[str, Any]], current_user: dict[str, Any]
                     continue
                 status_value = str(item.get("status") or "Draft")
                 cursor.execute("""
-                    INSERT INTO contracts (title, contract_number, category, description, start_date, end_date, status, uploaded_by, assigned_to)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    INSERT INTO contracts (title, contract_number, category, description, start_date, end_date, status, contract_value, uploaded_by, assigned_to)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
                     RETURNING contract_id::text AS id, title, contract_number, end_date
                 """, (
                     title, str(item.get("contract_number") or "").strip() or None,
@@ -470,7 +649,7 @@ def import_contracts(payload: list[dict[str, Any]], current_user: dict[str, Any]
                     str(item.get("counterparty") or item.get("description") or "").strip() or None,
                     item.get("effective_date") or item.get("start_date") or None,
                     item.get("expiry_date") or item.get("end_date") or None,
-                    status_value, current_user["id"], current_user["id"],
+                    status_value, item.get("value") or None, current_user["id"], current_user["id"],
                 ))
                 contract = dict(cursor.fetchone())
                 due_date = contract.get("end_date") or date.today() + timedelta(days=30)
@@ -550,7 +729,7 @@ def update_contract(
         "title": "title = %s", "contract_number": "contract_number = %s",
         "category": "category = %s", "counterparty": "description = %s",
         "effective_date": "start_date = %s", "expiry_date": "end_date = %s",
-        "status": "status = %s",
+        "status": "status = %s", "value": "contract_value = %s", "owner_id": "assigned_to = %s",
     }
     keys = [key for key in data if key in fields]
     if not keys:
@@ -564,22 +743,33 @@ def update_contract(
                               COALESCE(contract_number, contract_id::text) AS contract_id,
                               category, COALESCE(category, 'Unassigned') AS department,
                               COALESCE(description, '-') AS party, status,
-                              end_date AS expiry, NULL::numeric AS value, '1.0' AS version""",
+                              end_date AS expiry, contract_value AS value, '1.0' AS version""",
                 (*[data[key] for key in keys], contract_id),
             )
             contract = cursor.fetchone()
     if not contract:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Contract not found")
-    return dict(contract)
+    result = dict(contract)
+    record_database_audit("updated", "contract", contract_id, current_user["id"])
+    if data.get("owner_id") and data["owner_id"] != current_user["id"]:
+        create_postgres_notification({
+            "recipient_user_id": data["owner_id"],
+            "related_id": contract_id,
+            "related_type": "contract",
+            "title": "Contract assigned to you",
+            "message": f"You were assigned as the owner of {result['name']}.",
+        })
+    return result
 
 
 @api_router.delete("/api/contracts/{contract_id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_contract(contract_id: str, _: dict[str, Any] = Depends(get_current_user)) -> None:
+def delete_contract(contract_id: str, current_user: dict[str, Any] = Depends(get_current_user)) -> None:
     with get_connection() as connection:
         with connection.cursor() as cursor:
             cursor.execute("DELETE FROM contracts WHERE contract_id = %s", (contract_id,))
             if cursor.rowcount == 0:
                 raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Contract not found")
+    record_database_audit("deleted", "contract", contract_id, current_user["id"])
 
 
 @api_router.post("/api/contracts/{contract_id}/archive", response_model=APIRecord)
@@ -668,6 +858,14 @@ def create_obligation(payload: dict[str, Any], current_user: dict[str, Any] = De
             ))
             obligation = dict(cursor.fetchone())
     store.audit("created", "obligation", obligation["id"], current_user["id"])
+    if owner_id:
+        create_postgres_notification({
+            "recipient_user_id": owner_id,
+            "related_id": obligation["id"],
+            "related_type": "obligation",
+            "title": "Obligation assigned to you",
+            "message": f"{obligation['title']} is due on {obligation['due_date']}.",
+        })
     return obligation
 
 
@@ -782,6 +980,13 @@ def create_renewal(payload: dict[str, Any], current_user: dict[str, Any] = Depen
             ))
             renewal = dict(cursor.fetchone())
     store.audit("created", "renewal", renewal["id"], current_user["id"])
+    create_postgres_notification({
+        "recipient_user_id": current_user["id"],
+        "related_id": contract_id,
+        "related_type": "renewal",
+        "title": "Renewal scheduled",
+        "message": f"A renewal was scheduled for {renewal_date}.",
+    })
     return renewal
 
 
@@ -840,7 +1045,7 @@ def exported_contracts(search: str | None, status_filter: str | None, category: 
     with get_connection() as connection:
         with connection.cursor(row_factory=dict_row) as cursor:
             cursor.execute(f"""
-                SELECT contract_number, title, category, description, status, start_date, end_date
+                SELECT contract_number, title, category, description, status, start_date, end_date, contract_value AS value
                 FROM contracts {where_clause} ORDER BY created_at DESC NULLS LAST, contract_id
             """, parameters)
             return [dict(record) for record in cursor.fetchall()]
@@ -854,8 +1059,8 @@ def export_contracts_csv(
     _: dict[str, Any] = Depends(get_current_user),
 ) -> Response:
     contracts = exported_contracts(search, status_filter, category)
-    return csv_download("contracts.csv", ["Contract Number", "Title", "Category", "Description", "Status", "Start Date", "End Date"], [
-        [item.get("contract_number"), item.get("title"), item.get("category"), item.get("description"), item.get("status"), item.get("start_date"), item.get("end_date")]
+    return csv_download("contracts.csv", ["Contract Number", "Title", "Category", "Description", "Status", "Start Date", "End Date", "Value"], [
+        [item.get("contract_number"), item.get("title"), item.get("category"), item.get("description"), item.get("status"), item.get("start_date"), item.get("end_date"), item.get("value")]
         for item in contracts
     ])
 
@@ -868,8 +1073,8 @@ def export_contracts_excel(
     _: dict[str, Any] = Depends(get_current_user),
 ) -> Response:
     contracts = exported_contracts(search, status_filter, category)
-    return csv_download("contracts.xls", ["Contract Number", "Title", "Category", "Description", "Status", "Start Date", "End Date"], [
-        [item.get("contract_number"), item.get("title"), item.get("category"), item.get("description"), item.get("status"), item.get("start_date"), item.get("end_date")]
+    return csv_download("contracts.xls", ["Contract Number", "Title", "Category", "Description", "Status", "Start Date", "End Date", "Value"], [
+        [item.get("contract_number"), item.get("title"), item.get("category"), item.get("description"), item.get("status"), item.get("start_date"), item.get("end_date"), item.get("value")]
         for item in contracts
     ], "application/vnd.ms-excel")
     changes = {key: value for key, value in fields.items() if value is not None}

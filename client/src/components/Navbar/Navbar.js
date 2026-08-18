@@ -1,5 +1,5 @@
 import React from 'react';
-import { FiSearch, FiBell, FiChevronDown } from 'react-icons/fi';
+import { FiBell, FiChevronDown } from 'react-icons/fi';
 import './Navbar.css';
 import Breadcrumb from './Breadcrumb';
 import { useUser } from '../../context/UserContext';
@@ -14,11 +14,6 @@ const Navbar = () => {
       </div>
       
       <div className="navbar-right">
-        <div className="search-container">
-          <FiSearch className="search-icon" />
-          <input type="text" placeholder="Search..." className="search-input" />
-        </div>
-        
         <button className="notification-btn">
           <FiBell />
           <span className="badge">3</span>

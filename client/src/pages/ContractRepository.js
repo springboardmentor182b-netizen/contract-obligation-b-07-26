@@ -6,18 +6,22 @@ import ContractHeader from "../components/ContractHeader";
 import StatusTabs from "../components/StatusTabs";
 import CategoryTabs from "../components/CategoryTabs";
 import ContractTable from "../components/ContractTable";
+import ContractViewModal from "../components/ContractViewModal";
 import NewContractModal from "../components/NewContractModal";
-import { fetchContracts, createContract, updateContract, deleteContract } from "../api";
+import ContractAIWorkspace from "../components/ContractAIWorkspace";
+import { fetchContracts, fetchUsers, createContract, updateContract, deleteContract } from "../api";
 import "./ContractRepository.css";
 
 const ContractRepository = () => {
   const [contracts, setContracts] = useState([]);
+  const [users, setUsers] = useState([]);
   const [statusFilter, setStatusFilter] = useState("All");
   const [categoryFilter, setCategoryFilter] = useState("All");
   const [searchTerm, setSearchTerm] = useState("");
 
   const [showModal, setShowModal] = useState(false);
   const [selectedContract, setSelectedContract] = useState(null);
+  const [viewedContract, setViewedContract] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -54,6 +58,10 @@ const ContractRepository = () => {
         setDashboard(dashboardData);
       })
       .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    fetchUsers().then((rows) => setUsers(Array.isArray(rows) ? rows : [])).catch(() => setUsers([]));
   }, []);
 
   const toggleSidebar = () => {
@@ -135,6 +143,8 @@ const ContractRepository = () => {
             onCategoryChange={setCategoryFilter}
           />
 
+          <ContractAIWorkspace contracts={contracts} />
+
           <StatusTabs
             selectedStatus={statusFilter}
             setSelectedStatus={setStatusFilter}
@@ -171,6 +181,7 @@ const ContractRepository = () => {
             ) : (
               <ContractTable
                 contracts={contracts}
+                onView={setViewedContract}
                 onEdit={handleEditContract}
                 onDelete={handleDeleteContract}
               />
@@ -188,8 +199,10 @@ const ContractRepository = () => {
         }}
         onSave={handleSaveContract}
         contract={selectedContract}
+        users={users}
         isEditing={isEditing}
       />
+      <ContractViewModal contract={viewedContract} onClose={() => setViewedContract(null)} />
     </div>
   );
 };
