@@ -81,6 +81,7 @@ Desktop.ini
 .cache/
 tmp/
 temp/
+.deploy/
 
 # Runtime logs
 *.log

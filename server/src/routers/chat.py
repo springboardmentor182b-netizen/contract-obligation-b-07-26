@@ -22,6 +22,10 @@ from ..database.users import get_connection
 
 router = APIRouter(prefix="/api/chat", tags=["chat"])
 
+# Groq retired llama-3.3-70b-versatile for free/developer accounts on
+# 2026-08-16. Keep the current replacement configurable for each deployment.
+DEFAULT_GROQ_MODEL = "openai/gpt-oss-120b"
+
 
 class ChatMessage(BaseModel):
     role: str  # 'user' | 'assistant'
@@ -127,10 +131,11 @@ def ask(payload: ChatRequest, current_user: dict[str, Any] = Depends(get_current
     messages.append({"role": "user", "content": payload.message})
 
     client = Groq(api_key=api_key)
+    model = os.getenv("GROQ_MODEL", DEFAULT_GROQ_MODEL).strip() or DEFAULT_GROQ_MODEL
 
     try:
         response = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
+            model=model,
             messages=messages,
             max_tokens=1024,
         )
