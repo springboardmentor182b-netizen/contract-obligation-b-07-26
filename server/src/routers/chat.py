@@ -25,6 +25,10 @@ router = APIRouter(prefix="/api/chat", tags=["chat"])
 # Groq retired llama-3.3-70b-versatile for free/developer accounts on
 # 2026-08-16. Keep the current replacement configurable for each deployment.
 DEFAULT_GROQ_MODEL = "openai/gpt-oss-120b"
+MAX_CONTEXT_CHARS = 6_000
+MAX_HISTORY_MESSAGES = 6
+MAX_HISTORY_CONTENT_CHARS = 700
+MAX_USER_MESSAGE_CHARS = 1_200
 
 
 class ChatMessage(BaseModel):
@@ -56,7 +60,7 @@ def gather_context(user_id: str) -> str:
                        description AS counterparty, status, start_date, end_date
                 FROM contracts
                 ORDER BY created_at DESC NULLS LAST
-                LIMIT 50
+                LIMIT 12
             """)
             contracts = cursor.fetchall()
 
@@ -67,7 +71,7 @@ def gather_context(user_id: str) -> str:
                 FROM obligations AS o
                 LEFT JOIN contracts AS c ON c.contract_id = o.contract_id
                 ORDER BY o.due_date ASC NULLS LAST
-                LIMIT 50
+                LIMIT 15
             """)
             obligations = cursor.fetchall()
 
@@ -77,23 +81,33 @@ def gather_context(user_id: str) -> str:
                 FROM renewals AS r
                 LEFT JOIN contracts AS c ON c.contract_id = r.contract_id
                 ORDER BY r.renewal_date ASC NULLS LAST
-                LIMIT 50
+                LIMIT 12
             """)
             renewals = cursor.fetchall()
+
+    def compact_value(value: Any) -> str:
+        """Keep database values useful without allowing one field to exhaust tokens."""
+        text = " ".join(str(value).split())
+        return text[:160] + ("..." if len(text) > 160 else "")
 
     def format_rows(rows: list[dict[str, Any]]) -> str:
         if not rows:
             return "(none)"
         return "\n".join(
-            "- " + ", ".join(f"{key}: {value}" for key, value in row.items() if value is not None)
+            "- " + ", ".join(
+                f"{key}: {compact_value(value)}"
+                for key, value in row.items()
+                if value is not None
+            )
             for row in rows
         )
 
-    return (
+    context = (
         f"CONTRACTS:\n{format_rows(contracts)}\n\n"
         f"OBLIGATIONS:\n{format_rows(obligations)}\n\n"
         f"RENEWALS:\n{format_rows(renewals)}"
     )
+    return context[:MAX_CONTEXT_CHARS]
 
 
 @router.post("/ask", response_model=ChatResponse)
@@ -127,8 +141,18 @@ def ask(payload: ChatRequest, current_user: dict[str, Any] = Depends(get_current
     # system prompt is just the first message in the array, not a separate
     # parameter (unlike Anthropic's SDK).
     messages = [{"role": "system", "content": system_prompt}]
-    messages.extend({"role": m.role, "content": m.content} for m in payload.history)
-    messages.append({"role": "user", "content": payload.message})
+    for message in payload.history[-MAX_HISTORY_MESSAGES:]:
+        content = message.content.strip()[:MAX_HISTORY_CONTENT_CHARS]
+        if content:
+            messages.append({"role": message.role, "content": content})
+
+    user_message = payload.message.strip()[:MAX_USER_MESSAGE_CHARS]
+    if not user_message:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+            detail="Enter a question for the AI Assistant.",
+        )
+    messages.append({"role": "user", "content": user_message})
 
     client = Groq(api_key=api_key)
     model = os.getenv("GROQ_MODEL", DEFAULT_GROQ_MODEL).strip() or DEFAULT_GROQ_MODEL
@@ -137,7 +161,7 @@ def ask(payload: ChatRequest, current_user: dict[str, Any] = Depends(get_current
         response = client.chat.completions.create(
             model=model,
             messages=messages,
-            max_tokens=1024,
+            max_tokens=512,
         )
     except Exception as error:  # noqa: BLE001 — surface any provider error as a clean 502
         raise HTTPException(status_code=status.HTTP_502_BAD_GATEWAY, detail=f"AI request failed: {error}")
