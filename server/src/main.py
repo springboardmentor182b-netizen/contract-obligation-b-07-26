@@ -82,9 +82,6 @@ app.add_middleware(
 
 @app.on_event("startup")
 def startup() -> None:
-    from .database.users import ensure_database_exists
-
-    ensure_database_exists()
     initialize_database()
     initialize_core_tables()
     initialize_notifications_table()
