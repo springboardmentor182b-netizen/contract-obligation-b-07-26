@@ -76,6 +76,11 @@ def startup() -> None:
     initialize_database()
     initialize_notifications_table()
     initialize_reports_table()
+    from .database.migrations import run_migrations
+    try:
+        run_migrations()
+    except Exception as e:
+        print(f"Migration warning: {e}")
     Base.metadata.create_all(bind=engine)
 
 def public_user(user: dict[str, Any]) -> dict[str, Any]:

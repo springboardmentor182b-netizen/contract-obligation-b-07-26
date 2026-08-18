@@ -4,7 +4,8 @@ from src.database.session import Base
 class SettingsProfile(Base):
     __tablename__ = "settings_profiles"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(String, primary_key=True, index=True)  # VARCHAR to match deployed schema
+    user_id = Column(String, unique=True, index=True, nullable=True)  # UUID from users table
     first_name = Column(String, nullable=True)
     last_name = Column(String, nullable=True)
     email = Column(String, unique=True, index=True, nullable=False)

@@ -26,7 +26,7 @@ class SettingsProfileUpdate(BaseModel):
     profile_image: Optional[str] = None
 
 class SettingsProfileResponse(SettingsProfileBase):
-    id: int
+    id: str
 
     class Config:
         from_attributes = True

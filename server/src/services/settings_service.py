@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from sqlalchemy import text
 from src.models.settings import (
     SettingsProfile,
     SettingsSecurity,
@@ -6,7 +7,7 @@ from src.models.settings import (
     SettingsAppearance,
     SettingsOrganization,
 )
-from src.models.user import User
+from src.database import find_user_by_id
 from src.schemas.settings import (
     SettingsProfileUpdate,
     SettingsSecurityUpdate,
@@ -23,17 +24,28 @@ import hashlib
 
 def get_profile(
     db: Session,
-    profile_id: int,
+    profile_id: str,
     current_user: dict | None = None,
 ):
     """
     Get the settings profile for the authenticated user.
 
-    The profile ID is the same as the authenticated user's ID.
+    The profile_id is the UUID from the users table.
     If the settings profile doesn't exist, create it from the
-    actual User record.
+    actual User record from the PostgreSQL users table.
     """
 
+    # First check by user_id (new schema)
+    profile = (
+        db.query(SettingsProfile)
+        .filter(SettingsProfile.user_id == profile_id)
+        .first()
+    )
+
+    if profile:
+        return profile
+
+    # Also check by id (old schema - for backward compatibility)
     profile = (
         db.query(SettingsProfile)
         .filter(SettingsProfile.id == profile_id)
@@ -43,36 +55,29 @@ def get_profile(
     if profile:
         return profile
 
-    # Get the actual user from the users table
-    user = (
-        db.query(User)
-        .filter(User.id == profile_id)
-        .first()
-    )
+    # Get the actual user from the PostgreSQL users table
+    user = find_user_by_id(profile_id)
 
     if not user:
         return None
 
-    # Use first_name / last_name if available.
-    # Otherwise split full_name.
-    first_name = user.first_name or ""
-    last_name = user.last_name or ""
-
-    if not first_name and not last_name and user.full_name:
-        name_parts = user.full_name.strip().split(" ", 1)
-
-        first_name = name_parts[0] if name_parts else ""
-        last_name = name_parts[1] if len(name_parts) > 1 else ""
+    # Split full_name into first_name and last_name
+    full_name = user.get("name", "")
+    name_parts = full_name.strip().split(" ", 1)
+    first_name = name_parts[0] if name_parts else ""
+    last_name = name_parts[1] if len(name_parts) > 1 else ""
 
     # Create settings profile using actual user information
+    # Use user_id as the id since deployed schema uses VARCHAR for both
     profile = SettingsProfile(
-        id=user.id,
+        id=profile_id,  # Use the UUID as the id
+        user_id=profile_id,  # Also store in user_id for clarity
         first_name=first_name,
         last_name=last_name,
-        email=user.email,
-        phone=user.phone or "",
-        job_title=user.designation or "",
-        department=user.department or "",
+        email=user.get("email", ""),
+        phone=user.get("phone", ""),
+        job_title="",
+        department=user.get("department", ""),
         timezone="UTC",
         profile_image="",
     )
@@ -87,7 +92,7 @@ def get_profile(
 def update_profile(
     db: Session,
     profile_data: SettingsProfileUpdate,
-    profile_id: int,
+    profile_id: str,
     current_user: dict | None = None,
 ):
     """
