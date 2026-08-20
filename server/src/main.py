@@ -414,30 +414,29 @@ def list_activities(_: dict[str, Any] = Depends(get_current_user)) -> list[dict[
     return sorted(store.list("activities"), key=lambda item: item["created_at"], reverse=True)
 
 
-<<<<<<< HEAD
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.config.database import Base, engine
-
-Import Models
-from app.models import compliance
-from app.models import audit
-from app.models import report
-from app.models import history
-from app.models import risk
-from app.models import missed_obligation
+from src.config.database import Base, engine
 
 
-Import Routes
-from app.routes import compliance
-from app.routes import audit
-from app.routes import report
-from app.routes import history
-from app.routes import risk
-from app.routes import missed_obligation
-from app.routes import header
-from app.routes import kpi
+from src.models import compliance
+from src.models import audit
+from src.models import report
+from src.models import history
+from src.models import risk
+from src.models import missed_obligation
+
+
+
+from src.routers import compliance
+from src.routers import audit
+from src.routers import report
+from src.routers import history
+from src.routers import risk
+from src.routers import missed_obligation
+from src.routers import header
+from src.routers import kpi
 
 app = FastAPI(
     title="Compliance Monitoring API",
@@ -477,5 +476,3 @@ def home():
     return {
         "message": "Compliance Monitoring API Running Successfully"
     }
-=======
->>>>>>> fb79317a17b8dd58157808f025a1210e4a595049

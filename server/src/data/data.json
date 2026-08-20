@@ -1,0 +1,103 @@
+{
+  "users": [
+    {
+      "id": "2508040f-6539-4477-bd56-3c9a79c98599",
+      "name": "ContractIQ Administrator",
+      "email": "admin@contractiq.local",
+      "password_hash": "pbkdf2_sha256$260000$demo$2/P5s5WuPQH+J22VZTW5ngFenbO5gDrVexfrwR2IB0I=",
+      "role": "Administrator",
+      "department": "Legal Operations",
+      "is_active": true,
+      "created_at": "2026-08-20T07:52:14.223630+00:00",
+      "updated_at": "2026-08-20T07:52:14.223630+00:00"
+    }
+  ],
+  "contracts": [
+    {
+      "id": "b0308b84-a745-41fa-a9ee-2e81f2f0592b",
+      "title": "Master Vendor Services Agreement",
+      "category": "Vendor Contracts",
+      "counterparty": "Northwind Procurement Ltd",
+      "owner_id": "2508040f-6539-4477-bd56-3c9a79c98599",
+      "department": "Procurement",
+      "status": "Active",
+      "effective_date": "2026-01-01",
+      "expiry_date": "2026-12-31",
+      "value": 125000,
+      "document_name": "northwind-msa.pdf",
+      "tags": [
+        "vendor",
+        "renewal-watch"
+      ],
+      "created_at": "2026-08-20T07:52:14.223630+00:00",
+      "updated_at": "2026-08-20T07:52:14.223630+00:00"
+    }
+  ],
+  "contract_versions": [
+    {
+      "id": "37457f89-4544-42bf-adb3-b0e0c7f949e9",
+      "contract_id": "b0308b84-a745-41fa-a9ee-2e81f2f0592b",
+      "version": "1.0",
+      "summary": "Initial executed agreement.",
+      "document_name": "northwind-msa-v1.pdf",
+      "created_at": "2026-08-20T07:52:14.223630+00:00",
+      "updated_at": "2026-08-20T07:52:14.223630+00:00"
+    }
+  ],
+  "obligations": [
+    {
+      "id": "eceb126c-0455-4494-8006-8775e536b0f3",
+      "contract_id": "b0308b84-a745-41fa-a9ee-2e81f2f0592b",
+      "title": "Quarterly compliance certificate",
+      "obligation_type": "Reporting Requirements",
+      "responsible_user_id": "2508040f-6539-4477-bd56-3c9a79c98599",
+      "due_date": "2026-09-30",
+      "status": "Pending",
+      "compliance_level": "Pending",
+      "progress": 35,
+      "notes": "Awaiting department evidence pack.",
+      "created_at": "2026-08-20T07:52:14.223630+00:00",
+      "updated_at": "2026-08-20T07:52:14.223630+00:00"
+    }
+  ],
+  "renewals": [
+    {
+      "id": "866de266-10f8-418f-b601-3fa5730d05da",
+      "contract_id": "b0308b84-a745-41fa-a9ee-2e81f2f0592b",
+      "renewal_date": "2026-11-30",
+      "reminder_days": 45,
+      "status": "Upcoming",
+      "approval_owner_id": "2508040f-6539-4477-bd56-3c9a79c98599",
+      "notes": "Review pricing before renewal approval.",
+      "created_at": "2026-08-20T07:52:14.223630+00:00",
+      "updated_at": "2026-08-20T07:52:14.223630+00:00"
+    }
+  ],
+  "notifications": [
+    {
+      "id": "90d0fa62-a49f-4c3e-87a5-a5f068dcd1d1",
+      "recipient_user_id": "2508040f-6539-4477-bd56-3c9a79c98599",
+      "channel": "In-App",
+      "title": "Upcoming renewal review",
+      "message": "Northwind MSA renewal review opens in November 2026.",
+      "related_type": "contract",
+      "related_id": "b0308b84-a745-41fa-a9ee-2e81f2f0592b",
+      "read": false,
+      "created_at": "2026-08-20T07:52:14.223630+00:00",
+      "updated_at": "2026-08-20T07:52:14.223630+00:00"
+    }
+  ],
+  "reports": [],
+  "audit_logs": [],
+  "activities": [
+    {
+      "id": "cbbcb936-905f-475f-b090-5c6babbab0ab",
+      "actor_id": "2508040f-6539-4477-bd56-3c9a79c98599",
+      "message": "Seeded ContractIQ demo workspace",
+      "entity_type": "system",
+      "entity_id": null,
+      "created_at": "2026-08-20T07:52:14.223630+00:00",
+      "updated_at": "2026-08-20T07:52:14.223630+00:00"
+    }
+  ]
+}

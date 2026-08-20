@@ -1,5 +1,4 @@
 import React from 'react'
-import { NavLink } from 'react-router-dom'
 
 const navigationItems = [
   ['Dashboard', 'grid', '/dashboard', null], ['Contracts', 'file', '/contracts', 'total_contracts'], ['Repository', 'folder', '/repository', null], ['Obligations', 'check', '/obligations', 'pending_obligations'], ['Renewals', 'renew', '/renewals', 'upcoming_renewals'], ['Compliance', 'shield', '/compliance', null], ['Reports', 'chart', '/reports', null], ['Notifications', 'bell', '/notifications', null], ['Audit Logs', 'clipboard', '/audit-logs', null], ['Users', 'users', '/users', null], ['Settings', 'settings', '/settings', null],
@@ -30,12 +29,12 @@ export default function Sidebar({
     ),
     React.createElement('nav', { className: 'sidebar-nav', 'aria-label': 'Main navigation' },
       navigationItems.map(([label, icon, path, countKey]) => React.createElement(
-        NavLink,
+        'a',
         {
           key: label,
           to: path,
           title: collapsed ? label : undefined,
-          className: ({ isActive }) => `sidebar-link${isActive ? ' active' : ''}`,
+          className: 'sidebar-link',
         },
         React.createElement('span', { className: 'nav-icon' }, React.createElement(Icon, { name: icon })),
         React.createElement('span', { className: 'nav-label' }, label),
