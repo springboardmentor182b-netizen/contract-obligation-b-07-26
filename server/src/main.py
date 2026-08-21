@@ -476,3 +476,12 @@ def home():
     return {
         "message": "Compliance Monitoring API Running Successfully"
     }
+=======
+app.include_router(auth.router)
+app.include_router(users.router)
+app.include_router(roles.router)
+@app.get("/")
+def root():
+    return {
+        "message": "User Management API Running Successfully"
+    }
