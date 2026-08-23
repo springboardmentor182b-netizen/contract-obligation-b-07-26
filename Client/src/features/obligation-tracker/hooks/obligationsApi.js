@@ -1,4 +1,5 @@
-const BASE_URL = '/api/obligations'
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000'
+const BASE_URL = `${API_BASE_URL}/api/obligations`
 
 export async function fetchObligations(params = {}) {
   const query = new URLSearchParams(params).toString()
