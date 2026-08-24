@@ -1,0 +1,76 @@
+import React from 'react'
+
+export default function Navbar({ profile, pageTitle = 'Dashboard', unreadCount = 0 }) {
+  const initials =
+    profile?.name
+      ?.split(' ')
+      .map((name) => name[0])
+      .join('')
+      .slice(0, 2)
+      .toUpperCase() || '-'
+
+  return React.createElement(
+    'header',
+    { className: 'navbar' },
+
+    React.createElement(
+      'div',
+      { className: 'breadcrumb' },
+      React.createElement('a', { href: '/dashboard' }, 'ContractIQ'),
+      React.createElement('span', { className: 'breadcrumb-arrow' }, '>'),
+      React.createElement('strong', null, pageTitle)
+    ),
+
+    React.createElement(
+      'div',
+      { className: 'navbar-actions' },
+
+      React.createElement(
+        'button',
+        { className: 'primary-button', type: 'button' },
+        '+ New Contract'
+      ),
+
+      React.createElement(
+        'label',
+        { className: 'search-box' },
+        React.createElement(
+          'span',
+          { className: 'search-symbol', 'aria-hidden': true },
+          'o'
+        ),
+        React.createElement('input', {
+          type: 'search',
+          placeholder: 'Search...',
+          'aria-label': 'Search'
+        })
+      ),
+
+      React.createElement(
+        'a',
+        {
+          className: 'notification-button',
+          href: '/notifications',
+          'aria-label': 'Notifications'
+        },
+        'o',
+        unreadCount
+          ? React.createElement('span', { className: 'notification-dot' })
+          : null
+      ),
+
+      React.createElement(
+        'div',
+        { className: 'profile-summary' },
+        React.createElement('span', { className: 'avatar' }, initials),
+        React.createElement(
+          'span',
+          { className: 'profile-copy' },
+          React.createElement('strong', null, profile?.name || '-'),
+          React.createElement('small', null, profile?.role || '')
+        ),
+        React.createElement('span', { className: 'header-chevron' }, 'v')
+      )
+    )
+  )
+}
